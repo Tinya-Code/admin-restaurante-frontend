@@ -1,0 +1,28 @@
+
+<div class="relative flex w-full justify-center max-w-xs mx-auto inline-block text-left">
+  <!-- Botón del desplegable -->
+  <button 
+    class="inline-flex justify-center w-full px-4 py-2 bg-gray-900 text-white rounded-md hover:bg-gray-700 focus:outline-none"
+    (click)="toggleOpen()">
+    Menú temporal
+    <svg class="ml-2 h-5 w-5" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
+    </svg>
+  </button>
+
+  <!-- Contenido del desplegable -->
+   @if(isOpen){
+  <ul  
+      class="absolute right-0 mt-2 w-56 bg-gray-900 text-white rounded-lg shadow-lg p-2 grid gap-2">
+    <li><a routerLink="/login" class="block px-4 py-2 rounded hover:bg-red-600 transition">Login</a></li>
+    <li><a routerLink="/admin/home" class="block px-4 py-2 rounded hover:bg-blue-600 transition">Dashboard</a></li>
+    <li><a routerLink="/admin/products" class="block px-4 py-2 rounded hover:bg-blue-600 transition">Productos</a></li>
+    <li><a routerLink="/admin/product-form" class="block px-4 py-2 rounded hover:bg-blue-600 transition">Nuevo Producto</a></li>
+    <li><a routerLink="/admin/categories" class="block px-4 py-2 rounded hover:bg-blue-600 transition">Categorías</a></li>
+    <li><a routerLink="/admin/category-form" class="block px-4 py-2 rounded hover:bg-blue-600 transition">Nueva Categoría</a></li>
+    <li><a routerLink="/admin/settings" class="block px-4 py-2 rounded hover:bg-blue-600 transition">Configuración</a></li>
+  </ul>
+   }
+
+</div>
+<p>login-page works!</p>

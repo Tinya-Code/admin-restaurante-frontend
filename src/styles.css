@@ -1,1 +1,51 @@
-/* You can add global styles to this file, and also import other style files */
+@import 'tailwindcss';
+
+@font-face {
+  font-family: 'TAN Nimbus';
+  src: url('/fonts/TAN-NIMBUS.ttf') format('truetype');
+  font-style: normal;
+  font-weight: 400;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: 'Satisfy';
+  src: url('/fonts/Satisfy-Regular.ttf') format('truetype');
+  font-style: normal;
+  font-weight: 400;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: 'Poppins';
+  src: url('/fonts/Poppins-Regular.ttf') format('truetype');
+  font-weight: 400;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: 'Poppins';
+  src: url('/fonts/Poppins-SemiBold.ttf') format('truetype');
+  font-weight: 600;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: 'Poppins';
+  src: url('/fonts/Poppins-Bold.ttf') format('truetype');
+  font-weight: 700;
+  font-style: normal;
+  font-display: swap;
+}
+
+@theme {
+  --font-tan: 'TAN Nimbus', sans-serif;
+  --font-satisfy: 'Satisfy', sans-serif;
+  --font-poppins: 'Poppins', sans-serif;
+  --color-rojo-primario: #96100f;
+  --color-gris-oscuro: #151316;
+  --color-azul: #2d82ff;
+  --color-azul-hover: #2569cc;
+}
