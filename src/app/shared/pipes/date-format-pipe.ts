@@ -12,7 +12,7 @@ export class DateFormatPipe implements PipeTransform {
       return 'Sin fecha valida';
     }
     // retornamos la fecha formateada seung el modo ingresado
-    return new Intl.DateTimeFormat('en-PE', {dateStyle: mode}).format(new Date(date))
+    return new Intl.DateTimeFormat('es-PE', {dateStyle: mode}).format(new Date(date))
   }
 
 }
