@@ -28,7 +28,7 @@ class TestHostComponent {
   }
 }
 
-fdescribe('ModalDialog', () => {
+describe('ModalDialog', () => {
   let component: ModalDialog;
   let fixture: ComponentFixture<ModalDialog>;
   let testHostFixture: ComponentFixture<TestHostComponent>;
