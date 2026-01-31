@@ -1,1 +1,200 @@
-<p>data-table works!</p>
+<div class="relative w-full bg-white border border-gray-200 overflow-hidden">
+  
+  <!-- Loading State -->
+  @if (loading()) {
+    <div class="absolute inset-0 bg-white/95 flex items-center justify-center z-10">
+      <div class="flex flex-col items-center gap-3">
+        <div class="w-8 h-8 border-2 border-gray-300 border-t-gray-900 rounded-full animate-spin"></div>
+        <p class="text-xs tracking-wider text-gray-500 uppercase">Cargando datos...</p>
+      </div>
+    </div>
+  }
+
+  <!-- Table -->
+  <div class="w-full overflow-x-auto">
+    <table class="w-full border-collapse text-sm">
+      <thead>
+        <tr>
+          @for (column of columns(); track column.key) {
+            <th 
+              [style.width]="getColumnWidth(column)"
+              [style.text-align]="getTextAlign(column)"
+              class="px-4 py-4 text-left border-b border-gray-200 bg-gray-50 sticky top-0 z-5"
+            >
+              <div class="flex items-center gap-2">
+                <span class="text-xs font-medium text-gray-500 uppercase tracking-wider">
+                  {{ column.label }}
+                </span>
+              </div>
+            </th>
+          }
+          <th class="px-4 py-4 text-left border-b border-gray-200 bg-gray-50 sticky top-0 z-5 w-12">
+  <span class="sr-only">Acciones</span>
+</th>
+
+        </tr>
+      </thead>
+
+      <tbody>
+        @if (paginatedData().length === 0 && !loading()) {
+          <tr>
+            <td [attr.colspan]="columns().length" class="py-16 px-8 text-center">
+              <div class="flex flex-col items-center gap-4">
+                <lucide-angular name="inbox" class="w-12 h-12 text-gray-300 opacity-50" />
+                <p class="text-sm text-gray-500 tracking-wide">{{ emptyMessage() }}</p>
+              </div>
+            </td>
+          </tr>
+                  <td class="px-4 py-4 text-gray-900 font-light align-middle text-right">
+  <button class="p-2 rounded hover:bg-gray-100">
+    <lucide-angular [img]="morevertical" class="w-5 h-5 text-gray-500" />
+  </button>
+
+  <!-- Menú desplegable -->
+  <div class="absolute right-0 mt-2 w-40 bg-white border border-gray-200 rounded shadow-lg hidden group-hover:block">
+    <ul class="py-1 text-sm text-gray-700">
+      <li><a href="#" class="block px-4 py-2 hover:bg-gray-100">Editar</a></li>
+      <li><a href="#" class="block px-4 py-2 hover:bg-gray-100">Eliminar</a></li>
+      <li><a href="#" class="block px-4 py-2 hover:bg-gray-100">Detalles</a></li>
+    </ul>
+  </div>
+</td>
+        } @else {
+          @for (row of paginatedData(); track $index) {
+            <tr 
+              class="border-b border-gray-200 last:border-b-0 hover:bg-gray-50 cursor-pointer transition-colors duration-200"
+              (click)="onRowClick(row)"
+            >
+              @for (column of columns(); track column.key) {
+                <td 
+                  [style.text-align]="getTextAlign(column)"
+                  class="px-4 py-4 text-gray-900 font-light align-middle"
+                >
+                  {{ getCellValue(row, column) }}
+                </td>
+                
+              }
+                      <td class="px-4 py-4 group text-gray-900 font-light align-middle text-right">
+  <button class="p-2  rounded hover:bg-gray-100">
+    <lucide-angular [img]="morevertical" class="w-5 h-5 text-gray-500" />
+  </button>
+
+  <!-- Menú desplegable -->
+  <div class="absolute hidden right-0 mt-2 w-40 bg-white border border-gray-200 rounded shadow-lg z-10 group-hover:block">
+    <ul class="py-1 text-sm text-gray-700">
+      <li><a href="#" class="block px-4 py-2 hover:bg-gray-100">Editar</a></li>
+      <li><a href="#" class="block px-4 py-2 hover:bg-gray-100">Eliminar</a></li>
+      <li><a href="#" class="block px-4 py-2 hover:bg-gray-100">Detalles</a></li>
+    </ul>
+  </div>
+</td>
+            </tr>
+          }
+        }
+
+
+      </tbody>
+    </table>
+  </div>
+
+  <!-- Pagination -->
+  @if (dataSource().length > 0 && !loading()) {
+    <div class="flex flex-wrap items-center justify-between gap-4 px-4 py-4 border-t border-gray-200 bg-gray-50">
+      
+      <!-- Info de registros -->
+      <div class="flex items-center">
+        <span class="text-xs text-gray-600 tracking-wide">
+          Mostrando {{ startIndex() }} - {{ endIndex() }} de {{ dataSource().length }} registros
+        </span>
+      </div>
+
+      <!-- Selector de tamaño de página -->
+      <div class="flex items-center gap-2">
+        <label for="pageSize" class="text-xs text-gray-600 whitespace-nowrap">
+          Filas por página:
+        </label>
+        <select 
+          id="pageSize"
+          [value]="pageSize()"
+          (change)="changePageSize($event)"
+          class="px-3 py-1.5 text-xs text-gray-900 bg-white border border-gray-300 outline-none cursor-pointer transition-colors hover:border-gray-900 focus:border-gray-900"
+        >
+          @for (option of pagination().pageSizeOptions; track option) {
+            <option [value]="option">{{ option }}</option>
+          }
+        </select>
+      </div>
+
+      <!-- Controles de paginación -->
+      <div class="flex items-center gap-1">
+        
+        <!-- Primera página -->
+        <button
+          type="button"
+          (click)="firstPage()"
+          [disabled]="currentPage() === 1"
+          class="flex items-center justify-center w-8 h-8 p-0 bg-transparent border border-gray-300 text-gray-900 cursor-pointer transition-all hover:bg-gray-100 hover:border-gray-900 disabled:opacity-30 disabled:cursor-not-allowed"
+          aria-label="Primera página"
+        >
+          <lucide-angular [img]="ChevronsLeft" class="w-4 h-4" />
+        </button>
+
+        <!-- Página anterior -->
+        <button
+          type="button"
+          (click)="previousPage()"
+          [disabled]="currentPage() === 1"
+          class="flex items-center justify-center w-8 h-8 p-0 bg-transparent border border-gray-300 text-gray-900 cursor-pointer transition-all hover:bg-gray-100 hover:border-gray-900 disabled:opacity-30 disabled:cursor-not-allowed"
+          aria-label="Página anterior"
+        >
+          <lucide-angular [img]="ChevronLeft" class="w-4 h-4" />
+        </button>
+
+        <!-- Números de página -->
+        <div class="flex items-center gap-1">
+          @for (page of pageNumbers(); track $index) {
+            @if (page === '...') {
+              <span class="flex items-center justify-center min-w-8 h-8 text-xs text-gray-400">
+                ...
+              </span>
+            } @else {
+              <button
+                type="button"
+                (click)="goToPage(page)"
+                [class]="currentPage() === page 
+                  ? 'flex items-center justify-center min-w-8 h-8 px-2 text-xs font-medium text-white bg-gray-900 border border-gray-900 cursor-pointer transition-all tracking-wide'
+                  : 'flex items-center justify-center min-w-8 h-8 px-2 text-xs font-normal text-gray-900 bg-transparent border border-gray-300 cursor-pointer transition-all hover:bg-gray-100 hover:border-gray-900 tracking-wide'"
+              >
+                {{ page }}
+              </button>
+            }
+          }
+        </div>
+
+        <!-- Página siguiente -->
+        <button
+          type="button"
+          (click)="nextPage()"
+          [disabled]="currentPage() === totalPages()"
+          class="flex items-center justify-center w-8 h-8 p-0 bg-transparent border border-gray-300 text-gray-900 cursor-pointer transition-all hover:bg-gray-100 hover:border-gray-900 disabled:opacity-30 disabled:cursor-not-allowed"
+          aria-label="Página siguiente"
+        >
+          <lucide-angular [img]="ChevronRight" class="w-4 h-4" />
+        </button>
+
+        <!-- Última página -->
+        <button
+          type="button"
+          (click)="lastPage()"
+          [disabled]="currentPage() === totalPages()"
+          class="flex items-center justify-center w-8 h-8 p-0 bg-transparent border border-gray-300 text-gray-900 cursor-pointer transition-all hover:bg-gray-100 hover:border-gray-900 disabled:opacity-30 disabled:cursor-not-allowed"
+          aria-label="Última página"
+        >
+          <lucide-angular [img]="ChevronsRight" class="w-4 h-4" />
+        </button>
+
+      </div>
+    </div>
+  }
+
+</div>

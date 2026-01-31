@@ -42,7 +42,7 @@
       "name": "Chaqueta Impermeable",
       "description": "Chaqueta para lluvia con capucha desmontable",
       "price": 75.00,
-      "image_url": null,
+      "image_url": "https://ejemplo.com/cafetera.jpg",
       "is_available": true,
       "created_at": "2024-03-01T12:00:00Z",
       "updated_at": "2024-03-01T12:00:00Z"
@@ -108,7 +108,7 @@
       "name": "Zapatos Running",
       "description": "Zapatillas deportivas con amortiguación de gel",
       "price": 120.00,
-      "image_url": null,
+      "image_url": "https://ejemplo.com/cafetera.jpg",
       "is_available": true,
       "created_at": "2024-02-18T10:00:00Z",
       "updated_at": "2024-02-18T10:00:00Z"

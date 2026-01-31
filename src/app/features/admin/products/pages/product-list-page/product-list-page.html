@@ -1,1 +1,12 @@
-<p>product-list-page works!</p>
+    <div class="p-6 flex flex-col">
+      <h1 class="text-2xl font-light mb-6">Productos</h1>
+      
+      <app-data-table
+        [dataSource]="products()"
+        [columns]="columns"
+        [pagination]="paginationConfig"
+        [loading]="loading()"
+        [emptyMessage]="'No se encontraron productos'"
+        (rowClick)="onProductClick($event)"
+      />
+    </div>
