@@ -46,15 +46,12 @@ export class ModalDialog {
 
   close(): void {
     this.isOpen.set(false);
-    console.log('Modal closed1', this.isOpen());
     this.closed.emit();
-    console.log('Modal closed2');
   }
 
   onBackdropClick(): void {
     if (this.closeOnBackdrop()) {
       this.close();
-      console.log('Modal closed3');
     }
   }
 
