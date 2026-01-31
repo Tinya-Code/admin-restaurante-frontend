@@ -1,1 +1,16 @@
-<p>modal-dialog works!</p>
+@if (isOpen()) {
+<div class="backdrop" (click)="onBackdropClick()" aria-hidden="true"></div>
+
+<section class="modal" tabindex="-1">
+  @if (title()) {
+  <header class="modal__header">
+    <h2 id="modal-title" class="modal-title">{{ title() }}</h2>
+    <button type="button" class="close-btn" aria-label="Cerrar diálogo" (click)="close()">✕</button>
+  </header>
+  }
+
+  <div class="modal__content">
+    <ng-content />
+  </div>
+</section>
+}
