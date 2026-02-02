@@ -1,1 +1,177 @@
-<p>login-form works!</p>
+<!-- Contenedor principal del formulario (centrado y con ancho máximo) -->
+<div class="relative z-10 w-full max-w-[480px] px-6 py-12">
+
+  <!-- Tarjeta blanca con sombra -->
+  <div class="bg-white rounded-xl shadow-2xl overflow-hidden flex flex-col p-8 md:p-10 border border-[#e6e0db]">
+
+    <!-- Header / branding -->
+    <div class="flex flex-col items-center mb-8">
+
+      <!-- Icono principal -->
+      <div class="bg-[#f26522]/10 p-3 rounded-full mb-4">
+        <lucide-icon
+          [name]="Utensils"
+          class="text-[#f26522] w-12 h-12">
+        </lucide-icon>
+      </div>
+
+      <!-- Título -->
+      <h1 class="text-[#181411] tracking-tight text-3xl font-bold leading-tight text-center">
+        Welcome back
+      </h1>
+
+      <!-- Subtítulo -->
+      <p class="text-[#897261] text-base font-normal leading-normal text-center mt-2">
+        Log in to explore our menus Manager
+      </p>
+    </div>
+
+    <!-- FORMULARIO REACTIVO -->
+    <!-- formGroup conecta el FormGroup del componente -->
+    <!-- ngSubmit ejecuta onSubmit() -->
+    <form
+      [formGroup]="loginForm"
+      (ngSubmit)="onSubmit()"
+      class="flex flex-col gap-5">
+
+      <!-- EMAIL -->
+      <label class="flex flex-col w-full">
+
+        <!-- Label -->
+        <p class="text-[#181411] text-sm font-semibold leading-normal pb-2">
+          Email Address
+        </p>
+
+        <!-- Input email -->
+        <!-- Se pinta el borde en rojo si el email es inválido y fue tocado -->
+        <input
+          type="email"
+          formControlName="email"
+          placeholder="name@example.com"
+          [class.border-red-500]="
+            loginForm.controls.email.errors?.['email'] &&
+            loginForm.controls.email.touched
+          "
+          class="flex w-full rounded-lg text-[#181411]
+                 focus:outline-0 focus:ring-2 focus:ring-[#f26522]/50
+                 border border-[#e6e0db] bg-white h-12
+                 placeholder:text-[#897261]/50 p-4 text-base
+                 font-normal transition-all" />
+      </label>
+
+      <!-- PASSWORD -->
+      <label class="flex flex-col w-full">
+
+        <!-- Label + link -->
+        <div class="flex justify-between items-center pb-2">
+          <p class="text-[#181411] text-sm font-semibold leading-normal">
+            Password
+          </p>
+
+          <!-- Link (idealmente debería ser button en el futuro) -->
+          <a
+            class="text-[#f26522] text-sm font-medium hover:underline"
+            href="#">
+            Forgot password?
+          </a>
+        </div>
+
+        <!-- Input password + icono toggle -->
+        <div class="flex w-full items-stretch relative">
+
+          <!-- Input password -->
+          <!-- El tipo cambia según el signal eyeController -->
+          <input
+            formControlName="password"
+            placeholder="Enter your password"
+            [type]="eyeController() ? 'password' : 'text'"
+            class="flex w-full rounded-lg text-[#181411]
+                   focus:outline-0 focus:ring-2 focus:ring-[#f26522]/50
+                   border border-[#e6e0db] bg-white h-12
+                   placeholder:text-[#897261]/50 p-4 pr-12
+                   text-base font-normal transition-all" />
+
+          <!-- Icono para mostrar/ocultar contraseña -->
+          <div
+            class="absolute right-4 top-1/2 -translate-y-1/2
+                   text-[#897261] cursor-pointer
+                   hover:text-[#f26522] transition-colors">
+
+            <lucide-icon
+              [name]="eyeController() ? Eye : EyeOff"
+              (click)="toggleEyeController()"
+              class="w-5 h-5">
+            </lucide-icon>
+          </div>
+        </div>
+      </label>
+
+      <!-- BOTÓN SUBMIT -->
+      <!-- Cambia texto e icono según isLoading -->
+      <button
+        type="submit"
+        class="w-full bg-[#f06a2c] hover:bg-[#d45114]
+               hover:scale-[1.01] text-white font-bold
+               py-3.5 rounded-lg transition-colors
+               shadow-lg shadow-[#f26522]/20
+               flex items-center justify-center gap-2 mt-2">
+
+        {{ isLoading() ? 'Loading...' : 'LogIn' }}
+
+        <lucide-icon
+          [name]="isLoading() ? Loader : LogIn"
+          [class.animate-spin]="isLoading()"
+          class="w-5 h-5">
+        </lucide-icon>
+      </button>
+    </form>
+
+    <!-- SEPARADOR -->
+    <div class="flex items-center my-8">
+      <div class="h-px bg-[#e6e0db] flex-1"></div>
+      <span class="px-4 text-[#897261] text-xs font-semibold uppercase tracking-wider">
+        Or continue with
+      </span>
+      <div class="h-px bg-[#e6e0db] flex-1"></div>
+    </div>
+
+    <!-- LOGIN CON GOOGLE -->
+    <!-- El click ejecuta el método Google() -->
+    <div (click)="Google()" class="grid gap-4">
+
+      <!-- IMPORTANTE: debería ser type="button" -->
+      <button
+        type="button"
+        class="btn-google flex items-center justify-center gap-2
+               border border-[#e6e0db] py-3 rounded-lg bg-white">
+
+        <!-- SVG del logo de Google -->
+        <svg
+          class="w-5 h-5"
+          viewBox="-3 0 262 262"
+          xmlns="http://www.w3.org/2000/svg"
+          preserveAspectRatio="xMidYMid"
+          aria-hidden="true"
+          focusable="false">
+
+          <!-- paths del logo -->
+          <!-- ... (sin cambios) -->
+        </svg>
+
+        <span class="text-[#181411] text-sm font-semibold">
+          Google
+        </span>
+      </button>
+    </div>
+
+    <!-- Link a registro -->
+    <p class="mt-10 text-center text-sm text-[#897261]">
+      Don't have an account?
+      <a
+        class="text-[#f26522] font-bold hover:underline ml-1"
+        href="#">
+        Create an account
+      </a>
+    </p>
+  </div>
+</div>

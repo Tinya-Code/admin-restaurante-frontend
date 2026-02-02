@@ -1,17 +1,13 @@
 import { Injectable, inject } from '@angular/core';
 import { User } from '../models/user.model';
 import { Auth as fireAuth, signInWithPopup, GoogleAuthProvider } from '@angular/fire/auth';
-import { Notification } from './notification';
-import { Router } from '@angular/router';
 
 @Injectable({
   providedIn: 'root',
 })
 export class Auth {
   // inyectamos el servicio de autenticacion de firebase
-    private auth: fireAuth = inject(fireAuth)
-    private notificaction: Notification = inject(Notification);
-    private router: Router = inject(Router);
+    private auth = inject(fireAuth)
 
   // metodo para iniciar secion con google
   async loginWithGoogle() :Promise<User | void> {
