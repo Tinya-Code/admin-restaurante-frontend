@@ -1,0 +1,201 @@
+/* Variables CSS para fácil personalización */
+:host {
+  --back-button-bg: #ffffff;
+  --back-button-color: #1e293b;
+  --back-button-border: #e2e8f0;
+  --back-button-hover-bg: #f8fafc;
+  --back-button-hover-color: #0f172a;
+  --back-button-active-bg: #f1f5f9;
+  --back-button-shadow: 0 1px 3px rgba(0, 0, 0, 0.08);
+  --back-button-shadow-hover: 0 4px 12px rgba(0, 0, 0, 0.12);
+  --back-button-transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+  --back-button-icon-size: 20px;
+  --back-button-font-size: 0.9375rem;
+  --back-button-font-weight: 500;
+}
+
+/* Contenedor del componente */
+:host {
+  display: inline-block;
+  --back-button-icon-size: 20px;
+}
+
+/* Estilos del botón base */
+.back-button {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0.625rem 1.25rem;
+  border: 1.5px solid var(--back-button-border);
+  border-radius: 0.5rem;
+  background-color: var(--back-button-bg);
+  color: var(--back-button-color);
+  font-size: var(--back-button-font-size);
+  font-weight: var(--back-button-font-weight);
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', system-ui, sans-serif;
+  line-height: 1.5;
+  cursor: pointer;
+  transition: var(--back-button-transition);
+  box-shadow: var(--back-button-shadow);
+  user-select: none;
+  -webkit-tap-highlight-color: transparent;
+  overflow: hidden;
+}
+
+/* Efecto de brillo sutil en hover */
+.back-button::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: -100%;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(
+    90deg,
+    transparent,
+    rgba(255, 255, 255, 0.3),
+    transparent
+  );
+  transition: left 0.5s ease;
+}
+
+.back-button:hover::before {
+  left: 100%;
+}
+
+/* Estado hover */
+.back-button:hover {
+  background-color: var(--back-button-hover-bg);
+  color: var(--back-button-hover-color);
+  border-color: #cbd5e1;
+  box-shadow: var(--back-button-shadow-hover);
+  transform: translateY(-1px);
+}
+
+/* Estado active/pressed */
+.back-button:active {
+  background-color: var(--back-button-active-bg);
+  transform: translateY(0);
+  box-shadow: var(--back-button-shadow);
+}
+
+/* Estado focus para accesibilidad */
+.back-button:focus {
+  outline: none;
+  box-shadow: 
+    var(--back-button-shadow-hover),
+    0 0 0 3px rgba(59, 130, 246, 0.15);
+}
+
+.back-button:focus-visible {
+  outline: 2px solid #3b82f6;
+  outline-offset: 2px;
+}
+
+/* Contenedor del contenido */
+.back-button__content {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  position: relative;
+  z-index: 1;
+}
+
+/* Icono de flecha */
+.back-button__icon {
+  width: var(--back-button-icon-size);
+  height: var(--back-button-icon-size);
+  flex-shrink: 0;
+  transition: transform 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+/* Animación del icono en hover */
+.back-button:hover .back-button__icon {
+  transform: translateX(-3px);
+}
+
+/* Texto del botón */
+.back-button__text {
+  letter-spacing: 0.01em;
+}
+
+/* Estado disabled */
+.back-button:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+  pointer-events: none;
+}
+
+/* Variantes de tema oscuro */
+@media (prefers-color-scheme: dark) {
+  :host {
+    --back-button-bg: #1e293b;
+    --back-button-color: #f1f5f9;
+    --back-button-border: #334155;
+    --back-button-hover-bg: #334155;
+    --back-button-hover-color: #ffffff;
+    --back-button-active-bg: #475569;
+    --back-button-shadow: 0 1px 3px rgba(0, 0, 0, 0.3);
+    --back-button-shadow-hover: 0 4px 12px rgba(0, 0, 0, 0.4);
+  }
+}
+
+/* Estilos responsive */
+@media (max-width: 640px) {
+  .back-button {
+    padding: 0.5rem 1rem;
+    font-size: 0.875rem;
+  }
+
+  :host {
+    --back-button-icon-size: 18px;
+  }
+}
+
+/* Animación de entrada opcional */
+@keyframes fadeInSlide {
+  from {
+    opacity: 0;
+    transform: translateX(-10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+.back-button {
+  animation: fadeInSlide 0.3s ease-out;
+}
+
+/* Clases de utilidad para variantes de color */
+.back-button.btn-primary {
+  --back-button-bg: #3b82f6;
+  --back-button-color: #ffffff;
+  --back-button-border: #3b82f6;
+  --back-button-hover-bg: #2563eb;
+  --back-button-hover-color: #ffffff;
+}
+
+.back-button.btn-secondary {
+  --back-button-bg: #64748b;
+  --back-button-color: #ffffff;
+  --back-button-border: #64748b;
+  --back-button-hover-bg: #475569;
+  --back-button-hover-color: #ffffff;
+}
+
+.back-button.btn-ghost {
+  --back-button-bg: transparent;
+  --back-button-border: transparent;
+  --back-button-shadow: none;
+  --back-button-hover-bg: rgba(0, 0, 0, 0.05);
+}
+
+.back-button.btn-minimal {
+  border: none;
+  padding: 0.5rem 0.75rem;
+  --back-button-shadow: none;
+  --back-button-hover-bg: rgba(0, 0, 0, 0.04);
+}
