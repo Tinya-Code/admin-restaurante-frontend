@@ -1,1 +1,341 @@
-<p>data-table works!</p>
+<!-- data-table.html -->
+<div class="relative w-full bg-white border border-gray-200 overflow-hidden">
+  
+  @if (loading()) {
+    <div class="absolute inset-0 bg-white/95 flex items-center justify-center z-10">
+      <div class="flex flex-col items-center gap-3">
+        <div class="w-8 h-8 border-2 border-gray-300 border-t-gray-900 rounded-full animate-spin"></div>
+        <p class="text-xs tracking-wider text-gray-500 uppercase">Cargando datos...</p>
+      </div>
+    </div>
+  }
+
+  <div class="w-full overflow-x-auto">
+    @if (dataSource().length === 0 && !loading()) {
+      <div class="py-16 px-8 text-center">
+        <lucide-angular name="inbox" class="w-12 h-12 mx-auto mb-4 text-gray-300 opacity-50" />
+        <p class="text-sm text-gray-500 tracking-wide">{{ emptyMessage() }}</p>
+      </div>
+    } @else {
+      <table class="w-full border-collapse text-sm">
+        <thead class="hidden md:table-header-group">
+          <tr>
+            @if(imageKey()){
+              <th class="w-20 px-4 py-4 border-b border-gray-200 bg-gray-50 sticky top-0 z-5">
+                <span class="text-xs font-medium text-gray-500 uppercase tracking-wider">Imagen</span>
+              </th>
+            }
+            
+            @for (column of columns(); track trackByKey($index, column)) {
+              <th 
+                [style.width]="column.width"
+                [style.text-align]="column.align || 'left'"
+                class="px-4 py-4 border-b border-gray-200 bg-gray-50 sticky top-0 z-5"
+              >
+                <span class="text-xs font-medium text-gray-500 uppercase tracking-wider">
+                  {{ column.label }}
+                </span>
+              </th>
+            }
+            
+            @if (showToggle()) {
+              <th class="w-24 px-4 py-4 text-center border-b border-gray-200 bg-gray-50 sticky top-0 z-5">
+                <span class="text-xs font-medium text-gray-500 uppercase tracking-wider">Estado</span>
+              </th>
+            }
+            
+            <th class="w-16 px-4 py-4 border-b border-gray-200 bg-gray-50 sticky top-0 z-5">
+              <span class="sr-only">Acciones</span>
+            </th>
+          </tr>
+        </thead>
+
+        <tbody>
+          @for (row of dataSource(); track trackByIndex($index); let rowIndex = $index) {
+            <tr class="border-b border-gray-200 last:border-b-0 hover:bg-gray-50 transition-colors flex flex-col md:table-row">
+              
+              <td class="px-4 py-3 md:py-4 md:w-20 flex md:table-cell items-center gap-3 md:gap-0">
+                <!-- Imagen -->
+                @if(imageKey()){
+                  <img 
+                    [src]="getImageUrl(row)" 
+                    [alt]="getCellValue(row, mobileColumns()[0] || columns()[0])"
+                    class="w-16 h-16 md:w-14 md:h-14 object-cover rounded border border-gray-200 flex-shrink-0"
+                  />
+                }
+                
+                <!-- Mobile Info - GENÉRICO con PIPES -->
+                <div class="flex-1 min-w-0 md:hidden">
+                  @for (column of mobileColumns(); track trackByKey($index, column); let i = $index) {
+                    @if (i === 0) {
+                      <!-- Primer campo: Título principal -->
+                      <h3 class="text-sm font-medium text-gray-900 truncate max-w-45 sm:max-w-60">
+                        @if (column.pipe === 'currency') {
+                          {{ getCellValue(row, column) | currency:(column.pipeFormat || 'USD'):'symbol':'1.2-2' }}
+                        } @else if (column.pipe === 'date') {
+                          {{ getCellValue(row, column) | date:(column.pipeFormat || 'dd/MM/yyyy') }}
+                        } @else if (column.pipe === 'number') {
+                          {{ getCellValue(row, column) | number:(column.pipeFormat || '1.0-2') }}
+                        } @else if (column.pipe === 'percent') {
+                          {{ getCellValue(row, column) | percent:(column.pipeFormat || '1.0-2') }}
+                        } @else if (column.pipe === 'uppercase') {
+                          {{ getCellValue(row, column) | uppercase }}
+                        } @else if (column.pipe === 'lowercase') {
+                          {{ getCellValue(row, column) | lowercase }}
+                        } @else {
+                          {{ getCellValue(row, column) }}
+                        }
+                      </h3>
+                    } @else if (i === 1) {
+                      <!-- Segundo campo: Subtítulo -->
+                      <p class="text-xs text-gray-500 truncate max-w-45 sm:max-w-60">
+                        @if (column.pipe === 'currency') {
+                          {{ getCellValue(row, column) | currency:(column.pipeFormat || 'USD'):'symbol':'1.2-2' }}
+                        } @else if (column.pipe === 'date') {
+                          {{ getCellValue(row, column) | date:(column.pipeFormat || 'dd/MM/yyyy') }}
+                        } @else if (column.pipe === 'number') {
+                          {{ getCellValue(row, column) | number:(column.pipeFormat || '1.0-2') }}
+                        } @else if (column.pipe === 'percent') {
+                          {{ getCellValue(row, column) | percent:(column.pipeFormat || '1.0-2') }}
+                        } @else if (column.pipe === 'uppercase') {
+                          {{ getCellValue(row, column) | uppercase }}
+                        } @else if (column.pipe === 'lowercase') {
+                          {{ getCellValue(row, column) | lowercase }}
+                        } @else {
+                          {{ getCellValue(row, column) }}
+                        }
+                      </p>
+                    }
+                  }
+                  
+                  <!-- Resto de campos: Metadata inline -->
+                  @if (mobileColumns().length > 2) {
+                    <div class="flex items-center gap-3 mt-1 flex-wrap max-w-45 sm:max-w-60">
+                      @for (column of mobileColumns(); track trackByKey($index, column); let i = $index) {
+                        @if (i >= 2) {
+                          <span class="text-xs text-gray-900 font-medium">
+                            @if (column.pipe === 'currency') {
+                              {{ getCellValue(row, column) | currency:(column.pipeFormat || 'USD'):'symbol':'1.2-2' }}
+                            } @else if (column.pipe === 'date') {
+                              {{ getCellValue(row, column) | date:(column.pipeFormat || 'dd/MM/yyyy') }}
+                            } @else if (column.pipe === 'number') {
+                              {{ getCellValue(row, column) | number:(column.pipeFormat || '1.0-2') }}
+                            } @else if (column.pipe === 'percent') {
+                              {{ getCellValue(row, column) | percent:(column.pipeFormat || '1.0-2') }}
+                            } @else if (column.pipe === 'uppercase') {
+                              {{ getCellValue(row, column) | uppercase }}
+                            } @else if (column.pipe === 'lowercase') {
+                              {{ getCellValue(row, column) | lowercase }}
+                            } @else {
+                              {{ getCellValue(row, column) }}
+                            }
+                          </span>
+                        }
+                      }
+                    </div>
+                  }
+                </div>
+
+                <!-- Mobile Actions -->
+                <div class="flex md:hidden items-center gap-2">
+                  @if (showToggle()) {
+                    <label class="relative inline-flex items-center cursor-pointer">
+                      <input 
+                        type="checkbox" 
+                        [checked]="isToggleActive(row)"
+                        (change)="onToggleChange(row, $event)"
+                        class="sr-only peer"
+                      />
+                      <div class="w-9 h-5 bg-gray-200 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:start-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-4 after:w-4 after:transition-all peer-checked:bg-gray-900"></div>
+                    </label>
+                  }
+
+                  <div class="relative">
+                    <button 
+                      (click)="toggleMenu(rowIndex, $event)"
+                      class="p-1.5 rounded hover:bg-gray-200 transition-colors"
+                      type="button"
+                    >
+                      <lucide-angular [img]="icons.moreVertical" class="w-5 h-5 text-gray-500" />
+                    </button>
+
+                    @if (openMenuIndex() === rowIndex) {
+                      <div class="absolute right-0 top-full mt-1 w-40 bg-white border border-gray-200 rounded shadow-lg z-20">
+                        <ul class="py-1 text-sm">
+                          @for (action of actions(); track action.label) {
+                            <li>
+                              <button
+                                type="button"
+                                (click)="onActionClick(action, row, $event)"
+                                class="w-full text-left px-4 py-2 hover:bg-gray-100 flex items-center gap-2"
+                                [class.text-red-600]="action.variant === 'danger'"
+                              >
+                                @if (action.icon) {
+                                  <lucide-angular [img]="action.icon" class="w-4 h-4" />
+                                }
+                                <span>{{ action.label }}</span>
+                              </button>
+                            </li>
+                          }
+                        </ul>
+                      </div>
+                    }
+                  </div>
+                </div>
+              </td>
+
+              <!-- Desktop Columns con PIPES -->
+              @for (column of columns(); track trackByKey($index, column)) {
+                <td 
+                  [style.text-align]="column.align || 'left'"
+                  class="hidden md:table-cell px-4 py-4 text-gray-900 font-light cursor-pointer"
+                  (click)="onRowClick(row)"
+                >
+                  @if (column.pipe === 'currency') {
+                    {{ getCellValue(row, column) | currency:(column.pipeFormat || 'USD'):'symbol':'1.2-2' }}
+                  } @else if (column.pipe === 'date') {
+                    {{ getCellValue(row, column) | date:(column.pipeFormat || 'dd/MM/yyyy') }}
+                  } @else if (column.pipe === 'number') {
+                    {{ getCellValue(row, column) | number:(column.pipeFormat || '1.0-2') }}
+                  } @else if (column.pipe === 'percent') {
+                    {{ getCellValue(row, column) | percent:(column.pipeFormat || '1.0-2') }}
+                  } @else if (column.pipe === 'uppercase') {
+                    {{ getCellValue(row, column) | uppercase }}
+                  } @else if (column.pipe === 'lowercase') {
+                    {{ getCellValue(row, column) | lowercase }}
+                  } @else {
+                    {{ getCellValue(row, column) }}
+                  }
+                </td>
+              }
+              
+              @if (showToggle()) {
+                <td class="hidden md:table-cell px-4 py-4 text-center">
+                  <label class="relative inline-flex items-center cursor-pointer">
+                    <input 
+                      type="checkbox" 
+                      [checked]="isToggleActive(row)"
+                      (change)="onToggleChange(row, $event)"
+                      class="sr-only peer"
+                    />
+                    <div class="w-11 h-6 bg-gray-200 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:start-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-gray-900"></div>
+                  </label>
+                </td>
+              }
+              
+              <td class="hidden md:table-cell px-4 py-4 text-right relative">
+                <button 
+                  (click)="toggleMenu(rowIndex, $event)"
+                  class="p-2 rounded hover:bg-gray-100 transition-colors"
+                  type="button"
+                >
+                  <lucide-angular [img]="icons.moreVertical" class="w-5 h-5 text-gray-500" />
+                </button>
+
+                @if (openMenuIndex() === rowIndex) {
+                  <div class="absolute right-0 mt-2 w-48 bg-white border border-gray-200 rounded shadow-lg z-20">
+                    <ul class="py-1 text-sm">
+                      @for (action of actions(); track action.label) {
+                        <li>
+                          <button
+                            type="button"
+                            (click)="onActionClick(action, row, $event)"
+                            class="w-full text-left px-4 py-2 hover:bg-gray-100 flex items-center gap-2 transition-colors"
+                            [class.text-red-600]="action.variant === 'danger'"
+                          >
+                            @if (action.icon) {
+                              <lucide-angular [img]="action.icon" class="w-4 h-4" />
+                            }
+                            <span>{{ action.label }}</span>
+                          </button>
+                        </li>
+                      }
+                    </ul>
+                  </div>
+                }
+              </td>
+            </tr>
+          }
+        </tbody>
+      </table>
+    }
+  </div>
+
+  @if (meta().total_items > 0 && !loading()) {
+    <div class="flex flex-wrap items-center justify-between gap-4 px-4 py-4 border-t border-gray-200 bg-gray-50">
+      
+      <span class="text-xs text-gray-600">
+        {{ startIndex() }} - {{ endIndex() }} de {{ meta().total_items }}
+      </span>
+
+      <div class="flex items-center gap-1">
+        <button
+          type="button"
+          (click)="firstPage()"
+          [disabled]="!meta().has_prev"
+          class="hidden sm:flex items-center justify-center w-8 h-8 border border-gray-300 text-gray-900 hover:bg-gray-100 hover:border-gray-900 disabled:opacity-30 disabled:cursor-not-allowed transition-all"
+          aria-label="Primera página"
+        >
+          <lucide-angular [img]="icons.chevronsLeft" class="w-4 h-4" />
+        </button>
+
+        <button
+          type="button"
+          (click)="previousPage()"
+          [disabled]="!meta().has_prev"
+          class="flex items-center justify-center w-8 h-8 border border-gray-300 text-gray-900 hover:bg-gray-100 hover:border-gray-900 disabled:opacity-30 disabled:cursor-not-allowed transition-all"
+          aria-label="Anterior"
+        >
+          <lucide-angular [img]="icons.chevronLeft" class="w-4 h-4" />
+        </button>
+
+        <div class="hidden sm:flex items-center gap-1">
+          @for (page of pageNumbers(); track page) {
+            @if (page === '...') {
+              <span class="flex items-center justify-center min-w-8 h-8 text-xs text-gray-400">...</span>
+            } @else {
+              <button
+                type="button"
+                (click)="goToPage(page)"
+                [class]="meta().current_page === page 
+                  ? 'flex items-center justify-center min-w-8 h-8 px-2 text-xs font-medium text-white bg-gray-900 border border-gray-900'
+                  : 'flex items-center justify-center min-w-8 h-8 px-2 text-xs text-gray-900 border border-gray-300 hover:bg-gray-100 hover:border-gray-900'"
+              >
+                {{ page }}
+              </button>
+            }
+          }
+        </div>
+
+        <span class="sm:hidden text-xs text-gray-600 px-2">
+          {{ meta().current_page }} / {{ meta().total_pages }}
+        </span>
+
+        <button
+          type="button"
+          (click)="nextPage()"
+          [disabled]="!meta().has_next"
+          class="flex items-center justify-center w-8 h-8 border border-gray-300 text-gray-900 hover:bg-gray-100 hover:border-gray-900 disabled:opacity-30 disabled:cursor-not-allowed transition-all"
+          aria-label="Siguiente"
+        >
+          <lucide-angular [img]="icons.chevronRight" class="w-4 h-4" />
+        </button>
+
+        <button
+          type="button"
+          (click)="lastPage()"
+          [disabled]="!meta().has_next"
+          class="hidden sm:flex items-center justify-center w-8 h-8 border border-gray-300 text-gray-900 hover:bg-gray-100 hover:border-gray-900 disabled:opacity-30 disabled:cursor-not-allowed transition-all"
+          aria-label="Última página"
+        >
+          <lucide-angular [img]="icons.chevronsRight" class="w-4 h-4" />
+        </button>
+      </div>
+    </div>
+  }
+
+</div>
+
+@if (openMenuIndex() !== null) {
+  <div class="fixed inset-0 z-10" (click)="closeMenu()"></div>
+}
