@@ -1,0 +1,146 @@
+.navbar {
+  display: flex;
+  background: white;
+  padding: 0;
+  height: 100%;
+}
+
+/* Desktop sidebar styles */
+.navbar.desktop-right {
+  flex-direction: column;
+  width: 100%;
+  height: 100%;
+  position: relative;
+  right: auto;
+  top: auto;
+  transform: none;
+  border-radius: 0;
+  box-shadow: none;
+}
+
+.navbar.desktop-right .nav-list {
+  flex-direction: column;
+  gap: 0;
+  padding: 20px 16px;
+  margin: 0;
+}
+
+.navbar.desktop-right .nav-item {
+  display: block;
+  width: 100%;
+}
+
+.navbar.desktop-right .nav-button {
+  display: flex;
+  align-items: center;
+  padding: 12px 16px;
+  border-radius: 8px;
+  width: 100%;
+  min-width: auto;
+  min-height: auto;
+  text-align: left;
+  justify-content: flex-start;
+  gap: 12px;
+}
+
+.navbar.desktop-right .nav-button svg {
+  width: 20px;
+  height: 20px;
+  margin-bottom: 0;
+  flex-shrink: 0;
+}
+
+.navbar.desktop-right .nav-label {
+  font-size: 14px;
+  font-weight: 500;
+  white-space: nowrap;
+}
+
+/* Mobile bottom navigation styles */
+.navbar.mobile-bottom {
+  position: relative;
+  border-radius: 0;
+  margin: 0;
+  z-index: 1000;
+  box-shadow: none;
+  padding: 8px;
+  background: transparent;
+  width: 100%;
+}
+
+.navbar.mobile-bottom .nav-list {
+  display: flex;
+  justify-content: center;
+  list-style: none;
+  width: 100%;
+  margin: 0;
+  padding: 0;
+  gap: 4px;
+}
+
+.navbar.mobile-bottom .nav-item {
+  display: flex;
+  flex: 1;
+  justify-content: center;
+}
+
+.navbar.mobile-bottom .nav-button {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 12px 16px;
+  border: none;
+  background: transparent;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  color: #6b7280;
+  text-decoration: none;
+  min-width: 60px;
+}
+
+.navbar.mobile-bottom .nav-button svg {
+  width: 24px;
+  height: 24px;
+  margin-bottom: 4px;
+}
+
+.navbar.mobile-bottom .nav-label {
+  font-size: 12px;
+  font-weight: 500;
+  white-space: nowrap;
+}
+
+/* Common button styles */
+.nav-button {
+  border: none;
+  background: transparent;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  color: #6b7280;
+}
+
+.nav-button:hover {
+  background: #f3f4f6;
+  color: #374151;
+}
+
+.nav-button.active {
+  color: #14b8a6 !important;
+  background: #f0fdfa !important;
+}
+
+/* Hide desktop navbar on mobile */
+@media (max-width: 767px) {
+  .navbar.desktop-right {
+    display: none;
+  }
+}
+
+/* Hide mobile navbar on desktop */
+@media (min-width: 768px) {
+  .navbar.mobile-bottom {
+    display: none;
+  }
+}

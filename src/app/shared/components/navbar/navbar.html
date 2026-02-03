@@ -1,0 +1,39 @@
+@if (!isMobile()) {
+<aside class="navbar desktop-right">
+  <ul class="nav-list">
+    @for (item of navItems(); track item.id) {
+    <li class="nav-item">
+      <button
+        class="nav-button"
+        [class.active]="isActive(item.id)"
+        (click)="onItemClick(item.id)"
+        [attr.aria-label]="item.label"
+        [attr.aria-pressed]="isActive(item.id)"
+      >
+        <lucide-icon [img]="item.icon"></lucide-icon>
+        <span class="nav-label">{{ item.label }}</span>
+      </button>
+    </li>
+    }
+  </ul>
+</aside>
+} @else {
+<nav class="navbar mobile-bottom">
+  <ul class="nav-list">
+    @for (item of navItems(); track item.id) {
+    <li class="nav-item">
+      <button
+        class="nav-button"
+        [class.active]="isActive(item.id)"
+        (click)="onItemClick(item.id)"
+        [attr.aria-label]="item.label"
+        [attr.aria-pressed]="isActive(item.id)"
+      >
+        <lucide-icon [img]="item.icon"></lucide-icon>
+        <span class="nav-label">{{ item.label }}</span>
+      </button>
+    </li>
+    }
+  </ul>
+</nav>
+}

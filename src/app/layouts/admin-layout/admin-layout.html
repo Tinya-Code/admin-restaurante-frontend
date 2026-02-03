@@ -1,2 +1,13 @@
-<app-header/>
-<app-root/>
+<div class="admin-layout">
+  <app-header />
+
+  <div class="admin-body">
+    <aside class="nav">
+      <app-navbar [isMobile]="isMobile()" />
+    </aside>
+
+    <main class="content">
+      <router-outlet />
+    </main>
+  </div>
+</div>
