@@ -4,7 +4,7 @@ import { App } from "../../app";
 
 @Component({
   selector: 'app-auth-layout',
-  imports: [Header, App],
+  imports: [App],
   templateUrl: './auth-layout.html',
   styleUrl: './auth-layout.css',
 })
