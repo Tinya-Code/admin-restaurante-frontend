@@ -56,16 +56,14 @@ readonly columns: TableColumn[] = [
     width: '120px', 
     align: 'right',
     mobileOrder: 3,
-    pipe: 'currency',        
-    pipeFormat: 'USD'           
+    pipe: 'currency',            
   },
   { 
     key: 'created_at', 
     label: 'Creado', 
     width: '150px',
     hideOnMobile: true,
-    pipe: 'date',                
-    pipeFormat: 'dd/MM/yyyy'     
+    pipe: 'date',                 
   }
 ];
 

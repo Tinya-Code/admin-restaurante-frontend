@@ -8,6 +8,8 @@ import {
   ChevronsLeft,
   ChevronsRight,
 } from 'lucide-angular';
+import { CurrencyPipe } from '../../pipes/currency-pipe';
+import { DateFormatPipe } from '../../pipes/date-format-pipe';
 
 export interface TableColumn {
   key: string;
@@ -39,7 +41,7 @@ export interface TableAction {
 @Component({
   selector: 'app-data-table',
   standalone: true,
-  imports: [CommonModule, LucideAngularModule],
+  imports: [CommonModule, LucideAngularModule, CurrencyPipe, DateFormatPipe],
   templateUrl: './data-table.html',
   changeDetection: ChangeDetectionStrategy.OnPush,
 })

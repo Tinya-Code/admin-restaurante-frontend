@@ -71,7 +71,7 @@
                       <!-- Primer campo: Título principal -->
                       <h3 class="text-sm font-medium text-gray-900 truncate max-w-45 sm:max-w-60">
                         @if (column.pipe === 'currency') {
-                          {{ getCellValue(row, column) | currency:(column.pipeFormat || 'USD'):'symbol':'1.2-2' }}
+                          {{ getCellValue(row, column) | currency }}
                         } @else if (column.pipe === 'date') {
                           {{ getCellValue(row, column) | date:(column.pipeFormat || 'dd/MM/yyyy') }}
                         } @else if (column.pipe === 'number') {
@@ -90,9 +90,9 @@
                       <!-- Segundo campo: Subtítulo -->
                       <p class="text-xs text-gray-500 truncate max-w-45 sm:max-w-60">
                         @if (column.pipe === 'currency') {
-                          {{ getCellValue(row, column) | currency:(column.pipeFormat || 'USD'):'symbol':'1.2-2' }}
+                          {{ getCellValue(row, column) | currency }}
                         } @else if (column.pipe === 'date') {
-                          {{ getCellValue(row, column) | date:(column.pipeFormat || 'dd/MM/yyyy') }}
+                          {{ getCellValue(row, column) | dateFormat: `long` }}
                         } @else if (column.pipe === 'number') {
                           {{ getCellValue(row, column) | number:(column.pipeFormat || '1.0-2') }}
                         } @else if (column.pipe === 'percent') {
@@ -115,9 +115,9 @@
                         @if (i >= 2) {
                           <span class="text-xs text-gray-900 font-medium">
                             @if (column.pipe === 'currency') {
-                              {{ getCellValue(row, column) | currency:(column.pipeFormat || 'USD'):'symbol':'1.2-2' }}
+                              {{ getCellValue(row, column) | currency }}
                             } @else if (column.pipe === 'date') {
-                              {{ getCellValue(row, column) | date:(column.pipeFormat || 'dd/MM/yyyy') }}
+                              {{ getCellValue(row, column) | dateFormat: `long`  }}
                             } @else if (column.pipe === 'number') {
                               {{ getCellValue(row, column) | number:(column.pipeFormat || '1.0-2') }}
                             } @else if (column.pipe === 'percent') {
@@ -192,9 +192,9 @@
                   (click)="onRowClick(row)"
                 >
                   @if (column.pipe === 'currency') {
-                    {{ getCellValue(row, column) | currency:(column.pipeFormat || 'USD'):'symbol':'1.2-2' }}
+                    {{ getCellValue(row, column) | currency }}
                   } @else if (column.pipe === 'date') {
-                    {{ getCellValue(row, column) | date:(column.pipeFormat || 'dd/MM/yyyy') }}
+                    {{ getCellValue(row, column) | dateFormat: `long`  }}
                   } @else if (column.pipe === 'number') {
                     {{ getCellValue(row, column) | number:(column.pipeFormat || '1.0-2') }}
                   } @else if (column.pipe === 'percent') {
