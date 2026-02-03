@@ -104,10 +104,10 @@
 
 /* Icono de flecha */
 .back-button__icon {
-  width: var(--back-button-icon-size);
-  height: var(--back-button-icon-size);
-  flex-shrink: 0;
-  transition: transform 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+  width: 20px;
+  height: 20px;
+  margin-right: 0.5rem;
+  transition: transform 0.25s ease;
 }
 
 /* Animación del icono en hover */

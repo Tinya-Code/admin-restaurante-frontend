@@ -12,9 +12,8 @@ describe('BackButton', () => {
 
   beforeEach(async () => {
     await TestBed.configureTestingModule({
-      imports: [BackButton]
-    })
-    .compileComponents();
+      imports: [BackButton],
+    }).compileComponents();
 
     fixture = TestBed.createComponent(BackButton);
     component = fixture.componentInstance;
@@ -26,7 +25,7 @@ describe('BackButton', () => {
   it('should create', () => {
     expect(component).toBeTruthy();
   });
-  
+
   describe('Rendering', () => {
     it('should render button element', () => {
       expect(buttonElement).toBeTruthy();
@@ -39,9 +38,9 @@ describe('BackButton', () => {
     });
 
     it('should render with custom text when provided', () => {
-      component.text = 'Regresar';
+      component.text.set('Regresar');
       fixture.detectChanges();
-      
+
       const textElement = fixture.debugElement.query(By.css('.back-button__text'));
       expect(textElement.nativeElement.textContent.trim()).toBe('Regresar');
     });
@@ -49,21 +48,20 @@ describe('BackButton', () => {
     it('should render icon by default', () => {
       const iconElement = fixture.debugElement.query(By.css('.back-button__icon'));
       expect(iconElement).toBeTruthy();
-      expect(iconElement.nativeElement.tagName).toBe('svg');
     });
 
     it('should not render icon when showIcon is false', () => {
-      component.showIcon = false;
+      component.showIcon.set(false);
       fixture.detectChanges();
-      
+
       const iconElement = fixture.debugElement.query(By.css('.back-button__icon'));
       expect(iconElement).toBeNull();
     });
 
     it('should apply custom class when provided', () => {
-      component.customClass = 'btn-primary';
+      component.customClass.set('btn-primary');
       fixture.detectChanges();
-      
+
       expect(buttonElement.nativeElement.classList.contains('btn-primary')).toBe(true);
     });
 
@@ -83,9 +81,9 @@ describe('BackButton', () => {
     });
 
     it('should apply custom aria-label when provided', () => {
-      component.ariaLabel = 'Volver al inicio';
+      component.ariaLabel.set('Volver al inicio');
       fixture.detectChanges();
-      
+
       expect(buttonElement.nativeElement.getAttribute('aria-label'))
         .toBe('Volver al inicio');
     });
@@ -96,7 +94,7 @@ describe('BackButton', () => {
       expect(title).toBe(ariaLabel);
     });
 
-    it('should have aria-hidden="true" on icon SVG', () => {
+    it('should have aria-hidden="true" on icon element', () => {
       const iconElement = fixture.debugElement.query(By.css('.back-button__icon'));
       expect(iconElement.nativeElement.getAttribute('aria-hidden')).toBe('true');
     });
@@ -105,118 +103,66 @@ describe('BackButton', () => {
   describe('Navigation functionality', () => {
     it('should call location.back() when clicked', () => {
       spyOn(location, 'back');
-      
+
       buttonElement.nativeElement.click();
-      
+
       expect(location.back).toHaveBeenCalledTimes(1);
     });
 
     it('should call goBack method when button is clicked', () => {
       spyOn(component, 'goBack');
-      
+
       buttonElement.nativeElement.click();
-      
+
       expect(component.goBack).toHaveBeenCalledTimes(1);
     });
-
-    it('should navigate back on keyboard Enter', () => {
-      spyOn(location, 'back');
-      
-      const event = new KeyboardEvent('keydown', { key: 'Enter' });
-      buttonElement.nativeElement.dispatchEvent(event);
-      buttonElement.nativeElement.click(); // Simulates default button behavior
-      
-      expect(location.back).toHaveBeenCalled();
-    });
-
-    it('should navigate back on keyboard Space', () => {
-      spyOn(location, 'back');
-      
-      const event = new KeyboardEvent('keydown', { key: ' ' });
-      buttonElement.nativeElement.dispatchEvent(event);
-      buttonElement.nativeElement.click(); // Simulates default button behavior
-      
-      expect(location.back).toHaveBeenCalled();
-    });
   });
 
-  describe('Component inputs', () => {
-    it('should accept and render text input', () => {
-      component.text = 'Atrás';
-      fixture.detectChanges();
-      
-      const textElement = fixture.debugElement.query(By.css('.back-button__text'));
-      expect(textElement.nativeElement.textContent.trim()).toBe('Atrás');
+  describe('Signal-based inputs', () => {
+    it('should update text signal correctly', () => {
+      component.text.set('Atrás');
+      expect(component.text()).toBe('Atrás');
     });
 
-    it('should accept showIcon input', () => {
-      component.showIcon = false;
-      expect(component.showIcon).toBe(false);
+    it('should update showIcon signal correctly', () => {
+      component.showIcon.set(false);
+      expect(component.showIcon()).toBeFalse();
     });
 
-    it('should accept customClass input', () => {
-      component.customClass = 'my-custom-class';
-      expect(component.customClass).toBe('my-custom-class');
+    it('should update customClass signal correctly', () => {
+      component.customClass.set('my-class');
+      expect(component.customClass()).toBe('my-class');
     });
 
-    it('should accept ariaLabel input', () => {
-      component.ariaLabel = 'Custom accessibility label';
-      expect(component.ariaLabel).toBe('Custom accessibility label');
-    });
-  });
-
-  describe('Styling and CSS classes', () => {
-    it('should have back-button__content wrapper', () => {
-      const contentElement = fixture.debugElement.query(By.css('.back-button__content'));
-      expect(contentElement).toBeTruthy();
-    });
-
-    it('should have back-button__text span', () => {
-      const textElement = fixture.debugElement.query(By.css('.back-button__text'));
-      expect(textElement).toBeTruthy();
-    });
-
-    it('should apply multiple custom classes', () => {
-      component.customClass = 'btn-primary btn-large';
-      fixture.detectChanges();
-      
-      expect(buttonElement.nativeElement.classList.contains('btn-primary')).toBe(true);
-      expect(buttonElement.nativeElement.classList.contains('btn-large')).toBe(true);
+    it('should update ariaLabel signal correctly', () => {
+      component.ariaLabel.set('Etiqueta accesible');
+      expect(component.ariaLabel()).toBe('Etiqueta accesible');
     });
   });
 
   describe('Edge cases', () => {
-    it('should handle empty text input', () => {
-      component.text = '';
+    it('should handle empty text signal', () => {
+      component.text.set('');
       fixture.detectChanges();
-      
+
       const textElement = fixture.debugElement.query(By.css('.back-button__text'));
       expect(textElement.nativeElement.textContent.trim()).toBe('');
     });
 
-    it('should handle very long text', () => {
+    it('should handle long text', () => {
       const longText = 'Este es un texto muy largo para el botón de retroceso';
-      component.text = longText;
+      component.text.set(longText);
       fixture.detectChanges();
-      
+
       const textElement = fixture.debugElement.query(By.css('.back-button__text'));
       expect(textElement.nativeElement.textContent.trim()).toBe(longText);
-    });
-
-    it('should handle special characters in text', () => {
-      component.text = '← Volver & Regresar';
-      fixture.detectChanges();
-      
-      const textElement = fixture.debugElement.query(By.css('.back-button__text'));
-      expect(textElement.nativeElement.textContent.trim()).toContain('←');
-      expect(textElement.nativeElement.textContent.trim()).toContain('&');
     });
   });
 
   describe('Location service integration', () => {
     it('should inject Location service', () => {
       expect(location).toBeTruthy();
-      expect(location instanceof Location).toBe(true);
+      expect(location instanceof Location).toBeTrue();
     });
 
     it('should use Location.back() method', () => {

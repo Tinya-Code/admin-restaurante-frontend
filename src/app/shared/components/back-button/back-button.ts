@@ -1,59 +1,29 @@
-import { Component, Input } from '@angular/core';
+import { Component, signal } from '@angular/core';
 import { CommonModule, Location } from '@angular/common';
-
-/**
- * BackButton
- * 
- * Componente reutilizable que proporciona un botón de navegación hacia atrás
- * utilizando el historial del navegador a través del servicio Location de Angular.
- * 
- * @example
- * ```html
- * <!-- Uso básico -->
- * <app-back-button></app-back-button>
- * 
- * <!-- Con texto personalizado -->
- * <app-back-button [text]="'Regresar'"></app-back-button>
- * 
- * <!-- Con icono deshabilitado -->
- * <app-back-button [showIcon]="false"></app-back-button>
- * 
- * <!-- Con clase CSS personalizada -->
- * <app-back-button [customClass]="'btn-primary'"></app-back-button>
- * ```
- */
+import { LucideAngularModule, ArrowLeft } from 'lucide-angular';
 
 @Component({
   selector: 'app-back-button',
   standalone: true,
-  imports: [CommonModule],
+  imports: [CommonModule, LucideAngularModule],
   templateUrl: './back-button.html',
   styleUrl: './back-button.css',
 })
 export class BackButton {
-  /**
-   * Texto que se muestra en el botón
-   * @default 'Volver'
-   */
-  @Input() text: string = 'Volver';
+  /** Texto del botón */
+  text = signal('Volver');
 
-  /**
-   * Determina si se muestra el icono de flecha
-   * @default true
-   */
-  @Input() showIcon: boolean = true;
+  /** Mostrar icono */
+  showIcon = signal(true);
 
-  /**
-   * Clase CSS adicional para personalizar el estilo del botón
-   * @default ''
-   */
-  @Input() customClass: string = '';
+  /** Clases personalizadas */
+  customClass = signal('');
 
-  /**
-   * Título del atributo HTML para accesibilidad
-   * @default 'Volver a la página anterior'
-   */
-  @Input() ariaLabel: string = 'Volver a la página anterior';
+  /** Etiqueta accesible */
+  ariaLabel = signal('Volver a la página anterior');
+
+  /** Icono importado de Lucide */
+  readonly icon = ArrowLeft;
 
   constructor(private location: Location) {}
 
