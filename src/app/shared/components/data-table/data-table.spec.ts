@@ -1,192 +1,110 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
-import { DataTable, TableColumn } from './data-table';
-import { signal } from '@angular/core';
+import { DataTable, TableColumn, PaginationMeta, TableAction } from './data-table';
+import { Edit } from 'lucide-angular';
 
 describe('DataTable', () => {
   let component: DataTable;
   let fixture: ComponentFixture<DataTable>;
 
+  const mockMeta: PaginationMeta = {
+    limit: 10,
+    current_page: 1,
+    total_pages: 5,
+    total_items: 50,
+    has_next: true,
+    has_prev: false,
+  };
+
   const mockColumns: TableColumn[] = [
-    { key: 'id', label: 'ID', width: '80px' },
-    { key: 'name', label: 'Nombre', sortable: true },
-    { key: 'email', label: 'Email' },
-    { key: 'status', label: 'Estado', align: 'center' },
+    { key: 'id', label: 'ID' },
+    { key: 'name', label: 'Nombre' },
+    { key: 'price', label: 'Precio', render: (v) => `$${v.toFixed(2)}` },
   ];
 
   const mockData = [
-    { id: 1, name: 'Juan Pérez', email: 'juan@example.com', status: 'active' },
-    { id: 2, name: 'María García', email: 'maria@example.com', status: 'inactive' },
-    { id: 3, name: 'Pedro López', email: 'pedro@example.com', status: 'active' },
+    {
+      id: '1',
+      name: 'Producto 1',
+      price: 99.99,
+      image_url: 'https://example.com/1.jpg',
+      is_available: true,
+    },
+    { id: '2', name: 'Producto 2', price: 199.99, is_available: false },
   ];
 
   beforeEach(async () => {
     await TestBed.configureTestingModule({
-      imports: [DataTable]
+      imports: [DataTable],
     }).compileComponents();
 
     fixture = TestBed.createComponent(DataTable);
     component = fixture.componentInstance;
   });
 
-  it('should create', () => {
+  // ==================== CREACIÓN ====================
+  it('should create component', () => {
     expect(component).toBeTruthy();
   });
 
-  it('should display correct number of rows based on pageSize', () => {
+  // ==================== INPUTS ====================
+  it('should accept inputs and defaults', () => {
     fixture.componentRef.setInput('dataSource', mockData);
+    fixture.componentRef.setInput('meta', mockMeta);
     fixture.componentRef.setInput('columns', mockColumns);
     fixture.detectChanges();
 
-    component.pageSize.set(2);
-    fixture.detectChanges();
-
-    expect(component.paginatedData().length).toBe(2);
+    expect(component.dataSource()).toEqual(mockData);
+    expect(component.imageKey()).toBe('image_url');
+    expect(component.statusKey()).toBe('is_available');
   });
 
-  it('should calculate total pages correctly', () => {
-    fixture.componentRef.setInput('dataSource', mockData);
-    fixture.componentRef.setInput('columns', mockColumns);
-    component.pageSize.set(2);
-    fixture.detectChanges();
-
-    expect(component.totalPages()).toBe(2); // 3 items / 2 per page = 2 pages
+  // ==================== PAGINACIÓN ====================
+  it('should emit pageChange on goToPage', () => {
+    spyOn(component.pageChange, 'emit');
+    component.goToPage(3);
+    expect(component.pageChange.emit).toHaveBeenCalledWith(3);
   });
 
-  it('should navigate to next page', () => {
-    fixture.componentRef.setInput('dataSource', mockData);
-    fixture.componentRef.setInput('columns', mockColumns);
-    component.pageSize.set(2);
-    fixture.detectChanges();
-
+  it('should emit nextPage when has_next', () => {
+    spyOn(component.pageChange, 'emit');
     component.nextPage();
-    expect(component.currentPage()).toBe(2);
+    expect(component.pageChange.emit).toHaveBeenCalledWith(2);
   });
 
-  it('should navigate to previous page', () => {
-    fixture.componentRef.setInput('dataSource', mockData);
-    fixture.componentRef.setInput('columns', mockColumns);
-    component.currentPage.set(2);
-    fixture.detectChanges();
-
-    component.previousPage();
-    expect(component.currentPage()).toBe(1);
+  // ==================== HELPERS ====================
+  it('should get cell value with render', () => {
+    const value = component.getCellValue(mockData[0], mockColumns[2]);
+    expect(value).toBe('$99.99');
   });
 
-  it('should not go below page 1', () => {
-    fixture.componentRef.setInput('dataSource', mockData);
-    fixture.componentRef.setInput('columns', mockColumns);
-    component.currentPage.set(1);
-    fixture.detectChanges();
-
-    component.previousPage();
-    expect(component.currentPage()).toBe(1);
+  it('should return placeholder when image missing', () => {
+    const url = component.getImageUrl(mockData[1]);
+    expect(url).toBe('https://via.placeholder.com/80');
   });
 
-  it('should not exceed total pages', () => {
-    fixture.componentRef.setInput('dataSource', mockData);
-    fixture.componentRef.setInput('columns', mockColumns);
-    component.pageSize.set(2);
-    component.currentPage.set(2);
-    fixture.detectChanges();
-
-    component.nextPage();
-    expect(component.currentPage()).toBe(2); // No debe pasar de la última página
-  });
-
-  it('should go to first page', () => {
-    fixture.componentRef.setInput('dataSource', mockData);
-    fixture.componentRef.setInput('columns', mockColumns);
-    component.currentPage.set(2);
-    fixture.detectChanges();
-
-    component.firstPage();
-    expect(component.currentPage()).toBe(1);
-  });
-
-  it('should go to last page', () => {
-    fixture.componentRef.setInput('dataSource', mockData);
-    fixture.componentRef.setInput('columns', mockColumns);
-    component.pageSize.set(1);
-    component.currentPage.set(1);
-    fixture.detectChanges();
-
-    component.lastPage();
-    expect(component.currentPage()).toBe(3);
-  });
-
-  it('should change page size and reset to page 1', () => {
-    fixture.componentRef.setInput('dataSource', mockData);
-    fixture.componentRef.setInput('columns', mockColumns);
-    component.currentPage.set(2);
-    fixture.detectChanges();
-
-    const event = {
-      target: { value: '10' }
-    } as any;
-
-    component.changePageSize(event);
-    
-    expect(component.pageSize()).toBe(10);
-    expect(component.currentPage()).toBe(1);
-  });
-
-  it('should emit rowClick when row is clicked', () => {
-    fixture.componentRef.setInput('dataSource', mockData);
-    fixture.componentRef.setInput('columns', mockColumns);
-    fixture.detectChanges();
-
+  // ==================== EVENTOS ====================
+  it('should emit rowClick', () => {
     spyOn(component.rowClick, 'emit');
-    
-    const testRow = mockData[0];
-    component.onRowClick(testRow);
-
-    expect(component.rowClick.emit).toHaveBeenCalledWith(testRow);
+    component.onRowClick(mockData[0]);
+    expect(component.rowClick.emit).toHaveBeenCalledWith(mockData[0]);
   });
 
-  it('should render empty state when no data', () => {
+  it('should execute action handler', () => {
+    const handlerSpy = jasmine.createSpy('handler');
+    const action: TableAction = { label: 'Test', icon: Edit, handler: handlerSpy };
+    component.onActionClick(action, mockData[0], { stopPropagation: () => {} } as any);
+    expect(handlerSpy).toHaveBeenCalledWith(mockData[0]);
+  });
+
+  // ==================== RENDER ====================
+  it('should show empty state when no data', () => {
     fixture.componentRef.setInput('dataSource', []);
+    fixture.componentRef.setInput('meta', { ...mockMeta, total_items: 0 });
     fixture.componentRef.setInput('columns', mockColumns);
-    fixture.componentRef.setInput('emptyMessage', 'No hay datos');
+    fixture.componentRef.setInput('emptyMessage', 'Sin productos');
     fixture.detectChanges();
 
     const compiled = fixture.nativeElement;
-    const emptyMessage = compiled.querySelector('.empty-message');
-
-    expect(emptyMessage).toBeTruthy();
-    expect(emptyMessage.textContent).toContain('No hay datos');
-  });
-
-  it('should use custom render function if provided', () => {
-    const columnsWithRender: TableColumn[] = [
-      {
-        key: 'status',
-        label: 'Estado',
-        render: (value) => value === 'active' ? 'Activo' : 'Inactivo'
-      }
-    ];
-
-    fixture.componentRef.setInput('dataSource', mockData);
-    fixture.componentRef.setInput('columns', columnsWithRender);
-    fixture.detectChanges();
-
-    const result = component.getCellValue(mockData[0], columnsWithRender[0]);
-    expect(result).toBe('Activo');
-  });
-
-  it('should calculate start and end index correctly', () => {
-    fixture.componentRef.setInput('dataSource', mockData);
-    fixture.componentRef.setInput('columns', mockColumns);
-    component.pageSize.set(2);
-    component.currentPage.set(1);
-    fixture.detectChanges();
-
-    expect(component.startIndex()).toBe(1);
-    expect(component.endIndex()).toBe(2);
-
-    component.currentPage.set(2);
-    fixture.detectChanges();
-
-    expect(component.startIndex()).toBe(3);
-    expect(component.endIndex()).toBe(3);
+    expect(compiled.textContent).toContain('Sin productos');
   });
 });

@@ -1,19 +1,36 @@
-import { Component, input, output, computed, signal } from '@angular/core';
+import { Component, input, output, computed, signal, ChangeDetectionStrategy } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { LucideAngularModule, ChevronLeft, ChevronRight,MoreVertical, ChevronsLeft, ChevronsRight } from 'lucide-angular';
+import {
+  LucideAngularModule,
+  ChevronLeft,
+  ChevronRight,
+  MoreVertical,
+  ChevronsLeft,
+  ChevronsRight,
+} from 'lucide-angular';
 
 export interface TableColumn {
   key: string;
   label: string;
-  sortable?: boolean;
-  width?: string; // ej: '200px', '20%', 'auto'
+  width?: string;
   align?: 'left' | 'center' | 'right';
-  render?: (value: any, row: any) => string; // función personalizada para renderizar
+  render?: (value: any, row: any) => string;
 }
 
-export interface PaginationConfig {
-  pageSize: number;
-  pageSizeOptions: number[];
+export interface PaginationMeta {
+  limit: number;
+  current_page: number;
+  total_pages: number;
+  total_items: number;
+  has_next: boolean;
+  has_prev: boolean;
+}
+
+export interface TableAction {
+  label: string;
+  icon?: any;
+  variant?: 'default' | 'danger';
+  handler: (row: any) => void;
 }
 
 @Component({
@@ -21,159 +38,149 @@ export interface PaginationConfig {
   standalone: true,
   imports: [CommonModule, LucideAngularModule],
   templateUrl: './data-table.html',
-  styleUrl: './data-table.css',
+  changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class DataTable {
-  // Inputs con signals
-  dataSource = input.required<any[]>();
-  columns = input.required<TableColumn[]>();
-  pagination = input<PaginationConfig>({ 
-    pageSize: 10, 
-    pageSizeOptions: [10, 25, 50, 100] 
-  });
-  loading = input<boolean>(false);
-  emptyMessage = input<string>('No hay datos disponibles');
+  // Inputs
+  readonly dataSource = input.required<any[]>();
+  readonly meta = input.required<PaginationMeta>();
+  readonly columns = input.required<TableColumn[]>();
+  readonly imageKey = input<string>('');
+  readonly statusKey = input<string>('is_available');
+  readonly actions = input<TableAction[]>([]);
+  readonly showToggle = input<boolean>(false);
+  readonly loading = input<boolean>(false);
+  readonly emptyMessage = input<string>('No hay datos disponibles');
 
   // Outputs
-  rowClick = output<any>();
+  readonly rowClick = output<any>();
+  readonly toggleChange = output<{ row: any; enabled: boolean }>();
+  readonly pageChange = output<number>();
 
-  // Iconos de Lucide
-  readonly ChevronLeft = ChevronLeft;
-  readonly ChevronRight = ChevronRight;
-  readonly ChevronsLeft = ChevronsLeft;
-  readonly ChevronsRight = ChevronsRight;
-  readonly morevertical = MoreVertical;
+  // Icons
+  readonly icons = {
+    chevronLeft: ChevronLeft,
+    chevronRight: ChevronRight,
+    chevronsLeft: ChevronsLeft,
+    chevronsRight: ChevronsRight,
+    moreVertical: MoreVertical,
+  } as const;
 
-  // Estado interno
-  currentPage = signal(1);
-  pageSize = signal(10);
+  // State
+  readonly openMenuIndex = signal<number | null>(null);
 
-  // Computed signals
-  totalPages = computed(() => {
-    const total = this.dataSource().length;
-    const size = this.pageSize();
-    return Math.ceil(total / size) || 1;
-  });
-
-  paginatedData = computed(() => {
-    const data = this.dataSource();
-    const page = this.currentPage();
-    const size = this.pageSize();
-    const start = (page - 1) * size;
-    const end = start + size;
-    return data.slice(start, end);
-  });
-
-  startIndex = computed(() => {
-    const page = this.currentPage();
-    const size = this.pageSize();
-    return (page - 1) * size + 1;
-  });
-
-  endIndex = computed(() => {
-    const start = this.startIndex();
-    const size = this.pageSize();
-    const total = this.dataSource().length;
-    return Math.min(start + size - 1, total);
-  });
-
-  pageNumbers = computed(() => {
-    const total = this.totalPages();
-    const current = this.currentPage();
-    const delta = 2; // Páginas a mostrar antes y después de la actual
+  // Computed
+  readonly pageNumbers = computed(() => {
+    const meta = this.meta();
+    const total = meta.total_pages;
+    const current = meta.current_page;
     const pages: (number | string)[] = [];
 
     if (total <= 7) {
-      // Mostrar todas las páginas si son pocas
-      for (let i = 1; i <= total; i++) {
-        pages.push(i);
-      }
+      for (let i = 1; i <= total; i++) pages.push(i);
     } else {
-      // Lógica para mostrar páginas con puntos suspensivos
       if (current <= 4) {
         for (let i = 1; i <= 5; i++) pages.push(i);
-        pages.push('...');
-        pages.push(total);
+        pages.push('...', total);
       } else if (current >= total - 3) {
-        pages.push(1);
-        pages.push('...');
+        pages.push(1, '...');
         for (let i = total - 4; i <= total; i++) pages.push(i);
       } else {
-        pages.push(1);
-        pages.push('...');
-        for (let i = current - delta; i <= current + delta; i++) {
-          pages.push(i);
-        }
-        pages.push('...');
-        pages.push(total);
+        pages.push(1, '...', current - 1, current, current + 1, '...', total);
       }
     }
 
     return pages;
   });
 
-  constructor() {
-    // Inicializar pageSize con el valor de pagination
-    this.pageSize.set(this.pagination().pageSize);
-  }
+  readonly startIndex = computed(() => {
+    const meta = this.meta();
+    return (meta.current_page - 1) * meta.limit + 1;
+  });
 
-  // Métodos de paginación
+  readonly endIndex = computed(() => {
+    const meta = this.meta();
+    const data = this.dataSource();
+    return Math.min(this.startIndex() + data.length - 1, meta.total_items);
+  });
+
+  // Pagination
   goToPage(page: number | string): void {
-    if (typeof page === 'string') return; // Ignorar clicks en "..."
-    
-    const pageNum = Number(page);
-    if (pageNum >= 1 && pageNum <= this.totalPages()) {
-      this.currentPage.set(pageNum);
+    if (typeof page === 'number') {
+      this.pageChange.emit(page);
     }
   }
 
   nextPage(): void {
-    if (this.currentPage() < this.totalPages()) {
-      this.currentPage.update(p => p + 1);
+    const meta = this.meta();
+    if (meta.has_next) {
+      this.pageChange.emit(meta.current_page + 1);
     }
   }
 
   previousPage(): void {
-    if (this.currentPage() > 1) {
-      this.currentPage.update(p => p - 1);
+    const meta = this.meta();
+    if (meta.has_prev) {
+      this.pageChange.emit(meta.current_page - 1);
     }
   }
 
   firstPage(): void {
-    this.currentPage.set(1);
+    this.pageChange.emit(1);
   }
 
   lastPage(): void {
-    this.currentPage.set(this.totalPages());
+    this.pageChange.emit(this.meta().total_pages);
   }
 
-  changePageSize(event: Event): void {
-    const select = event.target as HTMLSelectElement;
-    const newSize = Number(select.value);
-    this.pageSize.set(newSize);
-    this.currentPage.set(1); // Reset a primera página
+  // Helpers
+  getCellValue(row: any, column: TableColumn): string {
+    const value = row[column.key];
+    return column.render ? column.render(value, row) : (value ?? '');
   }
 
+  getImageUrl(row: any): string {
+    return (
+      row[this.imageKey()] ||
+      'https://i.pinimg.com/1200x/47/49/9a/47499a5cd90f926e9506b4a47435a0eb.jpg'
+    );
+  }
+
+  isToggleActive(row: any): boolean {
+    return row[this.statusKey()] === true;
+  }
+
+  // Events
   onRowClick(row: any): void {
     this.rowClick.emit(row);
   }
 
-  getCellValue(row: any, column: TableColumn): any {
-    const value = row[column.key];
-    
-    // Si hay función de render personalizada, usarla
-    if (column.render) {
-      return column.render(value, row);
-    }
-    
-    return value;
+  onToggleChange(row: any, event: Event): void {
+    event.stopPropagation();
+    const enabled = (event.target as HTMLInputElement).checked;
+    this.toggleChange.emit({ row, enabled });
   }
 
-  getColumnWidth(column: TableColumn): string {
-    return column.width || 'auto';
+  toggleMenu(index: number, event: Event): void {
+    event.stopPropagation();
+    this.openMenuIndex.set(this.openMenuIndex() === index ? null : index);
   }
 
-  getTextAlign(column: TableColumn): string {
-    return column.align || 'left';
+  closeMenu(): void {
+    this.openMenuIndex.set(null);
+  }
+
+  onActionClick(action: TableAction, row: any, event: Event): void {
+    event.stopPropagation();
+    action.handler(row);
+    this.closeMenu();
+  }
+
+  trackByIndex(index: number): number {
+    return index;
+  }
+
+  trackByKey(index: number, column: TableColumn): string {
+    return column.key;
   }
 }

@@ -1,78 +1,107 @@
-import { Component , signal} from '@angular/core';
-import { DataTable } from '../../../../../shared/components/data-table/data-table';
+import { Component, signal } from '@angular/core';
+import { DataTable, TableColumn, TableAction , PaginationMeta} from '../../../../../shared/components/data-table/data-table';
+import { Edit, Trash2, Eye } from 'lucide-angular';
 import type { Product } from '../../../../../core/models/product.model';
-import type { TableColumn } from '../../../../../shared/components/data-table/data-table';
-import productsPaginate from '../../../../../data/productsPaginate.json';
+import productPaginate from '../../../../../data/productsPaginate.json';
+import categoriesPaginate from '../../../../../data/categoriesPaginate.json';
+
+interface ApiResponse {
+  status: string;
+  code: string;
+  message: string;
+  data: any[];
+  meta: PaginationMeta;
+}
+
 @Component({
   selector: 'app-product-list-page',
   imports: [DataTable],
   templateUrl: './product-list-page.html',
-  styleUrl: './product-list-page.css',
+  styleUrl: './product-list-page.css'
 })
 export class ProductListPage {
-loading = signal(false);
-  products = signal<Product[]>(productsPaginate.data);
+   readonly loading = signal(false);
+  readonly products = signal<Product[]>([]);
+  readonly meta = signal<PaginationMeta>({
+    limit: 10,
+    current_page: 1,
+    total_pages: 1,
+    total_items: 0,
+    has_next: false,
+    has_prev: false
+  });
 
-  paginationConfig = {
-    pageSize: productsPaginate.meta.total_pages,
-    pageSizeOptions: [25, 50, 100]
-  };
-
-  columns: TableColumn[] = [
-    { 
-      key: 'id', 
-      label: 'ID', 
-
-    },
-    { 
-      key: 'name', 
-      label: 'Producto',
-
-    },
-    { 
-      key: 'category_name', 
-      label: 'Categoría',
-
-    },
+  readonly columns: TableColumn[] = [
+    { key: 'id', label: 'ID', width: '120px' },
+    { key: 'name', label: 'Producto', width: '250px' },
+    { key: 'category_name', label: 'Categoría', width: '150px' },
     { 
       key: 'price', 
-      label: 'Precio',
-
-      render: (value) => `$${value.toFixed(2)}`
+      label: 'Precio', 
+      width: '120px', 
+      align: 'right',
+      render: (value) => `$${Number(value).toFixed(2)}`
     },
     { 
-      key: 'stock', 
-      label: 'Stock',
-      render: (value) => value > 0 ? `${value}` : 'Agotado'
-    },
-    { 
-      key: 'status', 
-      label: 'Estado',
-      render: (value) => value === 'active' ? '✓ Activo' : '✗ Inactivo'
+      key: 'created_at', 
+      label: 'Creado', 
+      width: '150px',
+      render: (value) => new Date(value).toLocaleDateString('es-PE')
     },
   ];
 
-  ngOnInit(): void {
-    this.loadProducts();
-  }
-
-  async loadProducts(): Promise<void> {
-    this.loading.set(true);
-    
-    try {
-      // Simulación de llamada al backend
-      const response = await fetch('/api/products');
-      const data = await response.json();
-      this.products.set(data);
-    } catch (error) {
-      console.error('Error cargando productos:', error);
-    } finally {
-      this.loading.set(false);
+  readonly tableActions: TableAction[] = [
+    {
+      label: 'Editar',
+      icon: Edit,
+      handler: (row) => this.editProduct(row)
+    },
+    {
+      label: 'Ver detalles',
+      icon: Eye,
+      handler: (row) => this.viewProduct(row)
+    },
+    {
+      label: 'Eliminar',
+      icon: Trash2,
+      variant: 'danger',
+      handler: (row) => this.deleteProduct(row)
     }
+  ];
+
+  ngOnInit(): void {
+    this.loadProducts(1, 10);
   }
 
-  onProductClick(product: Product): void {
-    console.log('Producto clickeado:', product);
-    // Navegar a detalle del producto
+  private async loadProducts(page: number, limit: number): Promise<void> {
+    this.products.set(productPaginate.data);
+    this.meta.set(productPaginate.meta);
+ 
+  }
+
+
+  onPageChange(page: number): void {
+    this.loadProducts(page, this.meta().limit);
+  }
+
+  onProductClick(product: any): void {
+    console.log('Producto:', product);
+  }
+
+  onToggleChange(event: { row: any; enabled: boolean }): void {
+    console.log('Toggle:', event);
+    // API call: updateProductStatus(event.row.id, event.enabled)
+  }
+
+  private editProduct(product: any): void {
+    console.log('Editar:', product);
+  }
+
+  private viewProduct(product: any): void {
+    console.log('Ver:', product);
+  }
+
+  private deleteProduct(product: any): void {
+    console.log('Eliminar:', product);
   }
 }

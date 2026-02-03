@@ -1,6 +1,5 @@
 <div class="relative w-full bg-white border border-gray-200 overflow-hidden">
   
-  <!-- Loading State -->
   @if (loading()) {
     <div class="absolute inset-0 bg-white/95 flex items-center justify-center z-10">
       <div class="flex flex-col items-center gap-3">
@@ -10,160 +9,223 @@
     </div>
   }
 
-  <!-- Table -->
   <div class="w-full overflow-x-auto">
-    <table class="w-full border-collapse text-sm">
-      <thead>
-        <tr>
-          @for (column of columns(); track column.key) {
-            <th 
-              [style.width]="getColumnWidth(column)"
-              [style.text-align]="getTextAlign(column)"
-              class="px-4 py-4 text-left border-b border-gray-200 bg-gray-50 sticky top-0 z-5"
-            >
-              <div class="flex items-center gap-2">
+    @if (dataSource().length === 0 && !loading()) {
+      <div class="py-16 px-8 text-center">
+        <lucide-angular name="inbox" class="w-12 h-12 mx-auto mb-4 text-gray-300 opacity-50" />
+        <p class="text-sm text-gray-500 tracking-wide">{{ emptyMessage() }}</p>
+      </div>
+    } @else {
+      <table class="w-full border-collapse text-sm">
+        <thead class="hidden md:table-header-group">
+          <tr>
+            @if(imageKey()){
+            <th class="w-20 px-4 py-4 border-b border-gray-200 bg-gray-50 sticky top-0 z-5">
+              <span class="text-xs font-medium text-gray-500 uppercase tracking-wider">Imagen</span>
+            </th>
+            }
+            @for (column of columns(); track trackByKey($index, column)) {
+              <th 
+                [style.width]="column.width"
+                [style.text-align]="column.align || 'left'"
+                class="px-4 py-4 border-b border-gray-200 bg-gray-50 sticky top-0 z-5"
+              >
                 <span class="text-xs font-medium text-gray-500 uppercase tracking-wider">
                   {{ column.label }}
                 </span>
-              </div>
+              </th>
+            }
+            
+            @if (showToggle()) {
+              <th class="w-24 px-4 py-4 text-center border-b border-gray-200 bg-gray-50 sticky top-0 z-5">
+                <span class="text-xs font-medium text-gray-500 uppercase tracking-wider">Estado</span>
+              </th>
+            }
+            
+            <th class="w-16 px-4 py-4 border-b border-gray-200 bg-gray-50 sticky top-0 z-5">
+              <span class="sr-only">Acciones</span>
             </th>
-          }
-          <th class="px-4 py-4 text-left border-b border-gray-200 bg-gray-50 sticky top-0 z-5 w-12">
-  <span class="sr-only">Acciones</span>
-</th>
-
-        </tr>
-      </thead>
-
-      <tbody>
-        @if (paginatedData().length === 0 && !loading()) {
-          <tr>
-            <td [attr.colspan]="columns().length" class="py-16 px-8 text-center">
-              <div class="flex flex-col items-center gap-4">
-                <lucide-angular name="inbox" class="w-12 h-12 text-gray-300 opacity-50" />
-                <p class="text-sm text-gray-500 tracking-wide">{{ emptyMessage() }}</p>
-              </div>
-            </td>
           </tr>
-                  <td class="px-4 py-4 text-gray-900 font-light align-middle text-right">
-  <button class="p-2 rounded hover:bg-gray-100">
-    <lucide-angular [img]="morevertical" class="w-5 h-5 text-gray-500" />
-  </button>
+        </thead>
 
-  <!-- Menú desplegable -->
-  <div class="absolute right-0 mt-2 w-40 bg-white border border-gray-200 rounded shadow-lg hidden group-hover:block">
-    <ul class="py-1 text-sm text-gray-700">
-      <li><a href="#" class="block px-4 py-2 hover:bg-gray-100">Editar</a></li>
-      <li><a href="#" class="block px-4 py-2 hover:bg-gray-100">Eliminar</a></li>
-      <li><a href="#" class="block px-4 py-2 hover:bg-gray-100">Detalles</a></li>
-    </ul>
-  </div>
-</td>
-        } @else {
-          @for (row of paginatedData(); track $index) {
-            <tr 
-              class="border-b border-gray-200 last:border-b-0 hover:bg-gray-50 cursor-pointer transition-colors duration-200"
-              (click)="onRowClick(row)"
-            >
-              @for (column of columns(); track column.key) {
+        <tbody>
+          @for (row of dataSource(); track trackByIndex($index)) {
+            <tr class="border-b border-gray-200 last:border-b-0 hover:bg-gray-50 transition-colors flex flex-col md:table-row">
+              
+              <td class="px-4 py-3 md:py-4 md:w-20 flex md:table-cell items-center gap-3 md:gap-0">
+                  @if(imageKey()){
+                <img 
+                  [src]="getImageUrl(row)" 
+                  [alt]="row.name || 'Item'"
+                  class="w-16 h-16 md:w-14 md:h-14 object-cover rounded border border-gray-200 flex-shrink-0"
+                />
+                  }
+                <div class="flex-1  min-w-0 md:hidden">
+                  <h3 class="text-sm font-medium max-w-50 text-gray-900 truncate">
+                    {{ row.name || row.title || 'Sin nombre' }}
+                  </h3>
+                  <p class="text-xs text-gray-500 truncate">
+                    {{ row.category_name || row.category || 'Sin categoría' }}
+                  </p>
+                  <div class="flex items-center gap-3 mt-1">
+                    @for (column of columns(); track trackByKey($index, column)) {
+                      @if (column.key === 'price') {
+                        <span class="text-xs text-gray-900 font-medium">
+                          {{ getCellValue(row, column) }}
+                        </span>
+                      }
+                    }
+                  </div>
+                </div>
+
+                <div class="flex md:hidden items-center gap-2">
+                  @if (showToggle()) {
+                    <label class="relative inline-flex items-center cursor-pointer">
+                      <input 
+                        type="checkbox" 
+                        [checked]="isToggleActive(row)"
+                        (change)="onToggleChange(row, $event)"
+                        class="sr-only peer"
+                      />
+                      <div class="w-9 h-5 bg-gray-200 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:start-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-4 after:w-4 after:transition-all peer-checked:bg-gray-900"></div>
+                    </label>
+                  }
+
+                  <div class="relative">
+                    <button 
+                      (click)="toggleMenu($index, $event)"
+                      class="p-1.5 rounded hover:bg-gray-200 transition-colors"
+                      type="button"
+                    >
+                      <lucide-angular [img]="icons.moreVertical" class="w-5 h-5 text-gray-500" />
+                    </button>
+
+                    @if (openMenuIndex() === $index) {
+                      <div class="absolute right-0 top-full mt-1 w-40 bg-white border border-gray-200 rounded shadow-lg z-20">
+                        <ul class="py-1 text-sm">
+                          @for (action of actions(); track action.label) {
+                            <li>
+                              <button
+                                type="button"
+                                (click)="onActionClick(action, row, $event)"
+                                class="w-full text-left px-4 py-2 hover:bg-gray-100 flex items-center gap-2"
+                                [class.text-red-600]="action.variant === 'danger'"
+                              >
+                                @if (action.icon) {
+                                  <lucide-angular [img]="action.icon" class="w-4 h-4" />
+                                }
+                                <span>{{ action.label }}</span>
+                              </button>
+                            </li>
+                          }
+                        </ul>
+                      </div>
+                    }
+                  </div>
+                </div>
+              </td>
+
+              @for (column of columns(); track trackByKey($index, column)) {
                 <td 
-                  [style.text-align]="getTextAlign(column)"
-                  class="px-4 py-4 text-gray-900 font-light align-middle"
+                  [style.text-align]="column.align || 'left'"
+                  class="hidden md:table-cell px-4 py-4 text-gray-900 font-light cursor-pointer"
+                  (click)="onRowClick(row)"
                 >
                   {{ getCellValue(row, column) }}
                 </td>
-                
               }
-                      <td class="px-4 py-4 group text-gray-900 font-light align-middle text-right">
-  <button class="p-2  rounded hover:bg-gray-100">
-    <lucide-angular [img]="morevertical" class="w-5 h-5 text-gray-500" />
-  </button>
+              
+              @if (showToggle()) {
+                <td class="hidden md:table-cell px-4 py-4 text-center">
+                  <label class="relative inline-flex items-center cursor-pointer">
+                    <input 
+                      type="checkbox" 
+                      [checked]="isToggleActive(row)"
+                      (change)="onToggleChange(row, $event)"
+                      class="sr-only peer"
+                    />
+                    <div class="w-11 h-6 bg-gray-200 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:start-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-gray-900"></div>
+                  </label>
+                </td>
+              }
+              
+              <td class="hidden md:table-cell px-4 py-4 text-right relative">
+                <button 
+                  (click)="toggleMenu($index, $event)"
+                  class="p-2 rounded hover:bg-gray-100 transition-colors"
+                  type="button"
+                >
+                  <lucide-angular [img]="icons.moreVertical" class="w-5 h-5 text-gray-500" />
+                </button>
 
-  <!-- Menú desplegable -->
-  <div class="absolute hidden right-0 mt-2 w-40 bg-white border border-gray-200 rounded shadow-lg z-10 group-hover:block">
-    <ul class="py-1 text-sm text-gray-700">
-      <li><a href="#" class="block px-4 py-2 hover:bg-gray-100">Editar</a></li>
-      <li><a href="#" class="block px-4 py-2 hover:bg-gray-100">Eliminar</a></li>
-      <li><a href="#" class="block px-4 py-2 hover:bg-gray-100">Detalles</a></li>
-    </ul>
-  </div>
-</td>
+                @if (openMenuIndex() === $index) {
+                  <div class="absolute right-0 mt-2 w-48 bg-white border border-gray-200 rounded shadow-lg z-20">
+                    <ul class="py-1 text-sm">
+                      @for (action of actions(); track action.label) {
+                        <li>
+                          <button
+                            type="button"
+                            (click)="onActionClick(action, row, $event)"
+                            class="w-full text-left px-4 py-2 hover:bg-gray-100 flex items-center gap-2 transition-colors"
+                            [class.text-red-600]="action.variant === 'danger'"
+                          >
+                            @if (action.icon) {
+                              <lucide-angular [img]="action.icon" class="w-4 h-4" />
+                            }
+                            <span>{{ action.label }}</span>
+                          </button>
+                        </li>
+                      }
+                    </ul>
+                  </div>
+                }
+              </td>
             </tr>
           }
-        }
-
-
-      </tbody>
-    </table>
+        </tbody>
+      </table>
+    }
   </div>
 
-  <!-- Pagination -->
-  @if (dataSource().length > 0 && !loading()) {
+  @if (meta().total_items > 0 && !loading()) {
     <div class="flex flex-wrap items-center justify-between gap-4 px-4 py-4 border-t border-gray-200 bg-gray-50">
       
-      <!-- Info de registros -->
-      <div class="flex items-center">
-        <span class="text-xs text-gray-600 tracking-wide">
-          Mostrando {{ startIndex() }} - {{ endIndex() }} de {{ dataSource().length }} registros
-        </span>
-      </div>
+      <span class="text-xs text-gray-600">
+        {{ startIndex() }} - {{ endIndex() }} de {{ meta().total_items }}
+      </span>
 
-      <!-- Selector de tamaño de página -->
-      <div class="flex items-center gap-2">
-        <label for="pageSize" class="text-xs text-gray-600 whitespace-nowrap">
-          Filas por página:
-        </label>
-        <select 
-          id="pageSize"
-          [value]="pageSize()"
-          (change)="changePageSize($event)"
-          class="px-3 py-1.5 text-xs text-gray-900 bg-white border border-gray-300 outline-none cursor-pointer transition-colors hover:border-gray-900 focus:border-gray-900"
-        >
-          @for (option of pagination().pageSizeOptions; track option) {
-            <option [value]="option">{{ option }}</option>
-          }
-        </select>
-      </div>
-
-      <!-- Controles de paginación -->
       <div class="flex items-center gap-1">
-        
-        <!-- Primera página -->
         <button
           type="button"
           (click)="firstPage()"
-          [disabled]="currentPage() === 1"
-          class="flex items-center justify-center w-8 h-8 p-0 bg-transparent border border-gray-300 text-gray-900 cursor-pointer transition-all hover:bg-gray-100 hover:border-gray-900 disabled:opacity-30 disabled:cursor-not-allowed"
+          [disabled]="!meta().has_prev"
+          class="hidden sm:flex items-center justify-center w-8 h-8 border border-gray-300 text-gray-900 hover:bg-gray-100 hover:border-gray-900 disabled:opacity-30 disabled:cursor-not-allowed transition-all"
           aria-label="Primera página"
         >
-          <lucide-angular [img]="ChevronsLeft" class="w-4 h-4" />
+          <lucide-angular [img]="icons.chevronsLeft" class="w-4 h-4" />
         </button>
 
-        <!-- Página anterior -->
         <button
           type="button"
           (click)="previousPage()"
-          [disabled]="currentPage() === 1"
-          class="flex items-center justify-center w-8 h-8 p-0 bg-transparent border border-gray-300 text-gray-900 cursor-pointer transition-all hover:bg-gray-100 hover:border-gray-900 disabled:opacity-30 disabled:cursor-not-allowed"
-          aria-label="Página anterior"
+          [disabled]="!meta().has_prev"
+          class="flex items-center justify-center w-8 h-8 border border-gray-300 text-gray-900 hover:bg-gray-100 hover:border-gray-900 disabled:opacity-30 disabled:cursor-not-allowed transition-all"
+          aria-label="Anterior"
         >
-          <lucide-angular [img]="ChevronLeft" class="w-4 h-4" />
+          <lucide-angular [img]="icons.chevronLeft" class="w-4 h-4" />
         </button>
 
-        <!-- Números de página -->
-        <div class="flex items-center gap-1">
-          @for (page of pageNumbers(); track $index) {
+        <div class="hidden sm:flex items-center gap-1">
+          @for (page of pageNumbers(); track page) {
             @if (page === '...') {
-              <span class="flex items-center justify-center min-w-8 h-8 text-xs text-gray-400">
-                ...
-              </span>
+              <span class="flex items-center justify-center min-w-8 h-8 text-xs text-gray-400">...</span>
             } @else {
               <button
                 type="button"
                 (click)="goToPage(page)"
-                [class]="currentPage() === page 
-                  ? 'flex items-center justify-center min-w-8 h-8 px-2 text-xs font-medium text-white bg-gray-900 border border-gray-900 cursor-pointer transition-all tracking-wide'
-                  : 'flex items-center justify-center min-w-8 h-8 px-2 text-xs font-normal text-gray-900 bg-transparent border border-gray-300 cursor-pointer transition-all hover:bg-gray-100 hover:border-gray-900 tracking-wide'"
+                [class]="meta().current_page === page 
+                  ? 'flex items-center justify-center min-w-8 h-8 px-2 text-xs font-medium text-white bg-gray-900 border border-gray-900'
+                  : 'flex items-center justify-center min-w-8 h-8 px-2 text-xs text-gray-900 border border-gray-300 hover:bg-gray-100 hover:border-gray-900'"
               >
                 {{ page }}
               </button>
@@ -171,30 +233,35 @@
           }
         </div>
 
-        <!-- Página siguiente -->
+        <span class="sm:hidden text-xs text-gray-600 px-2">
+          {{ meta().current_page }} / {{ meta().total_pages }}
+        </span>
+
         <button
           type="button"
           (click)="nextPage()"
-          [disabled]="currentPage() === totalPages()"
-          class="flex items-center justify-center w-8 h-8 p-0 bg-transparent border border-gray-300 text-gray-900 cursor-pointer transition-all hover:bg-gray-100 hover:border-gray-900 disabled:opacity-30 disabled:cursor-not-allowed"
-          aria-label="Página siguiente"
+          [disabled]="!meta().has_next"
+          class="flex items-center justify-center w-8 h-8 border border-gray-300 text-gray-900 hover:bg-gray-100 hover:border-gray-900 disabled:opacity-30 disabled:cursor-not-allowed transition-all"
+          aria-label="Siguiente"
         >
-          <lucide-angular [img]="ChevronRight" class="w-4 h-4" />
+          <lucide-angular [img]="icons.chevronRight" class="w-4 h-4" />
         </button>
 
-        <!-- Última página -->
         <button
           type="button"
           (click)="lastPage()"
-          [disabled]="currentPage() === totalPages()"
-          class="flex items-center justify-center w-8 h-8 p-0 bg-transparent border border-gray-300 text-gray-900 cursor-pointer transition-all hover:bg-gray-100 hover:border-gray-900 disabled:opacity-30 disabled:cursor-not-allowed"
+          [disabled]="!meta().has_next"
+          class="hidden sm:flex items-center justify-center w-8 h-8 border border-gray-300 text-gray-900 hover:bg-gray-100 hover:border-gray-900 disabled:opacity-30 disabled:cursor-not-allowed transition-all"
           aria-label="Última página"
         >
-          <lucide-angular [img]="ChevronsRight" class="w-4 h-4" />
+          <lucide-angular [img]="icons.chevronsRight" class="w-4 h-4" />
         </button>
-
       </div>
     </div>
   }
 
 </div>
+
+@if (openMenuIndex() !== null) {
+  <div class="fixed inset-0 z-10" (click)="closeMenu()"></div>
+}
