@@ -14,7 +14,10 @@ export interface TableColumn {
   label: string;
   width?: string;
   align?: 'left' | 'center' | 'right';
-  render?: (value: any, row: any) => string;
+  pipe?: 'currency' | 'date' | 'number' | 'percent' | 'uppercase' | 'lowercase'; // Pipes soportados
+  pipeFormat?: string; 
+  mobileOrder?: number;
+  hideOnMobile?: boolean;
 }
 
 export interface PaginationMeta {
@@ -51,6 +54,7 @@ export class DataTable {
   readonly showToggle = input<boolean>(false);
   readonly loading = input<boolean>(false);
   readonly emptyMessage = input<string>('No hay datos disponibles');
+  readonly mobileMaxFields = input<number>(3); // Máximo de campos a mostrar en mobile
 
   // Outputs
   readonly rowClick = output<any>();
@@ -70,6 +74,13 @@ export class DataTable {
   readonly openMenuIndex = signal<number | null>(null);
 
   // Computed
+  readonly mobileColumns = computed(() => {
+    return this.columns()
+      .filter(col => !col.hideOnMobile)
+      .sort((a, b) => (a.mobileOrder || 999) - (b.mobileOrder || 999))
+      .slice(0, this.mobileMaxFields());
+  });
+
   readonly pageNumbers = computed(() => {
     const meta = this.meta();
     const total = meta.total_pages;
@@ -104,6 +115,16 @@ export class DataTable {
     return Math.min(this.startIndex() + data.length - 1, meta.total_items);
   });
 
+
+applyCellPipe(value: any, column: TableColumn): any {
+  if (!column.pipe) {
+    return value;
+  }
+
+  // Aquí podrías aplicar pipes programáticamente si fuera necesario
+  // pero es mejor hacerlo directamente en el template
+  return value;
+}
   // Pagination
   goToPage(page: number | string): void {
     if (typeof page === 'number') {
@@ -134,10 +155,11 @@ export class DataTable {
   }
 
   // Helpers
-  getCellValue(row: any, column: TableColumn): string {
-    const value = row[column.key];
-    return column.render ? column.render(value, row) : (value ?? '');
-  }
+ 
+getCellValue(row: any, column: TableColumn): any {
+  return row[column.key] ?? '';
+  // Ya no aplicamos render aquí, se hace en el template con pipes
+}
 
   getImageUrl(row: any): string {
     return (

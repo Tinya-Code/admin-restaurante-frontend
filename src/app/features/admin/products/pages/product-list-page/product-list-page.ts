@@ -31,24 +31,43 @@ export class ProductListPage {
     has_prev: false
   });
 
-  readonly columns: TableColumn[] = [
-    { key: 'id', label: 'ID', width: '120px' },
-    { key: 'name', label: 'Producto', width: '250px' },
-    { key: 'category_name', label: 'Categoría', width: '150px' },
-    { 
-      key: 'price', 
-      label: 'Precio', 
-      width: '120px', 
-      align: 'right',
-      render: (value) => `$${Number(value).toFixed(2)}`
-    },
-    { 
-      key: 'created_at', 
-      label: 'Creado', 
-      width: '150px',
-      render: (value) => new Date(value).toLocaleDateString('es-PE')
-    },
-  ];
+readonly columns: TableColumn[] = [
+  { 
+    key: 'id', 
+    label: 'ID', 
+    width: '120px',
+    hideOnMobile: true 
+  },
+  { 
+    key: 'name', 
+    label: 'Producto', 
+    width: '250px',
+    mobileOrder: 1
+  },
+  { 
+    key: 'category_name', 
+    label: 'Categoría', 
+    width: '150px',
+    mobileOrder: 2 
+  },
+  { 
+    key: 'price', 
+    label: 'Precio', 
+    width: '120px', 
+    align: 'right',
+    mobileOrder: 3,
+    pipe: 'currency',        
+    pipeFormat: 'USD'           
+  },
+  { 
+    key: 'created_at', 
+    label: 'Creado', 
+    width: '150px',
+    hideOnMobile: true,
+    pipe: 'date',                
+    pipeFormat: 'dd/MM/yyyy'     
+  }
+];
 
   readonly tableActions: TableAction[] = [
     {

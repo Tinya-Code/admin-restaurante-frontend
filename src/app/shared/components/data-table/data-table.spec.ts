@@ -18,7 +18,7 @@ describe('DataTable', () => {
   const mockColumns: TableColumn[] = [
     { key: 'id', label: 'ID' },
     { key: 'name', label: 'Nombre' },
-    { key: 'price', label: 'Precio', render: (v) => `$${v.toFixed(2)}` },
+    { key: 'price', label: 'Precio'},
   ];
 
   const mockData = [
