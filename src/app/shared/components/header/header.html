@@ -1,26 +1,202 @@
-<p>header works!</p>
-<div class="relative flex w-full justify-center max-w-xs mx-auto inline-block text-left">
-  <!-- Botón del desplegable -->
-  <button 
-    class="inline-flex justify-center w-full px-4 py-2 bg-gray-900 text-white rounded-md hover:bg-gray-700 focus:outline-none"
-    (click)="toggleOpen()">
-    Menú temporal
-    <svg class="ml-2 h-5 w-5" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
-    </svg>
-  </button>
+<header class="sticky top-0 z-50 w-full bg-white border-b border-gray-200 shadow-sm">
+  <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+    <div class="flex items-center justify-between h-16">
+      <!-- Logo Section -->
+      <a routerLink="/admin/home" class="flex items-center gap-3 sm:gap-4">
 
-   @if(isOpen){
-  <ul  
-      class="absolute right-0 mt-2 w-56 bg-gray-900 text-white rounded-lg shadow-lg p-2 grid gap-2">
-    <li><a routerLink="/login" class="block px-4 py-2 rounded hover:bg-red-600 transition">Login</a></li>
-    <li><a routerLink="/admin/home" class="block px-4 py-2 rounded hover:bg-blue-600 transition">Dashboard</a></li>
-    <li><a routerLink="/admin/products" class="block px-4 py-2 rounded hover:bg-blue-600 transition">Productos</a></li>
-    <li><a routerLink="/admin/product-form" class="block px-4 py-2 rounded hover:bg-blue-600 transition">Nuevo Producto</a></li>
-    <li><a routerLink="/admin/categories" class="block px-4 py-2 rounded hover:bg-blue-600 transition">Categorías</a></li>
-    <li><a routerLink="/admin/category-form" class="block px-4 py-2 rounded hover:bg-blue-600 transition">Nueva Categoría</a></li>
-    <li><a routerLink="/admin/settings" class="block px-4 py-2 rounded hover:bg-blue-600 transition">Configuración</a></li>
-  </ul>
-   }
+          <img
+            [src]="getDisplayLogo()"
+            alt="Logo"
+            class="h-13 w-13  rounded-full object-contain"
+          />
 
-</div>
+      </a>
+      <!-- Menu temporal -->
+      <div class="relative flex w-50 justify-center max-w-xs mx-auto  text-left">
+        <!-- Botón del desplegable -->
+        <button
+          class="inline-flex justify-center w-full px-4 py-2 bg-gray-900 text-white rounded-md hover:bg-gray-700 focus:outline-none"
+          (click)="toggleOpen()"
+        >
+          Menú temporal
+          <svg
+            class="ml-2 h-5 w-5"
+            xmlns="http://www.w3.org/2000/svg"
+            fill="none"
+            viewBox="0 0 24 24"
+            stroke="currentColor"
+          >
+            <path
+              stroke-linecap="round"
+              stroke-linejoin="round"
+              stroke-width="2"
+              d="M19 9l-7 7-7-7"
+            />
+          </svg>
+        </button>
+
+        @if (isOpen) {
+          <ul
+            class="absolute right-0 mt-10 w-56 bg-gray-900 text-white rounded-lg shadow-lg p-2 grid gap-2"
+          >
+            <li>
+              <a routerLink="/login" class="block px-4 py-2 rounded hover:bg-red-600 transition"
+                >Login</a
+              >
+            </li>
+            <li>
+              <a
+                routerLink="/admin/home"
+                class="block px-4 py-2 rounded hover:bg-blue-600 transition"
+                >Dashboard</a
+              >
+            </li>
+            <li>
+              <a
+                routerLink="/admin/products"
+                class="block px-4 py-2 rounded hover:bg-blue-600 transition"
+                >Productos</a
+              >
+            </li>
+            <li>
+              <a
+                routerLink="/admin/product-form"
+                class="block px-4 py-2 rounded hover:bg-blue-600 transition"
+                >Nuevo Producto</a
+              >
+            </li>
+            <li>
+              <a
+                routerLink="/admin/categories"
+                class="block px-4 py-2 rounded hover:bg-blue-600 transition"
+                >Categorías</a
+              >
+            </li>
+            <li>
+              <a
+                routerLink="/admin/category-form"
+                class="block px-4 py-2 rounded hover:bg-blue-600 transition"
+                >Nueva Categoría</a
+              >
+            </li>
+            <li>
+              <a
+                routerLink="/admin/settings"
+                class="block px-4 py-2 rounded hover:bg-blue-600 transition"
+                >Configuración</a
+              >
+            </li>
+          </ul>
+        }
+      </div>
+      <!-- User Menu -->
+      <div class="relative">
+        <button
+          type="button"
+          (click)="toggleMenu()"
+          class="flex items-center gap-2 sm:gap-3 px-2 sm:px-3 py-2 rounded-sm hover:bg-gray-50 transition-colors"
+        >
+          <!-- User Avatar -->
+          <div class="relative">
+            @if (user().avatar) {
+              <img
+                [src]="user().avatar"
+                [alt]="user().name"
+                class="w-8 h-8 sm:w-9 sm:h-9 rounded-full object-cover border-2 border-gray-200"
+                (error)="$event.target.style.display = 'none'"
+              />
+            } @else {
+              <div
+                class="w-8 h-8 sm:w-9 sm:h-9 rounded-full bg-gray-200 flex items-center justify-center border-2 border-gray-300"
+              >
+                <span class="text-xs sm:text-sm font-medium text-gray-600">
+                  {{ getUserInitials() }}
+                </span>
+              </div>
+            }
+
+            <!-- Online indicator (optional) -->
+            <span
+              class="absolute bottom-0 right-0 block h-2.5 w-2.5 rounded-full bg-green-500 ring-2 ring-white"
+            ></span>
+          </div>
+
+          <!-- User Info (hidden on mobile) -->
+          <div class="hidden md:flex flex-col items-start min-w-0">
+            <span class="text-sm font-medium text-gray-900 truncate max-w-[150px]">
+              {{ user().name }}
+            </span>
+            <span class="text-xs text-gray-500 truncate max-w-[150px]">
+              {{ user().role }}
+            </span>
+          </div>
+
+          <!-- Chevron Icon -->
+          <lucide-angular
+            [img]="chevronDown"
+            class="w-4 h-4 text-gray-500 transition-transform"
+            [class.rotate-180]="isMenuOpen()"
+          />
+        </button>
+
+        <!-- Dropdown Menu -->
+        @if (isMenuOpen()) {
+          <div
+            class="absolute right-0 mt-2 w-56  bg-white border border-gray-200 rounded-sm shadow-lg z-50"
+          >
+            <!-- User Info Card (mobile only) -->
+            <div class="md:hidden px-4 py-3 border-b border-gray-200">
+              <p class="text-sm font-medium text-gray-900 truncate">
+                {{ user().name }}
+              </p>
+              <p class="text-xs text-gray-500 truncate mt-0.5">
+                {{ user().email }}
+              </p>
+            </div>
+
+            <!-- Menu Items -->
+            <div class="py-1">
+              <!-- Profile -->
+              <button
+                type="button"
+                (click)="goToProfile()"
+                class="w-full flex items-center gap-3 px-4 py-2.5 text-sm text-gray-700 hover:bg-gray-50 transition-colors"
+              >
+                <lucide-angular [img]="userIcon" class="w-4 h-4 text-gray-500" />
+                <span>Mi Perfil</span>
+              </button>
+
+              <!-- Settings -->
+              <button
+                type="button"
+                (click)="goToSettings()"
+                class="w-full flex items-center gap-3 px-4 py-2.5 text-sm text-gray-700 hover:bg-gray-50 transition-colors"
+              >
+                <lucide-angular [img]="settings" class="w-4 h-4 text-gray-500" />
+                <span>Configuración</span>
+              </button>
+
+              <!-- Divider -->
+              <div class="border-t border-gray-200 my-1"></div>
+
+              <!-- Logout -->
+              <button
+                type="button"
+                (click)="logout()"
+                class="w-full flex items-center gap-3 px-4 py-2.5 text-sm text-red-600 hover:bg-red-50 transition-colors"
+              >
+                <lucide-angular [img]="logOut" class="w-4 h-4" />
+                <span>Cerrar sesión</span>
+              </button>
+            </div>
+          </div>
+        }
+      </div>
+    </div>
+  </div>
+</header>
+
+<!-- Overlay para cerrar menú al hacer click fuera -->
+@if (isMenuOpen()) {
+  <div class="fixed inset-0 z-40" (click)="closeMenu()"></div>
+}
