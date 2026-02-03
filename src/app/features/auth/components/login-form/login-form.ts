@@ -2,6 +2,7 @@ import { Component, inject, signal } from '@angular/core';
 import { LucideAngularModule, Utensils, LogIn, Eye, EyeOff, Loader } from 'lucide-angular';
 import { FormBuilder, ReactiveFormsModule, Validators} from '@angular/forms';
 import { AuthService } from '../../services/authService';
+import { Notification } from '../../../../core/services/notification';
 @Component({
   selector: 'app-login-form',
   imports: [LucideAngularModule, ReactiveFormsModule],
@@ -11,6 +12,9 @@ import { AuthService } from '../../services/authService';
 export class LoginForm {
 
   private fb = inject(FormBuilder);
+  private authService = inject(AuthService);
+  private notification = inject(Notification);
+
   constructor() {}
 
   loginForm = this.fb.group({
@@ -39,19 +43,31 @@ export class LoginForm {
   // metodo para enviar el formulario y controlador para modal de carga
   isLoading = signal(false);
 
-   onSubmit(): string {
+   onSubmit(): void {
+    this.isLoading.set(true);
     if (this.loginForm.invalid) {
-      return `Formulario invalido`;
+      // si el formulario es invalido notificamos al usuario
+      this.notification.error('Por favor, complete el formulario correctamente.');
+      this.isLoading.set(false);
+      return;
     }
     const { email, password } = this.loginForm.value;
     this.claerForm();
-    console.log(`Formulario enviado con exito: ${ email } - ${ password }`);
-    
-    return `Formulario enviado con exito: ${ email } - ${ password }`;
+    console.log(`Formulario provado con exito: ${ email } - ${ password }`);
   }
 
   // metodo para iniciar sesion con google
   async Google(): Promise<boolean | void> {
     // llamamos al servicio de autenticacion de google
+    this.isLoading.set(true);
+    try {
+      await this.authService.loginGoogle();
+      this.isLoading.set(false);
+      return true;
+    } catch (error) {
+      console.error('Error al iniciar sesion con Google:', error);
+      this.isLoading.set(false);
+      return false;
+    }
   }
 }
