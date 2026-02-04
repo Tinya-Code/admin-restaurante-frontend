@@ -1,6 +1,6 @@
 import { Location } from '@angular/common';
 import { ComponentFixture, TestBed } from '@angular/core/testing';
-import { RouterTestingModule } from '@angular/router/testing';
+import { provideRouter } from '@angular/router';
 import { Navbar, NavItem } from './navbar';
 
 fdescribe('Navbar', () => {
@@ -13,8 +13,8 @@ fdescribe('Navbar', () => {
     mockLocation.path.and.returnValue('/admin/home');
 
     await TestBed.configureTestingModule({
-      imports: [Navbar, RouterTestingModule],
-      providers: [{ provide: Location, useValue: mockLocation }],
+      imports: [Navbar],
+      providers: [{ provide: Location, useValue: mockLocation }, provideRouter([])],
     }).compileComponents();
   });
 
