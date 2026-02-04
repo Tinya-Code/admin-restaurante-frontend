@@ -1,7 +1,15 @@
 import { CommonModule, Location } from '@angular/common';
 import { Component, computed, inject, input, output, signal } from '@angular/core';
 import { Router } from '@angular/router';
-import { Grid3x3, Home, LucideAngularModule, Settings, UtensilsCrossed } from 'lucide-angular';
+import {
+  ChevronLeft,
+  ChevronRight,
+  Grid3x3,
+  Home,
+  LucideAngularModule,
+  Settings,
+  UtensilsCrossed,
+} from 'lucide-angular';
 
 export interface NavItem {
   id: string;
@@ -25,6 +33,11 @@ export class Navbar {
   private readonly location = inject(Location);
 
   readonly activeItem = signal<string>('');
+  readonly isCollapsed = signal<boolean>(false);
+
+  // Icon references for template
+  readonly ChevronLeftIcon = ChevronLeft;
+  readonly ChevronRightIcon = ChevronRight;
 
   readonly navItems = signal<NavItem[]>([
     { id: 'inicio', label: 'Inicio', icon: Home, route: '/admin/home' },
@@ -44,6 +57,10 @@ export class Navbar {
     );
     return activeNav || this.navItems()[0]; // Fallback to first item
   });
+
+  toggleCollapse(): void {
+    this.isCollapsed.set(!this.isCollapsed());
+  }
 
   onItemClick(itemId: string): void {
     const navItem = this.navItems().find((item) => item.id === itemId);
