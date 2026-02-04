@@ -1,4 +1,4 @@
-import { CommonModule } from '@angular/common';
+import { CommonModule, Location } from '@angular/common';
 import { Component, computed, inject, input, output, signal } from '@angular/core';
 import { Router } from '@angular/router';
 import { Grid3x3, Home, LucideAngularModule, Settings, UtensilsCrossed } from 'lucide-angular';
@@ -22,8 +22,9 @@ export interface NavItem {
 })
 export class Navbar {
   private readonly router = inject(Router);
+  private readonly location = inject(Location);
 
-  readonly activeItem = signal<string>('inicio');
+  readonly activeItem = signal<string>('');
 
   readonly navItems = signal<NavItem[]>([
     { id: 'inicio', label: 'Inicio', icon: Home, route: '/admin/home' },
@@ -36,12 +37,15 @@ export class Navbar {
 
   readonly navigationClick = output<string>();
 
-  readonly activeItemData = computed(() =>
-    this.navItems().find((item) => item.id === this.activeItem())
-  );
+  readonly activeItemData = computed(() => {
+    const currentPath = this.location.path();
+    const activeNav = this.navItems().find(
+      (item) => currentPath.includes(item.route) || item.route.includes(currentPath)
+    );
+    return activeNav || this.navItems()[0]; // Fallback to first item
+  });
 
   onItemClick(itemId: string): void {
-    this.activeItem.set(itemId);
     const navItem = this.navItems().find((item) => item.id === itemId);
     if (navItem) {
       this.router.navigate([navItem.route]);
@@ -50,6 +54,10 @@ export class Navbar {
   }
 
   isActive(itemId: string): boolean {
-    return this.activeItem() === itemId;
+    const currentPath = this.location.path();
+    const navItem = this.navItems().find((item) => item.id === itemId);
+    if (!navItem) return false;
+
+    return currentPath.includes(navItem.route) || navItem.route.includes(currentPath);
   }
 }
