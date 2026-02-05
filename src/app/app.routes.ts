@@ -49,7 +49,6 @@ export const routes: Routes = [
         loadComponent: () =>
           import('./features/admin/configuration/pages/configuration-page/configuration-page').then(m => m.ConfigurationPage),
       },
-
       { path: '', redirectTo: 'home', pathMatch: 'full' },
     ],
   },
