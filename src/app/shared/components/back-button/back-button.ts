@@ -1,4 +1,4 @@
-import { Component, signal } from '@angular/core';
+import { Component, inject, signal } from '@angular/core';
 import { CommonModule, Location } from '@angular/common';
 import { LucideAngularModule, ArrowLeft } from 'lucide-angular';
 
@@ -12,6 +12,7 @@ import { LucideAngularModule, ArrowLeft } from 'lucide-angular';
 export class BackButton {
   /** Texto del botón */
   text = signal('Volver');
+  location = inject(Location);
 
   /** Mostrar icono */
   showIcon = signal(true);
@@ -25,7 +26,7 @@ export class BackButton {
   /** Icono importado de Lucide */
   readonly icon = ArrowLeft;
 
-  constructor(private location: Location) {}
+
 
   /**
    * Navega a la página anterior en el historial del navegador
