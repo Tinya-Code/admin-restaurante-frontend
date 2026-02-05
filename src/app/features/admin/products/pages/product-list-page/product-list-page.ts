@@ -4,6 +4,8 @@ import { Edit, Trash2, Eye } from 'lucide-angular';
 import type { Product } from '../../../../../core/models/product.model';
 import productPaginate from '../../../../../data/productsPaginate.json';
 import categoriesPaginate from '../../../../../data/categoriesPaginate.json';
+import { CategoryList } from "../../components/category-list/category-list";
+import { SearchBar } from "../../components/search-bar/search-bar";
 
 interface ApiResponse {
   status: string;
@@ -15,7 +17,7 @@ interface ApiResponse {
 
 @Component({
   selector: 'app-product-list-page',
-  imports: [DataTable],
+  imports: [DataTable, CategoryList, SearchBar],
   templateUrl: './product-list-page.html',
   styleUrl: './product-list-page.css'
 })

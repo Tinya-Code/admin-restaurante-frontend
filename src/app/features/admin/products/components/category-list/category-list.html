@@ -1,0 +1,10 @@
+<section class="w-full z-100 h-10">
+    <div class="absolute w-full h-13 transition duration-500 animate-scroll flex items-center justify-center gap-4 hover:flex-wrap hover:h-auto hover:bg-[#b6b6b6b0] hover:backdrop-blur-[2px] bg-[#b6b6b6] p-2">
+        @for (item of categoryList(); track item.id) {
+            <button class="bg-white  w-auto px-4 py-2 rounded-full text-sm font-medium text-gray-700 hover:bg-gray-200 transition flex-shrink-0">
+                {{item.name}}
+            </button>
+        }
+    </div>
+  
+</section>
