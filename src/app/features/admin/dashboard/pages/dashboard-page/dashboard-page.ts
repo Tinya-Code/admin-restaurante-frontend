@@ -1,5 +1,5 @@
 import { CommonModule } from '@angular/common';
-import { ChangeDetectionStrategy, Component, signal } from '@angular/core';
+import { ChangeDetectionStrategy, Component, computed, signal } from '@angular/core';
 import {
   Box,
   Edit,
@@ -9,6 +9,7 @@ import {
   QrCode,
   Share2,
 } from 'lucide-angular';
+import products from '../../../../../data/products.json';
 import {
   DataTable,
   PaginationMeta,
@@ -18,12 +19,24 @@ import {
 import { StatsCard } from '../../components/stats-card/stats-card';
 
 interface Product {
-  id: number;
-  image: string;
+  id: string;
+  category_name: string;
   name: string;
-  category: string;
+  description: string;
   price: number;
+  image_url: string | null;
+  is_available: boolean;
   created_at: string;
+  updated_at: string;
+}
+
+interface Category {
+  id: string;
+  restaurant_id: string;
+  name: string;
+  is_active: boolean;
+  created_at: string;
+  update_at: string;
 }
 
 @Component({
@@ -35,52 +48,39 @@ interface Product {
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class DashboardPage {
-  // Mock data
-  readonly totalProducts = signal(156);
-  readonly totalCategories = signal(12);
+  // Data from JSON files
+  private products: Product[] = [];
+  private categories: Category[] = [];
 
-  readonly recentProducts = signal<Product[]>([
-    {
-      id: 1,
-      image: 'https://via.placeholder.com/150',
-      name: 'Pizza Margarita',
-      category: 'Pizzas',
-      price: 12.99,
-      created_at: '2024-01-15T10:30:00Z',
-    },
-    {
-      id: 2,
-      image: 'https://via.placeholder.com/150',
-      name: 'Hamburguesa Clásica',
-      category: 'Hamburguesas',
-      price: 8.99,
-      created_at: '2024-01-14T15:20:00Z',
-    },
-    {
-      id: 3,
-      image: 'https://via.placeholder.com/150',
-      name: 'Ensalada César',
-      category: 'Ensaladas',
-      price: 6.99,
-      created_at: '2024-01-13T12:10:00Z',
-    },
-    {
-      id: 4,
-      image: 'https://via.placeholder.com/150',
-      name: 'Pasta Carbonara',
-      category: 'Pastas',
-      price: 10.99,
-      created_at: '2024-01-12T18:45:00Z',
-    },
-    {
-      id: 5,
-      image: 'https://via.placeholder.com/150',
-      name: 'Tacos de Carnitas',
-      category: 'Tacos',
-      price: 9.99,
-      created_at: '2024-01-11T14:30:00Z',
-    },
-  ]);
+  constructor() {
+    // Load data from JSON files
+    this.loadData();
+  }
+
+  private loadData(): void {
+    this.products = products;
+  }
+
+  // Computed values from real data
+  readonly totalProducts = computed(() => this.products.length);
+  readonly totalCategories = computed(
+    () => this.categories.filter((category) => category.is_active).length
+  );
+
+  // Get 5 most recent products
+  readonly recentProducts = computed(() => {
+    return this.products
+      .sort((a, b) => new Date(b.created_at).getTime() - new Date(a.created_at).getTime())
+      .slice(0, 5)
+      .map((product) => ({
+        id: product.id,
+        name: product.name,
+        category: product.category_name,
+        price: product.price,
+        image: product.image_url,
+        created_at: product.created_at,
+      }));
+  });
 
   readonly paginationMeta = signal<PaginationMeta>({
     limit: 5,
