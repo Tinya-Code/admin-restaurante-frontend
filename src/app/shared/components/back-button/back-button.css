@@ -1,0 +1,94 @@
+:host {
+  display: inline-block;
+  --back-color: #3b82f6; /* Celeste principal */
+  --back-color-hover: #2563eb;
+  --back-bg: transparent;
+  --back-bg-hover: rgba(59, 130, 246, 0.1);
+  --back-font-size: 1rem;
+  --back-font-weight: 500;
+  --back-transition: all 0.25s ease;
+}
+
+/* Botón base */
+.back-button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0.6rem 1rem;
+  background-color: var(--back-bg);
+  color: var(--back-color);
+  border: 2px solid transparent;
+  border-radius: 0.5rem;
+  font-size: var(--back-font-size);
+  font-weight: var(--back-font-weight);
+  cursor: pointer;
+  transition: var(--back-transition);
+}
+
+/* Hover y Active */
+.back-button:hover {
+  background-color: var(--back-bg-hover);
+  color: var(--back-color-hover);
+  transform: translateX(-2px);
+}
+
+.back-button:active {
+  transform: translateX(0);
+  background-color: rgba(59, 130, 246, 0.2);
+}
+
+/* Contenedor del contenido (ícono + texto) */
+.back-button__content {
+  display: inline-flex; 
+  align-items: center; 
+  justify-content: center;
+  gap: 0.5rem;  
+  line-height: 1;   
+}
+
+/* Icono */
+.back-button__icon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  vertical-align: middle;
+  color: var(--back-color, #3b82f6);
+  width: 22px;
+  height: 22px;
+  flex-shrink: 0;               /* Evita que se deforme */
+  transition: transform 0.25s ease, color 0.25s ease;
+}
+
+.back-button:hover .back-button__icon {
+  color: var(--back-color-hover, #2563eb);
+  transform: translateX(-3px);
+}
+
+/* Texto */
+.back-button__text {
+  color: var(--back-color, #3b82f6);
+  font-weight: 500;
+  letter-spacing: 0.01em;
+  vertical-align: middle;
+}
+
+/* Focus accesible */
+.back-button:focus-visible {
+  outline: 2px solid var(--back-color);
+  outline-offset: 2px;
+}
+
+/* Deshabilitado */
+.back-button:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+  pointer-events: none;
+}
+
+/* Adaptable en pantallas pequeñas */
+@media (max-width: 640px) {
+  .back-button {
+    padding: 0.5rem 0.75rem;
+    font-size: 0.9rem;
+  }
+}

@@ -1,1 +1,21 @@
-<p>back-button works!</p>
+<button 
+  type="button"
+  class="back-button {{ customClass() }}"
+  (click)="goBack()"
+  [attr.aria-label]="ariaLabel()"
+  [attr.title]="ariaLabel()">
+
+  <span class="back-button__content">
+    @if (showIcon()) {
+      <lucide-icon
+        [img]="icon"
+        name="arrow-left"
+        class="back-button__icon"
+        size="20"
+        strokeWidth="2.5"
+        aria-hidden="true">
+      </lucide-icon>
+    }
+    <span class="back-button__text">{{ text() }}</span>
+  </span>
+</button>

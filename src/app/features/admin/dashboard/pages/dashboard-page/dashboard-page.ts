@@ -39,6 +39,7 @@ interface Category {
   update_at: string;
 }
 
+
 @Component({
   selector: 'app-dashboard-page',
   standalone: true,
