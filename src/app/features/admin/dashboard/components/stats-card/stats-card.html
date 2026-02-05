@@ -1,1 +1,14 @@
-<p>stats-card works!</p>
+<div
+  role="article"
+  aria-labelledby="stats-title"
+  class="border border-gray-200 rounded-lg p-4 md:p-6 shadow flex gap-2 md:gap-6 items-center"
+>
+  @if (icon()) {
+  <lucide-icon [img]="icon()" class="text-blue-400 h-12 w-12 md:h-14 md:w-14" />
+  }
+
+  <div>
+    <h3 class="text-3xl font-bold md:text-3xl">{{ value() }}</h3>
+    <p id="stats-title">{{ title() }}</p>
+  </div>
+</div>
