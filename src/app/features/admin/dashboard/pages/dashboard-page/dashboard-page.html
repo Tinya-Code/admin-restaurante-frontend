@@ -1,1 +1,62 @@
-<p>dashboard-page works!</p>
+<div class="max-w-6xl mx-auto pt-6 p-4 md:p-8" style="font-family: var(--font-poppins)">
+  <!-- Stats Cards -->
+  <section class="mb-12" aria-label="Estadísticas generales">
+    <h2 class="text-xl font-semibold text-gray-900 mb-6">Resumen</h2>
+
+    <div class="grid grid-cols-1 grid-cols-2 gap-3 md:gap-6 mb-8">
+      <app-stats-card
+        [title]="'Productos'"
+        [value]="totalProducts()"
+        [icon]="HandPlatterIcon"
+        [variant]="'primary'"
+      />
+
+      <app-stats-card
+        [title]="'Categorías'"
+        [value]="totalCategories()"
+        [icon]="BoxIcon"
+        [variant]="'secondary'"
+      />
+    </div>
+  </section>
+
+  <!-- Action Buttons -->
+  <section class="mb-12" aria-label="Acciones rápidas">
+    <h2 class="text-xl font-semibold text-gray-900 mb-6">Acciones Rápidas</h2>
+    <div class="flex gap-4 w-full justify-center">
+      <button
+        class="flex flex-1 items-center md:gap-3 gap-2 md:px-6 px-4 py-3 rounded-full font-medium text-sm border border-gray-300 cursor-pointer transition-all duration-200 text-gray-900 border-gray-300 hover:bg-gray-50 hover:border-gray-400 focus:outline-2 focus:outline-blue-500 focus:outline-offset-2 justify-center"
+        (click)="copyQRCode()"
+        aria-label="Copiar código QR del menú"
+      >
+        <lucide-icon [img]="QrCodeIcon" class="w-5 h-5 flex-shrink-0" />
+        <span class="whitespace-nowrap">Generar QR</span>
+      </button>
+
+      <button
+        class="flex flex-1 items-center md:gap-3 gap-2 md:px-6 px-4 py-3 rounded-full font-medium text-sm border-2 border-transparent cursor-pointer transition-all duration-200 font-inherit bg-blue-500 text-white border-blue-500 hover:bg-blue-600 hover:border-blue-600 focus:outline-2 focus:outline-blue-500 focus:outline-offset-2 justify-center"
+        (click)="shareMenuLink()"
+        aria-label="Compartir link del menú"
+      >
+        <lucide-icon [img]="Share2Icon" class="w-5 h-5 flex-shrink-0" />
+        <span class="whitespace-nowrap">Compartir link</span>
+      </button>
+    </div>
+  </section>
+
+  <!-- Recent Products -->
+  <section class="mb-8" aria-label="Productos recientes">
+    <h2 class="text-xl font-semibold text-gray-900 mb-6">Productos Recientes</h2>
+
+    <app-data-table
+      [imageKey]="'image'"
+      [dataSource]="recentProducts()"
+      [meta]="paginationMeta()"
+      [columns]="columns"
+      [actions]="tableActions"
+      [emptyMessage]="'No hay productos recientes'"
+      [mobileMaxFields]="3"
+      (pageChange)="onPageChange($event)"
+    />
+  </section>
+</div>
