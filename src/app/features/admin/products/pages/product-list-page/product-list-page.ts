@@ -92,11 +92,40 @@ readonly columns: TableColumn[] = [
     this.loadProducts(1, 10);
   }
 
-  private async loadProducts(page: number, limit: number): Promise<void> {
-    this.products.set(productPaginate.data);
+  private async loadProducts(page: number, limit: number, category:string = `all`): Promise<void> {
+
+    const snapShot = await this.getProduct(category);
+    this.products.set(snapShot)
     this.meta.set(productPaginate.meta);
  
   }
+  
+  //variable que contiene categorya emitida por category-list
+  category = signal<string>(`all`)
+  // Insetamos la funcion getproduc para que este pueda extraer de base de datos los valores filtrados.
+  async getProduct(category:string ):Promise<Product[]> {
+    try{
+
+      // para simulacion condicionaremos el retorno de all  json completo
+      if( category === `all` ){
+        return productPaginate.data as Product[]
+      }
+      //variable que contendra res del backend
+      const data:Product[] = await productPaginate.data.filter( product => product.category_name === category)
+      // retoramos data con datos ( filtrados para esta simulacion )
+      return data
+    }catch (error){
+      console.log(`error en conseguir productos de categoria ${category}`, error);
+      return [];
+    }
+    
+  }
+
+  onCategoryChange(category: string): void {
+  this.category.set(category);
+  this.loadProducts(1, 10, category);
+}
+
 
 
   onPageChange(page: number): void {

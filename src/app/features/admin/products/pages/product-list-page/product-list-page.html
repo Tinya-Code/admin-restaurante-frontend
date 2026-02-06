@@ -1,5 +1,8 @@
 <app-search-bar> </app-search-bar>
-<app-category-list></app-category-list>
+
+<app-category-list
+  (categoryChange)="onCategoryChange($event)">
+</app-category-list>
 
 <div class="p-4 sm:p-6 lg:p-8">
   <div class="mb-6">
