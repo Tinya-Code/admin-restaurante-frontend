@@ -1,1 +1,31 @@
-<p>category-list-page works!</p>
+<section class="category-list-page w-full min-h-screen bg-gray-50 p-4 flex flex-col gap-4">
+
+  <!-- 🔹 Encabezado principal de la página -->
+  <header class="page-header">
+    <h1 class="text-2xl font-semibold text-gray-800">Gestión de Categorías</h1>
+  </header>
+
+  <!-- 🔹 Espacio reservado para la barra de búsqueda -->
+  <section
+    class="search-bar-placeholder w-full max-h-20 h-20 bg-white border border-gray-200 rounded-xl flex items-center justify-center shadow-sm">
+    <!-- ⚠️ Solo reservado, sin funcionalidad -->
+    <p class="text-gray-400 text-sm select-none italic">
+      (Espacio reservado para la barra de búsqueda)
+    </p>
+  </section>
+
+  <!-- 🔹 Contenedor principal del DataTable -->
+  <main class="flex-1 w-full">
+    <app-data-table
+      [dataSource]="dataSource"
+      [meta]="meta"
+      [columns]="columns"
+      [actions]="actions"
+      [showToggle]="true"
+      (rowClick)="onRowClick($event)"
+      (pageChange)="onPageChange($event)"
+      (toggleChange)="onToggleChange($event)">
+    </app-data-table>
+  </main>
+
+</section>
