@@ -5,7 +5,7 @@ import type { Product } from '../../../../../core/models/product.model';
 import productPaginate from '../../../../../data/productsPaginate.json';
 import categoriesPaginate from '../../../../../data/categoriesPaginate.json';
 import { CategoryList } from "../../components/category-list/category-list";
-import { SearchBar } from "../../components/search-bar/search-bar";
+import { SearchBar } from "../../../../../shared/components/search-bar/search-bar";
 
 interface ApiResponse {
   status: string;
