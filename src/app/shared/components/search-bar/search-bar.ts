@@ -17,7 +17,7 @@ export class SearchBar {
 
   // signal para almacenar la palabra buscada
   word = this.fb.group({
-    searchWord: [ `` , [Validators.minLength(4)]]
+    searchWord: [ `` , [Validators.minLength(4), Validators.maxLength(100)]]
   })
 
   // adjudicamos al metodo onsearch la logica de busqueda con retorno de la palabra buscada para conprovar su funcionamiento
