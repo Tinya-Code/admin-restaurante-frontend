@@ -8,24 +8,21 @@
   <!-- 🔹 Espacio reservado para la barra de búsqueda -->
   <section
     class="search-bar-placeholder w-full max-h-20 h-20 bg-white border border-gray-200 rounded-xl flex items-center justify-center shadow-sm">
-    <!-- ⚠️ Solo reservado, sin funcionalidad -->
-    <p class="text-gray-400 text-sm select-none italic">
-      (Espacio reservado para la barra de búsqueda)
-    </p>
+    <app-search-bar></app-search-bar>
   </section>
 
   <!-- 🔹 Contenedor principal del DataTable -->
   <main class="flex-1 w-full">
     <app-data-table
-      [dataSource]="dataSource"
-      [meta]="meta"
-      [columns]="columns"
-      [actions]="actions"
+      [dataSource]="dataSource()"
+      [meta]="meta()"
+      [columns]="columns()"
+      [actions]="actions()"
+      [loading]="loading()"
       [showToggle]="true"
       (rowClick)="onRowClick($event)"
       (pageChange)="onPageChange($event)"
       (toggleChange)="onToggleChange($event)">
     </app-data-table>
   </main>
-
 </section>

@@ -32,3 +32,34 @@
   font-style: italic;
   box-shadow: 0 1px 3px rgba(0,0,0,0.05);
 }
+
+.page-header {
+  padding-bottom: 0.5rem;
+}
+
+.search-section {
+  max-height: 5rem; /* h-20 */
+  background-color: transparent;
+}
+
+/* Alineaciones de columnas */
+th {
+  text-transform: uppercase;
+  font-weight: 600;
+  color: #6b7280;
+}
+
+th:first-child,
+td:first-child {
+  text-align: left;
+}
+
+th:nth-child(2),
+td:nth-child(2) {
+  text-align: center;
+}
+
+th:nth-child(3),
+td:nth-child(3) {
+  text-align: center;
+}

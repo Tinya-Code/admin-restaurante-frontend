@@ -10,6 +10,7 @@ import {
 } from 'lucide-angular';
 import { CurrencyPipe } from '../../pipes/currency-pipe';
 import { DateFormatPipe } from '../../pipes/date-format-pipe';
+import { NgZone } from '@angular/core';
 
 export interface TableColumn {
   key: string;
@@ -75,6 +76,9 @@ export class DataTable {
   // State
   readonly openMenuIndex = signal<number | null>(null);
 
+  // 🧭 Posición del menú contextual (para mostrar fuera del overflow)
+  readonly menuPosition = signal<{ x: number; y: number }>({ x: 0, y: 0 });
+
   // Computed
   readonly mobileColumns = computed(() => {
     return this.columns()
@@ -117,16 +121,13 @@ export class DataTable {
     return Math.min(this.startIndex() + data.length - 1, meta.total_items);
   });
 
-
-applyCellPipe(value: any, column: TableColumn): any {
-  if (!column.pipe) {
+  applyCellPipe(value: any, column: TableColumn): any {
+    if (!column.pipe) {
+      return value;
+    }
     return value;
   }
 
-  // Aquí podrías aplicar pipes programáticamente si fuera necesario
-  // pero es mejor hacerlo directamente en el template
-  return value;
-}
   // Pagination
   goToPage(page: number | string): void {
     if (typeof page === 'number') {
@@ -157,11 +158,9 @@ applyCellPipe(value: any, column: TableColumn): any {
   }
 
   // Helpers
- 
-getCellValue(row: any, column: TableColumn): any {
-  return row[column.key] ?? '';
-  // Ya no aplicamos render aquí, se hace en el template con pipes
-}
+  getCellValue(row: any, column: TableColumn): any {
+    return row[column.key] ?? '';
+  }
 
   getImageUrl(row: any): string {
     return (
@@ -185,15 +184,43 @@ getCellValue(row: any, column: TableColumn): any {
     this.toggleChange.emit({ row, enabled });
   }
 
-  toggleMenu(index: number, event: Event): void {
+  constructor(private ngZone: NgZone) {
+    window.addEventListener('scroll', () => this.closeMenu());
+    window.addEventListener('resize', () => this.closeMenu());
+  }
+
+  /**
+   * 🧭 Calcula la posición del menú contextual y lo muestra
+   */
+  toggleMenu(index: number, event: MouseEvent): void {
     event.stopPropagation();
-    this.openMenuIndex.set(this.openMenuIndex() === index ? null : index);
+
+    const current = this.openMenuIndex();
+    if (current === index) {
+      this.openMenuIndex.set(null);
+      return;
+    }
+
+    // Obtener posición absoluta del clic
+    const rect = (event.target as HTMLElement).getBoundingClientRect();
+    const scrollY = window.scrollY || document.documentElement.scrollTop;
+    const scrollX = window.scrollX || document.documentElement.scrollLeft;
+
+    this.menuPosition.set({
+      x: rect.left + scrollX - 140, // ajusta si el menú sale del viewport
+      y: rect.bottom + scrollY + 6, // justo debajo del botón
+    });
+
+    this.openMenuIndex.set(index);
   }
 
   closeMenu(): void {
     this.openMenuIndex.set(null);
   }
 
+  /**
+   * Acción del menú contextual
+   */
   onActionClick(action: TableAction, row: any, event: Event): void {
     event.stopPropagation();
     action.handler(row);
