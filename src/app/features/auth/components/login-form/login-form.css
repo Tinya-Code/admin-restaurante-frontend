@@ -1,0 +1,14 @@
+.btn-google {
+  background: linear-gradient(to top, #f26522 50%, white 50%);
+  background-size: 100% 200%;
+  background-position: top;
+  transition: background-position 0.4s ease;
+}
+
+.btn-google:hover {
+  background-position: bottom;
+}
+
+button{
+    cursor: pointer;
+}

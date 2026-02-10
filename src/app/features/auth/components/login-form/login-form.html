@@ -1,1 +1,173 @@
-<p>login-form works!</p>
+<!-- Contenedor principal del formulario (centrado y con ancho máximo) -->
+<div class="w-full h-full max-w-[480px] px-6 py-12">
+
+  <!-- Tarjeta blanca con sombra -->
+  <div class="bg-white rounded-xl shadow-2xl overflow-hidden flex flex-col p-8 md:p-10 border border-[#e6e0db]">
+
+    <!-- Header / branding -->
+    <div class="flex flex-col items-center mb-8">
+
+      <!-- Icono principal -->
+      <div class="bg-[#f26522]/10 p-3 rounded-full mb-4">
+        <lucide-icon
+          [name]="Utensils"
+          class="text-[#f26522] w-12 h-12">
+        </lucide-icon>
+      </div>
+
+      <!-- Título -->
+      <h1 class="text-[#181411] tracking-tight text-3xl font-bold leading-tight text-center">
+        Welcome back
+      </h1>
+
+      <!-- Subtítulo -->
+      <p class="text-[#897261] text-base font-normal leading-normal text-center mt-2">
+        Log in to explore our menus Manager
+      </p>
+    </div>
+
+    <!-- FORMULARIO REACTIVO -->
+    <!-- formGroup conecta el FormGroup del componente -->
+    <!-- ngSubmit ejecuta onSubmit() -->
+    <form
+      [formGroup]="loginForm"
+      (ngSubmit)="onSubmit()"
+      class="flex flex-col gap-5">
+
+      <!-- EMAIL -->
+      <label class="flex flex-col w-full">
+
+        <!-- Label -->
+        <p class="text-[#181411] text-sm font-semibold leading-normal pb-2">
+          Email Address
+        </p>
+
+        <!-- Input email -->
+        <!-- Se pinta el borde en rojo si el email es inválido y fue tocado -->
+        <input
+          type="email"
+          formControlName="email"
+          placeholder="name@example.com"
+          [class.border-red-500]="
+            loginForm.controls.email.errors?.['email'] &&
+            loginForm.controls.email.touched
+          "
+          class="flex w-full rounded-lg text-[#181411]
+                 focus:outline-0 focus:ring-2 focus:ring-[#f26522]/50
+                 border border-[#e6e0db] bg-white h-12
+                 placeholder:text-[#897261]/50 p-4 text-base
+                 font-normal transition-all" />
+      </label>
+
+      <!-- PASSWORD -->
+      <label class="flex flex-col w-full">
+
+        <!-- Label + link -->
+        <div class="flex justify-between items-center pb-2">
+          <p class="text-[#181411] text-sm font-semibold leading-normal">
+            Password
+          </p>
+
+          <!-- Link (idealmente debería ser button en el futuro) -->
+          <a
+            class="text-[#f26522] text-sm font-medium hover:underline"
+            href="#">
+            Forgot password?
+          </a>
+        </div>
+
+        <!-- Input password + icono toggle -->
+        <div class="flex w-full items-stretch relative">
+
+          <!-- Input password -->
+          <!-- El tipo cambia según el signal eyeController -->
+          <input
+            formControlName="password"
+            placeholder="Enter your password"
+            [type]="eyeController() ? 'password' : 'text'"
+            class="flex w-full rounded-lg text-[#181411]
+                   focus:outline-0 focus:ring-2 focus:ring-[#f26522]/50
+                   border border-[#e6e0db] bg-white h-12
+                   placeholder:text-[#897261]/50 p-4 pr-12
+                   text-base font-normal transition-all" />
+
+          <!-- Icono para mostrar/ocultar contraseña -->
+          <div
+            class="absolute right-4 top-1/2 -translate-y-1/2
+                   text-[#897261] cursor-pointer
+                   hover:text-[#f26522] transition-colors">
+
+            <lucide-icon
+              [name]="eyeController() ? Eye : EyeOff"
+              (click)="toggleEyeController()"
+              class="w-5 h-5">
+            </lucide-icon>
+          </div>
+        </div>
+      </label>
+
+      <!-- BOTÓN SUBMIT -->
+      <!-- Cambia texto e icono según isLoading -->
+      <button
+        type="submit"
+        class="w-full bg-[#f06a2c] hover:bg-[#d45114]
+               hover:scale-[1.01] text-white font-bold
+               py-3.5 rounded-lg transition-colors
+               shadow-lg shadow-[#f26522]/20
+               flex items-center justify-center gap-2 mt-2">
+
+        {{ isLoading() ? 'Loading...' : 'LogIn' }}
+
+        <lucide-icon
+          [name]="isLoading() ? Loader : LogIn"
+          [class.animate-spin]="isLoading()"
+          class="w-5 h-5">
+        </lucide-icon>
+      </button>
+    </form>
+
+    <!-- SEPARADOR -->
+    <div class="flex items-center my-8">
+      <div class="h-px bg-[#e6e0db] flex-1"></div>
+      <span class="px-4 text-[#897261] text-xs font-semibold uppercase tracking-wider">
+        Or continue with
+      </span>
+      <div class="h-px bg-[#e6e0db] flex-1"></div>
+    </div>
+
+    <!-- LOGIN CON GOOGLE -->
+    <!-- El click ejecuta el método Google() -->
+    <div (click)="Google()" class="grid gap-4">
+
+      <!-- IMPORTANTE: debería ser type="button" -->
+      <button
+        type="button"
+        class="btn-google flex items-center justify-center gap-2
+               border border-[#e6e0db] py-3 rounded-lg bg-white">
+
+        <!-- SVG del logo de Google -->
+        <svg class="w-5 h-5" viewBox="-3 0 262 262" xmlns="http://www.w3.org/2000/svg" preserveAspectRatio="xMidYMid" fill="#000000"><g id="SVGRepo_bgCarrier" stroke-width="0"></g><g id="SVGRepo_tracerCarrier" stroke-linecap="round" stroke-linejoin="round"></g><g id="SVGRepo_iconCarrier">
+            <path d="M255.878 133.451c0-10.734-.871-18.567-2.756-26.69H130.55v48.448h71.947c-1.45 12.04-9.283 30.172-26.69 42.356l-.244 1.622 38.755 30.023 2.685.268c24.659-22.774 38.875-56.282 38.875-96.027" fill="#4285F4"></path>
+            <path d="M130.55 261.1c35.248 0 64.839-11.605 86.453-31.622l-41.196-31.913c-11.024 7.688-25.82 13.055-45.257 13.055-34.523 0-63.824-22.773-74.269-54.25l-1.531.13-40.298 31.187-.527 1.465C35.393 231.798 79.49 261.1 130.55 261.1" fill="#34A853"></path>
+            <path d="M56.281 156.37c-2.756-8.123-4.351-16.827-4.351-25.82 0-8.994 1.595-17.697 4.206-25.82l-.073-1.73L15.26 71.312l-1.335.635C5.077 89.644 0 109.517 0 130.55s5.077 40.905 13.925 58.602l42.356-32.782" fill="#FBBC05"></path>
+            <path d="M130.55 50.479c24.514 0 41.05 10.589 50.479 19.438l36.844-35.974C195.245 12.91 165.798 0 130.55 0 79.49 0 35.393 29.301 13.925 71.947l42.211 32.783c10.59-31.477 39.891-54.251 74.414-54.251" fill="#EB4335">
+            </path></g>
+        </svg>
+
+        <span class="text-[#181411] text-sm font-semibold">
+          Google
+        </span>
+      </button>
+    </div>
+
+    <!-- Link a registro -->
+    <p class="mt-10 text-center text-sm text-[#897261]">
+      Don't have an account?
+      <a
+        class="text-[#f26522] font-bold hover:underline ml-1"
+        href="#">
+        Create an account
+      </a>
+    </p>
+  </div>
+</div>
