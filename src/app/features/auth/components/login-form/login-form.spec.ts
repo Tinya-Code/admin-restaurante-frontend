@@ -29,9 +29,18 @@ describe('LoginForm', () => {
     component = fixture.componentInstance;
     fixture.detectChanges();
   });
+
+  // test para la validacion de datos del formulario
+  it(`deve mostrar los string ingresados de password y email`,()=>{
+    component.loginForm.setValue({email: `testAngular@gmail.com`, password: `password123`});
+
+    // verificamosque elresultado sea valido
+    expect(component.loginForm.value).toEqual({email: `testAngular@gmail.com`, password: `password123`});
+  })
+
   // Test para el metodo onSubmit cuando el formulario es invalido
   it(`mostrar error si el formulario es invalido`, () => {
-    component.loginForm.setValue({ email: '', password: '' });
+    component.loginForm.setValue({ email: 'testAngular', password: '12345' });
     component.onSubmit();
 
     expect(notification.error).toHaveBeenCalledWith('Por favor, complete el formulario correctamente.');
