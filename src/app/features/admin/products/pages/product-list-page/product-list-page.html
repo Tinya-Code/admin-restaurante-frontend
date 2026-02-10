@@ -1,1 +1,23 @@
-<p>product-list-page works!</p>
+<section class="relative flex flex-col p-4 sm:p-6 lg:p-8 space-y-2">
+
+  <app-category-list (categoryChange)="onCategoryChange($event)" />
+  <div class="flex justify-between  flex-col md:flex-row gap-4 w-full ">
+    <app-search-bar />
+
+    <app-button [link]="'/admin/product-form'" [id]="'123'" [name]="'agregar'" />
+  </div>
+  <app-data-table
+    [dataSource]="products()"
+    [meta]="meta()"
+    [columns]="columns"
+    [imageKey]="'image_url'"
+    [statusKey]="'is_available'"
+    [actions]="tableActions"
+    [showToggle]="true"
+    [loading]="loading()"
+    [emptyMessage]="'No hay productos'"
+    (rowClick)="onProductClick($event)"
+    (toggleChange)="onToggleChange($event)"
+    (pageChange)="onPageChange($event)"
+  />
+</section>

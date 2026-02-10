@@ -6,10 +6,10 @@
     {
       "id": "prod_001",
       "category_name": "Electrónica",
-      "name": "Laptop UltraSlim",
+      "name": "Laptop UltraSlim Laptop UltraSlim Laptop UltraSlim",
       "description": "Laptop ligera con pantalla de 14 pulgadas y 16GB RAM",
       "price": 1299.99,
-      "image_url": "https://ejemplo.com/laptop.jpg",
+      "image_url": "https://i.pinimg.com/1200x/47/49/9a/47499a5cd90f926e9506b4a47435a0eb.jpg",
       "is_available": true,
       "created_at": "2024-01-15T10:30:00Z",
       "updated_at": "2024-01-20T14:25:00Z"
@@ -42,7 +42,7 @@
       "name": "Chaqueta Impermeable",
       "description": "Chaqueta para lluvia con capucha desmontable",
       "price": 75.00,
-      "image_url": null,
+      "image_url": "https://ejemplo.com/cafetera.jpg",
       "is_available": true,
       "created_at": "2024-03-01T12:00:00Z",
       "updated_at": "2024-03-01T12:00:00Z"
@@ -108,7 +108,7 @@
       "name": "Zapatos Running",
       "description": "Zapatillas deportivas con amortiguación de gel",
       "price": 120.00,
-      "image_url": null,
+      "image_url": "https://ejemplo.com/cafetera.jpg",
       "is_available": true,
       "created_at": "2024-02-18T10:00:00Z",
       "updated_at": "2024-02-18T10:00:00Z"

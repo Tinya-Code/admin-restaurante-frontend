@@ -1,11 +1,153 @@
-import { Component } from '@angular/core';
+import { Component, signal } from '@angular/core';
+import {
+  DataTable,
+  TableColumn,
+  TableAction,
+  PaginationMeta,
+} from '../../../../../shared/components/data-table/data-table';
+import { Edit, Trash2, Eye } from 'lucide-angular';
+import type { Product } from '../../../../../core/models/product.model';
+import productPaginate from '../../../../../data/productsPaginate.json';
+import categoriesPaginate from '../../../../../data/categoriesPaginate.json';
+import { CategoryList } from '../../components/category-list/category-list';
+import { SearchBar } from '../../../../../shared/components/search-bar/search-bar';
+import { Button } from '../../../../../shared/components/button/button';
+
+interface ApiResponse {
+  status: string;
+  code: string;
+  message: string;
+  data: any[];
+  meta: PaginationMeta;
+}
 
 @Component({
   selector: 'app-product-list-page',
-  imports: [],
+  imports: [DataTable, CategoryList, SearchBar, Button],
   templateUrl: './product-list-page.html',
   styleUrl: './product-list-page.css',
 })
 export class ProductListPage {
+  readonly loading = signal(false);
+  readonly products = signal<Product[]>([]);
+  readonly meta = signal<PaginationMeta>({
+    limit: 10,
+    current_page: 1,
+    total_pages: 1,
+    total_items: 0,
+    has_next: false,
+    has_prev: false,
+  });
 
+  readonly columns: TableColumn[] = [
+    {
+      key: 'id',
+      label: 'ID',
+      hideOnMobile: true,
+    },
+    {
+      key: 'name',
+      label: 'Producto',
+      mobileOrder: 1,
+    },
+    {
+      key: 'category_name',
+      label: 'Categoría',
+      mobileOrder: 2,
+    },
+    {
+      key: 'price',
+      label: 'Precio',
+      width: '150px',
+      mobileOrder: 3,
+      pipe: 'currency',
+    },
+    {
+      key: 'created_at',
+      label: 'Creado',
+      width: '150px',
+      hideOnMobile: true,
+      pipe: 'date',
+    },
+  ];
+
+  readonly tableActions: TableAction[] = [
+    {
+      label: 'Editar',
+      icon: Edit,
+      handler: (row) => this.editProduct(row),
+    },
+    {
+      label: 'Ver detalles',
+      icon: Eye,
+      handler: (row) => this.viewProduct(row),
+    },
+    {
+      label: 'Eliminar',
+      icon: Trash2,
+      variant: 'danger',
+      handler: (row) => this.deleteProduct(row),
+    },
+  ];
+
+  ngOnInit(): void {
+    this.loadProducts(1, 10);
+  }
+
+  private async loadProducts(page: number, limit: number, category: string = `all`): Promise<void> {
+    const snapShot = await this.getProduct(category);
+    this.products.set(snapShot);
+    this.meta.set(productPaginate.meta);
+  }
+
+  //variable que contiene categorya emitida por category-list
+  category = signal<string>(`all`);
+  // Insetamos la funcion getproduc para que este pueda extraer de base de datos los valores filtrados.
+  async getProduct(category: string): Promise<Product[]> {
+    try {
+      // para simulacion condicionaremos el retorno de all  json completo
+      if (category === `all`) {
+        return productPaginate.data as Product[];
+      }
+      //variable que contendra res del backend
+      const data: Product[] = await productPaginate.data.filter(
+        (product) => product.category_name === category,
+      );
+      // retoramos data con datos ( filtrados para esta simulacion )
+      return data;
+    } catch (error) {
+      console.log(`error en conseguir productos de categoria ${category}`, error);
+      return [];
+    }
+  }
+
+  onCategoryChange(category: string): void {
+    this.category.set(category);
+    this.loadProducts(1, 10, category);
+  }
+
+  onPageChange(page: number): void {
+    this.loadProducts(page, this.meta().limit);
+  }
+
+  onProductClick(product: any): void {
+    console.log('Producto:', product);
+  }
+
+  onToggleChange(event: { row: any; enabled: boolean }): void {
+    console.log('Toggle:', event);
+    // API call: updateProductStatus(event.row.id, event.enabled)
+  }
+
+  private editProduct(product: any): void {
+    console.log('Editar:', product);
+  }
+
+  private viewProduct(product: any): void {
+    console.log('Ver:', product);
+  }
+
+  private deleteProduct(product: any): void {
+    console.log('Eliminar:', product);
+  }
 }

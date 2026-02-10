@@ -1,1 +1,12 @@
-<p>button works!</p>
+<button 
+  class="p-4 md:py-2.5 md:px-4 text-white fixed bottom-35 md:static active:scale-95 duration-300 right-5 rounded-full md:rounded-sm  z-50"
+  [ngClass]="{
+    ' bg-azul': name() === '',
+    'flex gap-4 bg-azul': name() !== ''
+  }"
+  [routerLink]="[link()]" 
+  [queryParams]="{ id: id() }"
+>
+  <span class="hidden md:flex">{{ name() }}</span>
+  <lucide-icon [img]="plus"></lucide-icon>
+</button>
