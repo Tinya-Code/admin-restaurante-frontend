@@ -73,7 +73,7 @@
                         @if (column.pipe === 'currency') {
                           {{ getCellValue(row, column) | currency }}
                         } @else if (column.pipe === 'date') {
-                          {{ getCellValue(row, column) | date:(column.pipeFormat || 'dd/MM/yyyy') }}
+                          {{ getCellValue(row, column) | dateFormat: `short` }}
                         } @else if (column.pipe === 'number') {
                           {{ getCellValue(row, column) | number:(column.pipeFormat || '1.0-2') }}
                         } @else if (column.pipe === 'percent') {
@@ -92,7 +92,7 @@
                         @if (column.pipe === 'currency') {
                           {{ getCellValue(row, column) | currency }}
                         } @else if (column.pipe === 'date') {
-                          {{ getCellValue(row, column) | dateFormat: `long` }}
+                          {{ getCellValue(row, column) | dateFormat: `short` }}
                         } @else if (column.pipe === 'number') {
                           {{ getCellValue(row, column) | number:(column.pipeFormat || '1.0-2') }}
                         } @else if (column.pipe === 'percent') {
@@ -117,7 +117,7 @@
                             @if (column.pipe === 'currency') {
                               {{ getCellValue(row, column) | currency }}
                             } @else if (column.pipe === 'date') {
-                              {{ getCellValue(row, column) | dateFormat: `long`  }}
+                              {{ getCellValue(row, column) | dateFormat: `short`  }}
                             } @else if (column.pipe === 'number') {
                               {{ getCellValue(row, column) | number:(column.pipeFormat || '1.0-2') }}
                             } @else if (column.pipe === 'percent') {
@@ -194,7 +194,7 @@
                   @if (column.pipe === 'currency') {
                     {{ getCellValue(row, column) | currency }}
                   } @else if (column.pipe === 'date') {
-                    {{ getCellValue(row, column) | dateFormat: `long`  }}
+                    {{ getCellValue(row, column) | dateFormat: `short`  }}
                   } @else if (column.pipe === 'number') {
                     {{ getCellValue(row, column) | number:(column.pipeFormat || '1.0-2') }}
                   } @else if (column.pipe === 'percent') {

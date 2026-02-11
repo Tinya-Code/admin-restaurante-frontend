@@ -13,7 +13,7 @@ import { firstValueFrom } from 'rxjs';
   selector: 'app-product-list-page',
   imports: [DataTable, CategoryList, SearchBar],
   templateUrl: './product-list-page.html',
-  styleUrl: './product-list-page.css'
+  styleUrl: './product-list-page.css',
 })
 export class ProductListPage {
 
@@ -34,7 +34,7 @@ export class ProductListPage {
     total_pages: 1,
     total_items: 0,
     has_next: false,
-    has_prev: false
+    has_prev: false,
   });
 
   // Filtros reactivos
@@ -74,19 +74,19 @@ export class ProductListPage {
     {
       label: 'Editar',
       icon: Edit,
-      handler: (row) => this.editProduct(row)
+      handler: (row) => this.editProduct(row),
     },
     {
       label: 'Ver detalles',
       icon: Eye,
-      handler: (row) => this.viewProduct(row)
+      handler: (row) => this.viewProduct(row),
     },
     {
       label: 'Eliminar',
       icon: Trash2,
       variant: 'danger',
-      handler: (row) => this.deleteProduct(row)
-    }
+      handler: (row) => this.deleteProduct(row),
+    },
   ];
 
   // ============================================================
@@ -205,7 +205,7 @@ export class ProductListPage {
   /**
    * Método principal que carga productos.
    *
-   * Aquí deberías:
+   * Aquí debería:
    * - activar loading
    * - llamar API real
    * - actualizar signals
@@ -277,6 +277,11 @@ export class ProductListPage {
 
   /**
    * Método de request al backend con paginación y filtros.
+   * 
+   * Aquí debería:
+   * - construir los parámetros de la query
+   * - hacer la petición HTTP
+   * - retornar la respuesta
    */
   async getProduct(
     category: string,
@@ -330,3 +335,4 @@ export class ProductListPage {
     console.log('Eliminar:', product);
   }
 }
+
