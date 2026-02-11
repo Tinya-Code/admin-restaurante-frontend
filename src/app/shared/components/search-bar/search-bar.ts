@@ -1,4 +1,4 @@
-import { Component, inject, signal } from '@angular/core';
+import { Component, inject, Output, EventEmitter } from '@angular/core';
 import { LucideAngularModule, Search } from 'lucide-angular';
 import { ReactiveFormsModule, FormBuilder, Validators } from '@angular/forms';
 @Component({
@@ -11,7 +11,7 @@ export class SearchBar {
 
   // Icon
   searchIcon = Search
-
+  
   // iniciamos el form builder
   private fb = inject(FormBuilder);
 
@@ -20,15 +20,25 @@ export class SearchBar {
     searchWord: [ `` , [Validators.minLength(4), Validators.maxLength(100)]]
   })
 
-  // adjudicamos al metodo onsearch la logica de busqueda con retorno de la palabra buscada para conprovar su funcionamiento
-  onsearch(): string {
+  // Metodo para buscar productos
+  onsearch(): void {
     if (this.word.invalid) {
       console.log('El termino de busqueda debe tener al menos 4 caracteres');
-      return '';
+      return;
     }
     const { searchWord } = this.word.value;
-    console.log(searchWord);
-
-    return searchWord as string;
+    console.log(`Palabra buscada:`, searchWord);
+    this.searchChange.emit(searchWord as string);
+    console.log('Emitiendo palabra buscada al componente padre');
   }
+
+  // Output para emitir la palabra buscada
+  @Output()
+  searchChange = new EventEmitter<string>()
+
+  // Metodo para limpiar el formulario
+  clear(): void {
+    this.word.reset();
+  }
+
 }
