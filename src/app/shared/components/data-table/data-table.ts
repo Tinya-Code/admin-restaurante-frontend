@@ -7,6 +7,7 @@ import {
   MoreVertical,
   ChevronsLeft,
   ChevronsRight,
+  Inbox
 } from 'lucide-angular';
 import { CurrencyPipe } from '../../pipes/currency-pipe';
 import { DateFormatPipe } from '../../pipes/date-format-pipe';
@@ -70,6 +71,7 @@ export class DataTable {
     chevronsLeft: ChevronsLeft,
     chevronsRight: ChevronsRight,
     moreVertical: MoreVertical,
+    inbox: Inbox
   } as const;
 
   // State

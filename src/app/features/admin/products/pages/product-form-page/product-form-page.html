@@ -1,4 +1,4 @@
 <section class=" flex flex-col justify-center items-center">
-    <app-product-form/>
+    <app-product-form (formSubmit)="onFormSubmit($event)" (formCancel)="onFormCancel()"/>
 
 </section>

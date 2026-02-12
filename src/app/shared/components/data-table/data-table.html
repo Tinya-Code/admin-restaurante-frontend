@@ -13,7 +13,7 @@
   <div class="w-full overflow-x-auto">
     @if (dataSource().length === 0 && !loading()) {
       <div class="py-16 px-8 text-center">
-        <lucide-angular name="inbox" class="w-12 h-12 mx-auto mb-4 text-gray-300 opacity-50" />
+        <lucide-angular [img]="icons.inbox" class="w-12 h-12 mx-auto mb-4 text-gray-300 opacity-50" />
         <p class="text-sm text-gray-500 tracking-wide">{{ emptyMessage() }}</p>
       </div>
     } @else {
