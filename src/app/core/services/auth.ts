@@ -68,4 +68,19 @@ readonly user = toSignal(
   async logOut(): Promise<void> {
     await this.auth.signOut();
   }
+
+  // método para obtener el token de autenticación
+  async getIdToken(): Promise<string | null> {
+    const currentUser = this.auth.currentUser;
+    if (!currentUser) {
+      return null;
+    }
+    
+    try {
+      return await currentUser.getIdToken();
+    } catch (error) {
+      console.error('Error obteniendo token de autenticación:', error);
+      return null;
+    }
+  }
 }

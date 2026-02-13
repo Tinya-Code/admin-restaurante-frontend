@@ -8,6 +8,7 @@ import { CategoryList } from "../../components/category-list/category-list";
 import { SearchBar } from "../../../../../shared/components/search-bar/search-bar";
 import { ApiResponse } from "../../../../../core/models/api-response.model";
 import { Api } from "../../../../../core/http/api";
+import { Auth } from "../../../../../core/services/auth";
 import { firstValueFrom } from 'rxjs';
 @Component({
   selector: 'app-product-list-page',
@@ -200,6 +201,7 @@ export class ProductListPage {
    * Injectamos servicio de Api
    */
   private api = inject(Api);
+  private auth = inject(Auth);
   
 
   /**
@@ -291,21 +293,44 @@ export class ProductListPage {
   ): Promise<ApiResponse<Product[]>> {
 
     try {
-      const params: { [key: string]: string | number | boolean } = {};
+      // Obtener token de autenticación
+      const token = await this.auth.getIdToken();
       
-      if (category !== 'todos') {
-        params['category'] = category;
+      // Construir headers con autorización
+      const headers: { [key: string]: string } = {};
+      if (token) {
+        headers['Authorization'] = `Bearer ${token}`;
       }
+      
+      // Construir query string para búsqueda
+      const queryParams = new URLSearchParams();
       
       if (searchWord) {
-        params['search'] = searchWord;
+        queryParams.append('q', searchWord);
       }
       
-      params['page'] = page;
-      params['limit'] = limit;
+      // TODO: Obtener restaurant_id dinámicamente (por ahora hardcoded)
+      queryParams.append('restaurant_id', '550e8400');
+      
+      if (category !== 'todos') {
+        queryParams.append('type', category);
+      }
+      
+      // Construir URL completa
+      const queryString = queryParams.toString();
+      const url = queryString ? `/search?${queryString}` : '/search';
+      
+      // Params para paginación
+      const paginationParams: { [key: string]: number } = {
+        page: page,
+        limit: limit
+      };
       
       const response: ApiResponse<Product[]> = await firstValueFrom(
-        this.api.get<Product[]>('/products/search', { params })
+        this.api.get<Product[]>(url, { 
+          headers: headers,
+          params: paginationParams 
+        })
       );
       
       return response;
