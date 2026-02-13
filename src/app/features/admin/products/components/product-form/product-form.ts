@@ -3,7 +3,6 @@ import { FormBuilder, FormGroup, Validators, ReactiveFormsModule } from '@angula
 import { CommonModule } from '@angular/common';
 import { Product, ProductCreate, ProductUpdate } from '../../../../../core/models/product.model';
 //import { Category } from '../../services/category.service';
-
 @Component({
   selector: 'app-product-form',
   imports: [ReactiveFormsModule, CommonModule],
@@ -14,7 +13,8 @@ export class ProductForm implements OnInit {
   private readonly fb = inject(FormBuilder);
 
   // Inputs
-  readonly product = input<Product | null>(null);
+  readonly product = input<Product | undefined>(undefined);
+
   categories = signal<any[]>([
     { id: '239f1742-fc12-4f17-bf2a-bd955890582b', name: 'Bebidas' },
     { id: '2', name: 'Platos principales' },
@@ -88,7 +88,6 @@ export class ProductForm implements OnInit {
       this.resetFileInput(input);
       return;
     }
-
     this.selectedFile.set(file);
     this.generateImagePreview(file);
   }

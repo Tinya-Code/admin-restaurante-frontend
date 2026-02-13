@@ -1,5 +1,5 @@
 <!-- data-table.html -->
-<div class="relative w-full bg-white border border-gray-200 overflow-hidden">
+<div class="relative w-full min-h-50  bg-white border border-gray-200 overflow-hidden">
   
   @if (loading()) {
     <div class="absolute inset-0 bg-white/95 flex items-center justify-center z-10">
@@ -160,7 +160,7 @@
                     </button>
 
                     @if (openMenuIndex() === rowIndex) {
-                      <div class="absolute right-0 top-full mt-1 w-40 bg-white border border-gray-200 rounded shadow-lg z-20">
+                      <div class="absolute right-8 top-full mt-1 w-40 bg-white border border-gray-200 rounded shadow-lg z-20">
                         <ul class="py-1 text-sm">
                           @for (action of actions(); track action.label) {
                             <li>
@@ -188,7 +188,7 @@
               @for (column of columns(); track trackByKey($index, column)) {
                 <td 
                   [style.text-align]="column.align || 'left'"
-                  class="hidden md:table-cell px-4 py-4 text-gray-900 font-light cursor-pointer"
+                  class="hidden md:table-cell line-clamp-3 truncate px-4 py-4 text-gray-900 font-light cursor-pointer"
                   (click)="onRowClick(row)"
                 >
                   @if (column.pipe === 'currency') {
@@ -223,7 +223,8 @@
                 </td>
               }
               
-              <td class="hidden md:table-cell px-4 py-4 text-right relative">
+              <td class="hidden md:table-cell px-4 py-4 text-right ">
+                <div class="relative inline-block">
                 <button 
                   (click)="toggleMenu(rowIndex, $event)"
                   class="p-2 rounded hover:bg-gray-100 transition-colors"
@@ -233,7 +234,7 @@
                 </button>
 
                 @if (openMenuIndex() === rowIndex) {
-                  <div class="absolute right-0 mt-2 w-48 bg-white border border-gray-200 rounded shadow-lg z-20">
+                  <div class="absolute z-50 right-6 -top-18 mt-2 w-48 bg-white border border-gray-200 rounded shadow-lg ">
                     <ul class="py-1 text-sm">
                       @for (action of actions(); track action.label) {
                         <li>
@@ -253,6 +254,7 @@
                     </ul>
                   </div>
                 }
+                </div>
               </td>
             </tr>
           }

@@ -1,17 +1,38 @@
-import { Component, inject } from '@angular/core';
+import { Component, inject, OnInit } from '@angular/core';
 import { ProductForm } from '../../components/product-form/product-form';
-import { ProductCreate, ProductUpdate } from '../../../../../core/models/product.model';
+import { Product, ProductCreate, ProductPatch, ProductUpdate } from '../../../../../core/models/product.model';
 import { ProductService } from '../../services/product';
 import { Notification } from '../../../../../core/services/notification';
+import { ActivatedRoute } from '@angular/router';
+import { BackButton } from "../../../../../shared/components/back-button/back-button";
 @Component({
   selector: 'app-product-form-page',
-  imports: [ProductForm],
+  imports: [ProductForm, BackButton],
   templateUrl: './product-form-page.html',
   styleUrl: './product-form-page.css',
 })
-export class ProductFormPage {
+export class ProductFormPage implements OnInit {
   private readonly productService = inject(ProductService);
   private readonly notification = inject(Notification);
+  private readonly route = inject(ActivatedRoute);
+productData: Product | undefined = undefined;
+
+ngOnInit(): void {
+  const id = this.route.snapshot.paramMap.get('id');
+  if (id) {
+    this.productService.getProductById(id).subscribe({
+      next: (res) => {
+        this.productData = res.data; // ✅
+      },
+      error: (err) => {
+        this.notification.error('Error al cargar producto');
+        console.error(err);
+      },
+    });
+  }
+}
+
+
   onFormSubmit(event: { data: ProductCreate | ProductUpdate; image?: File }): void {
     if ('id' in event.data) {
       this.productService

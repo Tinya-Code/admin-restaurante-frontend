@@ -5,7 +5,7 @@ import {
   TableAction,
   PaginationMeta,
 } from '../../../../../shared/components/data-table/data-table';
-import { Edit, Trash2, Eye, Inbox } from 'lucide-angular';
+import { Edit, Trash2, Eye, Inbox, Router as RouterIcon } from 'lucide-angular';
 import type { Product } from '../../../../../core/models/product.model';
 import { CategoryList } from '../../components/category-list/category-list';
 import { SearchBar } from '../../../../../shared/components/search-bar/search-bar';
@@ -13,7 +13,7 @@ import { ProductService } from '../../services/product';
 import { Notification } from '../../../../../core/services/notification';
 import { firstValueFrom } from 'rxjs';
 import { Button } from '../../../../../shared/components/button/button';
-import { Storage } from '../../../../../core/services/storage';
+import { Router } from '@angular/router';
 
 @Component({
   selector: 'app-product-list-page',
@@ -26,7 +26,6 @@ export class ProductListPage {
   // ===================== STATE (Signals) ======================
   // ============================================================
 
-
   readonly loading = signal(false);
   readonly products = signal<Product[]>([]);
   readonly meta = signal<PaginationMeta>({
@@ -38,9 +37,8 @@ export class ProductListPage {
     has_prev: false,
   });
 
-category = signal<string | undefined>(undefined);
-searchWord = signal<string | undefined>(undefined);
-
+  category = signal<string | undefined>(undefined);
+  searchWord = signal<string | undefined>(undefined);
 
   currentPage = signal<number>(1);
   currentLimit = signal<number>(10);
@@ -51,13 +49,13 @@ searchWord = signal<string | undefined>(undefined);
 
   private productService = inject(ProductService);
   private notification = inject(Notification);
+  private router = inject(Router)
 
   // ============================================================
   // ===================== TABLE CONFIG =========================
   // ============================================================
 
   readonly columns: TableColumn[] = [
-    { key: 'id', label: 'ID', width: '120px', hideOnMobile: true },
     { key: 'name', label: 'Producto', width: '250px', mobileOrder: 1 },
     { key: 'category_name', label: 'Categoría', width: '150px', mobileOrder: 2 },
     {
@@ -200,6 +198,7 @@ searchWord = signal<string | undefined>(undefined);
   private editProduct(product: any): void {
     console.log('Editar:', product);
     this.notification.info(`Editando producto ${product.name}`);
+    this.router.navigate(['/admin/product-form', product.id]);
   }
 
   private viewProduct(product: any): void {

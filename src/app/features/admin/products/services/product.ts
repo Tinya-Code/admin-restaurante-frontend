@@ -4,6 +4,7 @@ import {
   Product as ProductI,
   ProductCreate,
   ProductUpdate,
+  ProductPatch,
 } from '../../../../core/models/product.model';
 import { Api } from '../../../../core/http/api';
 import { EndpointsService } from '../../../../core/constants/endpoints';
@@ -50,8 +51,11 @@ export class ProductService {
   }
 
   updateProduct(id: string, data: ProductUpdate, image?: File): Observable<ApiResponse<ProductI>> {
-    const formData = this.buildFormData(data, image);
-    return this.api.put<ProductI>(this.endpoints.productById(id), formData);
+    if (image) {
+      const formData = this.buildFormData(data, image);
+      return this.api.patch<ProductI>(this.endpoints.productById(id), formData);
+    }
+    return this.api.patch<ProductI>(this.endpoints.productById(id), data);
   }
 
   patchProduct(
@@ -67,7 +71,10 @@ export class ProductService {
     return this.api.delete<void>(this.endpoints.productById(id));
   }
 
-  private buildFormData(data: ProductCreate | ProductUpdate | Partial<ProductI>, image?: File): FormData {
+  private buildFormData(
+    data: ProductCreate | ProductUpdate | Partial<ProductI>,
+    image?: File,
+  ): FormData {
     const formData = new FormData();
 
     // Añadir restaurant_id automáticamente
