@@ -1,5 +1,6 @@
-import { Injectable } from '@angular/core';
-import { Observable, map, switchMap } from 'rxjs';
+import { inject, Injectable } from '@angular/core';
+import { map, Observable, switchMap } from 'rxjs';
+import { EndpointsService } from '../../../../core/constants/endpoints';
 import { Api } from '../../../../core/http/api';
 import { ApiResponse } from '../../../../core/models/api-response.model';
 
@@ -46,13 +47,14 @@ export interface RecentProductsResponse {
   providedIn: 'root',
 })
 export class DashboardService {
-  restaurantId = '5a53d32f-834d-43df-a9ed-5db9b6badef9';
+  restaurantId = localStorage.getItem('restaurant_id') || '';
 
-  constructor(private api: Api) {}
+  api = inject(Api);
+  endpoints = inject(EndpointsService);
 
   getProductsCount(): Observable<number> {
     return this.api
-      .get<ProductsCountResponse>('statistics/products/count', {
+      .get<ProductsCountResponse>(this.endpoints.productsCount(), {
         params: { restaurant_id: this.restaurantId },
       })
       .pipe(
@@ -67,7 +69,7 @@ export class DashboardService {
 
   getCategoriesCount(): Observable<number> {
     return this.api
-      .get<CategoriesCountResponse>('statistics/categories/count', {
+      .get<CategoriesCountResponse>(this.endpoints.categoriesCount(), {
         params: { restaurant_id: this.restaurantId },
       })
       .pipe(
@@ -82,7 +84,7 @@ export class DashboardService {
 
   getRecentProducts(): Observable<Product[]> {
     return this.api
-      .get<RecentProductsResponse>('statistics/products/recent', {
+      .get<RecentProductsResponse>(this.endpoints.recentProducts(), {
         params: { restaurant_id: this.restaurantId },
       })
       .pipe(
