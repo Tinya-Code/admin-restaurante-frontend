@@ -8,7 +8,6 @@ import { CategoryList } from "../../components/category-list/category-list";
 import { SearchBar } from "../../../../../shared/components/search-bar/search-bar";
 import { ApiResponse } from "../../../../../core/models/api-response.model";
 import { Api } from "../../../../../core/http/api";
-import { Auth } from "../../../../../core/services/auth";
 import { firstValueFrom } from 'rxjs';
 @Component({
   selector: 'app-product-list-page',
@@ -39,7 +38,7 @@ export class ProductListPage {
   });
 
   // Filtros reactivos
-  category = signal<string>('todos');
+  category = signal<string>('');
   searchWord = signal<string>('');
   
   // Paginación reactiva
@@ -201,9 +200,7 @@ export class ProductListPage {
    * Injectamos servicio de Api
    */
   private api = inject(Api);
-  private auth = inject(Auth);
   
-
   /**
    * Método principal que carga productos.
    *
@@ -293,34 +290,22 @@ export class ProductListPage {
   ): Promise<ApiResponse<Product[]>> {
 
     try {
-      // Obtener token de autenticación
-      const token = await this.auth.getIdToken();
-      
-      // Construir headers con autorización
-      const headers: { [key: string]: string } = {};
-      if (token) {
-        headers['Authorization'] = `Bearer ${token}`;
-      }
-      
       // Construir query string para búsqueda
       const queryParams = new URLSearchParams();
-      
+      // si no existe searchWord, no se agrega el parámetro
       if (searchWord) {
-        queryParams.append('q', searchWord);
+        queryParams.append('keyword', searchWord);
       }
       
-      // TODO: Obtener restaurant_id dinámicamente (por ahora hardcoded)
-      queryParams.append('restaurant_id', '550e8400');
-      
-      if (category !== 'todos') {
-        queryParams.append('type', category);
+      if (category) {
+        queryParams.append('category', category);
       }
       
       // Construir URL completa
       const queryString = queryParams.toString();
-      const url = queryString ? `/search?${queryString}` : '/search';
+      const url = queryString ? `/products?${queryString}` : '/products';
       
-      // Params para paginación
+      // Params para paginación (el interceptor agrega el token automáticamente)
       const paginationParams: { [key: string]: number } = {
         page: page,
         limit: limit
@@ -328,7 +313,6 @@ export class ProductListPage {
       
       const response: ApiResponse<Product[]> = await firstValueFrom(
         this.api.get<Product[]>(url, { 
-          headers: headers,
           params: paginationParams 
         })
       );

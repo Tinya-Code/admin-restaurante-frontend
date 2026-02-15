@@ -1,6 +1,6 @@
 import { ApplicationConfig, provideBrowserGlobalErrorListeners, provideZoneChangeDetection, isDevMode } from '@angular/core';
 import { provideRouter } from '@angular/router';
-import { provideHttpClient, withFetch  } from '@angular/common/http';
+import { provideHttpClient, withInterceptors, withFetch  } from '@angular/common/http';
 
 import { routes } from './app.routes';
 import { provideServiceWorker } from '@angular/service-worker';
@@ -11,6 +11,9 @@ import { provideAuth, getAuth } from '@angular/fire/auth';
 import { provideFirestore, getFirestore } from '@angular/fire/firestore';
 import { environment } from '../environments/environment';
 
+// inserción del interceptor
+import { AuthInterceptor } from './core/interceptors/auth.interceptor';
+
 export const appConfig: ApplicationConfig = {
   providers: [
     provideBrowserGlobalErrorListeners(),
@@ -19,14 +22,12 @@ export const appConfig: ApplicationConfig = {
             enabled: !isDevMode(),
             registrationStrategy: 'registerWhenStable:30000'
           }),
-          provideHttpClient(withFetch()),
+    provideHttpClient(withFetch()),
+    AuthInterceptor,
 
-      // usamos provideFirebaseApp para inicializar la app con la configuracion de enviroment
+    // usamos provideFirebaseApp para inicializar la app con la configuracion de enviroment
     provideFirebaseApp(()=> initializeApp(environment.firebaseConfig)),
     provideFirestore(()=> getFirestore()),
     provideAuth(()=> getAuth())
-    ]
-
-  
-
+  ]
 };
