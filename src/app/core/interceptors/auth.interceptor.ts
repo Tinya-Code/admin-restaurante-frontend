@@ -36,23 +36,17 @@ export class AuthInterceptor implements HttpInterceptor {
       // Obtener token de Firebase
       const token = await this.auth.getIdToken();
       
-      // Obtener UID del usuario actual  ***(por ahora falso)***
-      const currentUser = `uidPrueba`;
-      const userUid = currentUser;
-      
       let authReq = req;
       
-      // Agregar headers si hay token
+      // Agregar token si existe
       if (token) {
         authReq = req.clone({
           setHeaders: {
-            Authorization: `Bearer ${token}`,
-            sopUuid: userUid  // *** Header personalizado con UID ***
+            Authorization: `Bearer ${token}`
           }
         });
         
         console.log('🔐 Interceptor: Token agregado a', req.url);
-        console.log('👤 UID del usuario:', userUid);
       } else {
         console.log('⚠️ Interceptor: No hay token disponible');
       }
