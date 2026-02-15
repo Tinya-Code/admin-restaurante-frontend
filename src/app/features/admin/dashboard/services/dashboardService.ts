@@ -3,7 +3,7 @@ import { map, Observable, switchMap } from 'rxjs';
 import { EndpointsService } from '../../../../core/constants/endpoints';
 import { Api } from '../../../../core/http/api';
 import { ApiResponse } from '../../../../core/models/api-response.model';
-
+import { Storage } from '../../../../core/services/storage';
 export interface Product {
   id: string;
   category_name: string;
@@ -47,10 +47,11 @@ export interface RecentProductsResponse {
   providedIn: 'root',
 })
 export class DashboardService {
-  restaurantId = localStorage.getItem('restaurant_id') || '';
+  private api = inject(Api);
+  private endpoints = inject(EndpointsService);
+  private storage = inject(Storage);
 
-  api = inject(Api);
-  endpoints = inject(EndpointsService);
+  private restaurantId: string = this.storage.get<string>('restaurant_id') || '';
 
   getProductsCount(): Observable<number> {
     return this.api

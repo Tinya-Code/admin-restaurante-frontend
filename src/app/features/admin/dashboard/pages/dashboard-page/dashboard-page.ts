@@ -1,5 +1,5 @@
 import { CommonModule } from '@angular/common';
-import { ChangeDetectionStrategy, Component, inject, signal } from '@angular/core';
+import { ChangeDetectionStrategy, Component, inject, OnInit, signal } from '@angular/core';
 import {
   Box,
   Edit,
@@ -18,6 +18,7 @@ import {
 } from '../../../../../shared/components/data-table/data-table';
 import { StatsCard } from '../../components/stats-card/stats-card';
 import { DashboardService } from '../../services/dashboardService';
+import { Storage } from '../../../../../core/services/storage';
 
 interface Product {
   id: string;
@@ -48,17 +49,21 @@ interface Category {
   styleUrl: './dashboard-page.css',
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
-export class DashboardPage {
+export class DashboardPage implements OnInit{
   // Data from JSON files
   private products: Product[] = [];
   private categories: Category[] = [];
+  private storage = inject(Storage);
   private dashboardService = inject(DashboardService);
 
   constructor() {
     // Load data from JSON files
-    this.loadData();
+  
   }
-
+ngOnInit(): void {
+  this.storage.set("restaurant_id","5a53d32f-834d-43df-a9ed-5db9b6badef9")
+    this.loadData();
+}
   private loadData(): void {
     this.dashboardService
       .getDashboardStats()
