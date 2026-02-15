@@ -13,6 +13,5 @@ import { RouterModule } from '@angular/router';
 export class Button {
   readonly plus = Plus;
   link = input.required<string>();
-  id = input<string>('');
   name = input<string>('');
 }

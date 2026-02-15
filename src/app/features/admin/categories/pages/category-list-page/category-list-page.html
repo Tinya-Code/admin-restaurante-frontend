@@ -1,1 +1,27 @@
-<p>category-list-page works!</p>
+<section class="relative flex flex-col p-4 sm:p-6 lg:p-8 space-y-2">
+
+  <!-- 🔹 Encabezado -->
+  <header class="page-header">
+    <h1 class="text-2xl font-semibold text-gray-800">Gestión de Categorías</h1>
+  </header>
+
+  <!-- 🔹 Barra de búsqueda y botón de agregar -->
+  <div class="flex justify-between flex-col md:flex-row gap-4 w-full">
+    <app-search-bar (searchChange)="onSearchChange($event)" />
+    <app-button [link]="'/admin/category-form'" [name]="'agregar'" />
+  </div>
+
+  <!-- 🔹 Tabla de categorías -->
+  <app-data-table
+    [dataSource]="categories()"
+    [meta]="meta()"
+    [columns]="columns"
+    [actions]="tableActions"
+    [showToggle]="true"
+    [loading]="loading()"
+    [emptyMessage]="'No hay categorías'"
+    (rowClick)="onCategoryClick($event)"
+    (toggleChange)="onToggleChange($event)"
+    (pageChange)="onPageChange($event)"
+  />
+</section>

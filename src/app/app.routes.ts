@@ -29,8 +29,13 @@ export const routes: Routes = [
         loadComponent: () =>
           import('./features/admin/products/pages/product-list-page/product-list-page').then(m => m.ProductListPage),
       },
-      {
+          {
         path: 'product-form',
+        loadComponent: () =>
+          import('./features/admin/products/pages/product-form-page/product-form-page').then(m => m.ProductFormPage),
+      },
+      {
+        path: 'product-form/:id',
         loadComponent: () =>
           import('./features/admin/products/pages/product-form-page/product-form-page').then(m => m.ProductFormPage),
       },

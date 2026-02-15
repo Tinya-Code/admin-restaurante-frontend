@@ -1,6 +1,7 @@
 export interface Product {
   id: string;             
-  category_name: string;    
+  category_name?: string;
+  category_id?:string;    
   name: string;
   description?: string;     
   price: number;
@@ -14,10 +15,10 @@ export interface Product {
 export type ProductCreate = Omit<Product, 'id' | 'created_at' | 'updated_at'>;
 
 // (PATCH) Actualización parcial
-export type ProductPatch = Partial<Omit<Product, 'id' | 'category_name' | 'created_at' | 'updated_at'>>;
+export type ProductPatch = Partial<Omit<Product, 'created_at' | 'updated_at'>>;
 
 // (PUT) Actualización completa
-export type ProductUpdate = Omit<Product, 'created_at' | 'updated_at'>;
+export type ProductUpdate = Omit<Product,  'created_at' | 'updated_at'>;
 
 // (GET) Listado simple
 export type ProductList = Product[];
