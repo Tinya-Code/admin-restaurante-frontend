@@ -3,15 +3,18 @@ import { DataTable, TableColumn, TableAction , PaginationMeta }
   from '../../../../../shared/components/data-table/data-table';
 import { Edit, Trash2, Eye } from 'lucide-angular';
 import type { Product } from '../../../../../core/models/product.model';
-import productPaginate from '../../../../../data/productsPaginate.json';
 import { CategoryList } from "../../components/category-list/category-list";
 import { SearchBar } from "../../../../../shared/components/search-bar/search-bar";
+import { Notification } from '../../../../../core/services/notification';
+
 import { ApiResponse } from "../../../../../core/models/api-response.model";
 import { Api } from "../../../../../core/http/api";
 import { firstValueFrom } from 'rxjs';
+import { Router } from '@angular/router';
+import { Button } from '../../../../../shared/components/button/button';
 @Component({
   selector: 'app-product-list-page',
-  imports: [DataTable, CategoryList, SearchBar],
+  imports: [DataTable, CategoryList, SearchBar, Button],
   templateUrl: './product-list-page.html',
   styleUrl: './product-list-page.css',
 })
@@ -44,6 +47,10 @@ export class ProductListPage {
   // Paginación reactiva
   currentPage = signal<number>(1);
   currentLimit = signal<number>(10);
+
+  private notification = inject(Notification);
+  private router = inject(Router)
+
 
   // ============================================================
   // ===================== TABLE CONFIG =========================
@@ -88,6 +95,10 @@ export class ProductListPage {
       handler: (row) => this.deleteProduct(row),
     },
   ];
+
+  // ============================================================
+  // ===================== LIFECYCLE ============================
+  // ============================================================
 
   // ============================================================
   // ===================== LIFECYCLE ============================
@@ -334,14 +345,18 @@ export class ProductListPage {
 
   private editProduct(product: any): void {
     console.log('Editar:', product);
+    this.notification.info(`Editando producto ${product.name}`);
+    this.router.navigate(['/admin/product-form', product.id]);
   }
 
   private viewProduct(product: any): void {
     console.log('Ver:', product);
+    this.notification.info(`Viendo detalles de ${product.name}`);
   }
 
   private deleteProduct(product: any): void {
     console.log('Eliminar:', product);
+    this.notification.warning(`Producto ${product.name} eliminado`);
   }
 }
 

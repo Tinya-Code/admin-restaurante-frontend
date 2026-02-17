@@ -8,7 +8,6 @@ import { ReactiveFormsModule, FormBuilder, Validators } from '@angular/forms';
   styleUrl: './search-bar.css',
 })
 export class SearchBar {
-
   // Icon
   searchIcon = Search
   
@@ -17,13 +16,14 @@ export class SearchBar {
 
   // signal para almacenar la palabra buscada
   word = this.fb.group({
-    searchWord: [ `` , [Validators.minLength(4), Validators.maxLength(100)]]
-  })
+    searchWord: [``, [Validators.minLength(4), Validators.maxLength(100)]],
+  });
 
   // Metodo para buscar productos
   onsearch(): void {
     if (this.word.invalid) {
       console.log('El termino de busqueda debe tener al menos 4 caracteres');
+      return;
       return;
     }
     const { searchWord } = this.word.value;

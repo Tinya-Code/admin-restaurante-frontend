@@ -28,4 +28,16 @@ export class EndpointsService {
   logout(): string {
     return `/auth/logout`;
   }
+  statistics(): string {
+    return `/statistics`;
+  }
+  productsCount(): string {
+    return `${this.statistics()}/products/count`;
+  }
+  categoriesCount(): string {
+    return `${this.statistics()}/categories/count`;
+  }
+  recentProducts(): string {
+    return `${this.statistics()}/products/recent`;
+  }
 }

@@ -3,21 +3,28 @@ import { FormBuilder, FormGroup, Validators, ReactiveFormsModule } from '@angula
 import { CommonModule } from '@angular/common';
 import { Product, ProductCreate, ProductUpdate } from '../../../../../core/models/product.model';
 //import { Category } from '../../services/category.service';
-
 @Component({
   selector: 'app-product-form',
   imports: [ReactiveFormsModule, CommonModule],
   templateUrl: './product-form.html',
   styleUrl: './product-form.css',
 })
-export class ProductForm  implements OnInit {
+export class ProductForm implements OnInit {
   private readonly fb = inject(FormBuilder);
 
   // Inputs
-  readonly product = input<Product | null>(null);
+  readonly product = input<Product | undefined>(undefined);
+
+  categories = signal<any[]>([
+    { id: '239f1742-fc12-4f17-bf2a-bd955890582b', name: 'Bebidas' },
+    { id: '2', name: 'Platos principales' },
+    { id: '3', name: 'Postres' },
+    { id: '4', name: 'Entradas' },
+  ]);
+
   //readonly categories = input.required<Category[]>();
   readonly loading = input<boolean>(false);
-  
+
   // Outputs
   readonly formSubmit = output<{ data: ProductCreate | ProductUpdate; image?: File }>();
   readonly formCancel = output<void>();
@@ -47,25 +54,22 @@ export class ProductForm  implements OnInit {
 
   private initForm(): void {
     this.productForm = this.fb.group({
-      category_name: ['', [Validators.required]],
-      name: ['', [
-        Validators.required, 
-        Validators.minLength(3), 
-        Validators.maxLength(100)
-      ]],
+      category_id: ['', [Validators.required]],
+      name: ['', [Validators.required, Validators.minLength(3), Validators.maxLength(100)]],
       description: ['', [Validators.maxLength(500)]],
       price: [0, [Validators.required, Validators.min(0.01)]],
-      is_available: [true]
+      is_available: [true],
+      display_order: [0],
     });
   }
 
   private loadProductData(product: Product): void {
     this.productForm.patchValue({
-      category_name: product.category_name,
+      category_id: product.category_id,
       name: product.name,
       description: product.description || '',
       price: product.price,
-      is_available: product.is_available
+      is_available: product.is_available,
     });
 
     if (product.image_url) {
@@ -75,16 +79,15 @@ export class ProductForm  implements OnInit {
 
   onFileSelected(event: Event): void {
     const input = event.target as HTMLInputElement;
-    
+
     if (!input.files?.length) return;
 
     const file = input.files[0];
-    
+
     if (!this.validateImage(file)) {
       this.resetFileInput(input);
       return;
     }
-
     this.selectedFile.set(file);
     this.generateImagePreview(file);
   }
@@ -121,7 +124,7 @@ export class ProductForm  implements OnInit {
   removeImage(): void {
     this.selectedFile.set(null);
     this.imagePreview.set(null);
-    
+
     const fileInput = document.getElementById('image_file') as HTMLInputElement;
     if (fileInput) {
       fileInput.value = '';
@@ -139,30 +142,31 @@ export class ProductForm  implements OnInit {
 
     this.formSubmit.emit({
       data,
-      image: this.selectedFile() || undefined
+      image: this.selectedFile() || undefined,
     });
   }
 
   private buildSubmitData(formValue: any): ProductCreate | ProductUpdate {
     const baseData = {
-      category_name: formValue.category_name,
+      category_id: formValue.category_id,
       name: formValue.name,
       description: formValue.description || undefined,
       price: Number(formValue.price),
-      is_available: formValue.is_available
+      is_available: formValue.is_available,
+      display_order: formValue.display_order ?? 0,
     };
 
     if (this.isEditMode()) {
       return {
         id: this.product()!.id,
         ...baseData,
-        image_url: this.product()!.image_url
+        image_url: this.product()!.image_url,
       } as ProductUpdate;
     }
 
     return {
       ...baseData,
-      image_url: undefined
+      image_url: undefined,
     } as ProductCreate;
   }
 
@@ -170,9 +174,20 @@ export class ProductForm  implements OnInit {
     this.formCancel.emit();
   }
 
-  get categoryName() { return this.productForm.get('category_name'); }
-  get name() { return this.productForm.get('name'); }
-  get description() { return this.productForm.get('description'); }
-  get price() { return this.productForm.get('price'); }
-  get isAvailable() { return this.productForm.get('is_available'); }
+  get categoryId() {
+    return this.productForm.get('category_id');
+  }
+
+  get name() {
+    return this.productForm.get('name');
+  }
+  get description() {
+    return this.productForm.get('description');
+  }
+  get price() {
+    return this.productForm.get('price');
+  }
+  get isAvailable() {
+    return this.productForm.get('is_available');
+  }
 }

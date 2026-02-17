@@ -1,17 +1,12 @@
-<app-search-bar
-  (searchChange)="onSearchChange($event)">
-</app-search-bar>
-
-
-
 <section class="p-4 sm:p-6 lg:p-8">
+  <div class="flex justify-between  flex-col md:flex-row gap-4 w-full ">
+    <app-search-bar (searchChange)="onSearchChange($event)"/>
+    <app-button [link]="'/admin/product-form'" [name]="'agregar'" />
+  </div>
   <app-category-list
     (categoryChange)="onCategoryChange($event)">
   </app-category-list>
-  <div class="mb-6">
-    <h1 class="text-2xl sm:text-3xl font-light text-gray-900 mb-2">Productos</h1>
-    <p class="text-sm text-gray-600">Gestiona tu inventario</p>
-  </div>
+
 
   <app-data-table
     [dataSource]="products()"
