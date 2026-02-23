@@ -1,80 +1,47 @@
-import { Injectable } from '@angular/core';
-import { 
-  HttpInterceptor, 
-  HttpRequest, 
-  HttpHandler, 
-  HttpEvent,
-  HttpErrorResponse 
-} from '@angular/common/http';
-import { Observable, throwError, from } from 'rxjs';
-import { catchError, switchMap } from 'rxjs/operators';
+import { HttpInterceptorFn, HttpEvent } from '@angular/common/http';
+import { from, Observable } from 'rxjs';
+import { catchError } from 'rxjs/operators';
 import { firstValueFrom } from 'rxjs';
-import { Auth } from '../services/auth';
 
-@Injectable()
-export class AuthInterceptor implements HttpInterceptor {
+export const authInterceptor: HttpInterceptorFn = (req, next) => {
   
-  constructor(private auth: Auth) {}
-
-  intercept(req: HttpRequest<any>, next: HttpHandler): Observable<HttpEvent<any>> {
+  // Solo agregar token a peticiones a nuestro backend
+  if (requiresAuth(req.url)) {
     
-    // Solo agregar token a peticiones a nuestro backend
-    if (this.requiresAuth(req.url)) {
-      
-      // Convertir Promise a Observable para manejar el token asíncrono
-      return from(this.handleAuthRequest(req, next)).pipe(
-        catchError((error) => this.handleError(error))
-      );
-    }
-    
-    // Si no requiere auth, dejar pasar la petición original
-    return next.handle(req);
-  }
-
-  private async handleAuthRequest(req: HttpRequest<any>, next: HttpHandler): Promise<HttpEvent<any>> {
-    try {
-      // Obtener token de Firebase
-      const token = await this.auth.getIdToken();
-      
-      let authReq = req;
-      
-      // Agregar token si existe
-      if (token) {
-        authReq = req.clone({
-          setHeaders: {
-            Authorization: `Bearer ${token}`
-          }
-        });
-        
-        console.log('🔐 Interceptor: Token agregado a', req.url);
-      } else {
-        console.log('⚠️ Interceptor: No hay token disponible');
+    // Agregar token directamente
+    const authReq = req.clone({
+      setHeaders: {
+        Authorization: 'Bearer test-token-123'
       }
-      
-      // Ejecutar la petición
-      return await firstValueFrom(next.handle(authReq));
-      
-    } catch (error) {
-      console.error('❌ Interceptor: Error en auth', error);
-      throw error;
-    }
-  }
-
-  private requiresAuth(url: string): boolean {
-    // Definir qué endpoints requieren autenticación
-    const authRequiredEndpoints = ['/search', '/api/'];
-    return authRequiredEndpoints.some(endpoint => url.includes(endpoint));
-  }
-
-  private handleError(error: HttpErrorResponse): Observable<never> {
-    console.error('❌ HTTP Error:', error);
+    });
     
-    // Manejar errores de autenticación
-    if (error.status === 401) {
-      console.warn('🔓 No autorizado - redirigir a login');
-      // TODO: Redirigir a login o refresh token
-    }
+    console.log('🔐 Interceptor: Token agregado a', req.url);
+    console.log('📋 Headers enviados:', authReq.headers);
     
-    return throwError(() => error);
+    return next(authReq).pipe(
+      catchError((error) => handleError(error))
+    );
   }
+  
+  // Si no requiere auth, dejar pasar la petición original
+  console.log('⚡ Pasando sin auth:', req.url);
+  return next(req);
+};
+
+function requiresAuth(url: string): boolean {
+  // Definir qué endpoints requieren autenticación
+  const authRequiredEndpoints = ['/search/products', '/api/'];
+  return authRequiredEndpoints.some(endpoint => url.includes(endpoint));
+}
+
+function handleError(error: any): Observable<never> {
+  console.error('❌ HTTP Error:', error);
+  
+  // Manejar errores de autenticación
+  if (error.status === 401) {
+    console.warn('🔓 No autorizado - redirigir a login');
+    // TODO: Redirigir a login o refresh token
+  }
+  
+  throw error;
 }

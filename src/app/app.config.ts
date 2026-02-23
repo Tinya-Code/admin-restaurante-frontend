@@ -12,7 +12,7 @@ import { provideFirestore, getFirestore } from '@angular/fire/firestore';
 import { environment } from '../environments/environment';
 
 // inserción del interceptor
-import { AuthInterceptor } from './core/interceptors/auth.interceptor';
+import { authInterceptor } from './core/interceptors/auth.interceptor';
 
 export const appConfig: ApplicationConfig = {
   providers: [
@@ -22,8 +22,7 @@ export const appConfig: ApplicationConfig = {
             enabled: !isDevMode(),
             registrationStrategy: 'registerWhenStable:30000'
           }),
-    provideHttpClient(withFetch()),
-    AuthInterceptor,
+    provideHttpClient(withFetch(), withInterceptors([authInterceptor])),
 
     // usamos provideFirebaseApp para inicializar la app con la configuracion de enviroment
     provideFirebaseApp(()=> initializeApp(environment.firebaseConfig)),

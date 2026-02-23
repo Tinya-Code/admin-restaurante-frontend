@@ -303,6 +303,7 @@ export class ProductListPage {
     try {
       // Construir query string para búsqueda
       const queryParams = new URLSearchParams();
+      
       // si no existe searchWord, no se agrega el parámetro
       if (searchWord) {
         queryParams.append('keyword', searchWord);
@@ -312,20 +313,18 @@ export class ProductListPage {
         queryParams.append('category', category);
       }
       
-      // Construir URL completa
-      const queryString = queryParams.toString();
-      const url = queryString ? `/products?${queryString}` : '/products';
+      // Agregar parámetros de paginación
+      queryParams.append('page', page.toString());
+      queryParams.append('limit', limit.toString());
       
-      // Params para paginación (el interceptor agrega el token automáticamente)
-      const paginationParams: { [key: string]: number } = {
-        page: page,
-        limit: limit
-      };
+      // Construir URL completa con todos los params juntos
+      const queryString = queryParams.toString();
+      const url = queryString ? `/search/products?${queryString}` : '/search/products';
+      
+      console.log('🔐 Enviando petición (interceptor agregará token):', url);
       
       const response: ApiResponse<Product[]> = await firstValueFrom(
-        this.api.get<Product[]>(url, { 
-          params: paginationParams 
-        })
+        this.api.get<Product[]>(url)  // ← Interceptor agrega el token
       );
       
       return response;
