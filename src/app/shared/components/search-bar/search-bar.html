@@ -1,1 +1,13 @@
-<p>search-bar works!</p>
+<form [formGroup]="word" (ngSubmit)="onsearch()" class="relative w-full md:min-w-100 flex items-center">
+  <input
+    formControlName="searchWord"
+    type="text"
+    placeholder="Buscar..."
+    class="w-full rounded-sm border border-gray-200 bg-white py-2.5 pl-10 pr-4 text-sm text-gray-700 placeholder-gray-400 outline-none transition focus:border-indigo-500 focus:ring-2 focus:ring-indigo-100"
+  />
+  <lucide-icon
+    [name]="searchIcon"
+    class="absolute right-3 text-black w-5 h-5 flex items-center justify-center pointer-events-none"
+  >
+  </lucide-icon>
+</form>

@@ -1,31 +1,54 @@
 import { Injectable } from '@angular/core';
+import { environment } from '../../../environments/environment';
 
 @Injectable({
   providedIn: 'root',
 })
 export class EndpointsService {
+  private readonly baseUrl = environment.apiURL;
+
+  // Auth endpoints
+  login(): string {
+    return `/auth/login`;
+  }
+
+  // Categories endpoints
   categories(): string {
     return `/categories`;
   }
+  
   categoryById(categoryId: string): string {
     return `/categories/${categoryId}`;
   }
+
+  // Products endpoints
   products(): string {
     return `/products`;
   }
+  
   productById(productId: string): string {
     return `/products/${productId}`;
   }
+
+  // Users endpoints
   userById(userId: string): string {
-    return `/users/${userId}`;
+    return `${this.baseUrl}/users/${userId}`;
   }
-  loginEmail(): string {
-    return `/auth/login`;
+
+  // Statistics endpoints
+  statistics(): string {
+    return `/statistics`;
   }
-  loginGoogle(): string {
-    return `/auth/google`;
+  
+  productsCount(): string {
+    return `${this.statistics()}/products/count`;
   }
-  logout(): string {
-    return `/auth/logout`;
+  
+  categoriesCount(): string {
+    return `${this.statistics()}/categories/count`;
+  }
+  
+  recentProducts(): string {
+    return `${this.statistics()}/products/recent`;
   }
 }

@@ -1,1 +1,125 @@
-<p>category-form works!</p>
+<!-- ══ Barra de navegación superior ════════════════════════════════════════ -->
+<nav class="cf-nav" aria-label="Navegación de la página">
+  <button
+    type="button"
+    class="cf-nav__back"
+    (click)="onCancel()"
+    aria-label="Volver al listado de categorías"
+  >
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"
+         stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false">
+      <path d="M15 18l-6-6 6-6"/>
+    </svg>
+  </button>
+  <h1 class="cf-nav__title">Add Category</h1>
+  <span class="cf-nav__spacer" aria-hidden="true"></span>
+</nav>
+
+<!-- ══ Cuerpo del formulario ════════════════════════════════════════════════ -->
+<main class="cf-page">
+  <form
+    [formGroup]="form"
+    (ngSubmit)="onSubmit()"
+    novalidate
+    class="cf-form"
+    aria-label="Formulario de nueva categoría"
+  >
+
+    <!-- ── Category Name ──────────────────────────────────────────────── -->
+    <p class="cf-field">
+      <label for="name" class="cf-field__label">Category Name</label>
+
+      <input
+        id="name"
+        type="text"
+        formControlName="name"
+        placeholder="e.g. Main Course"
+        autocomplete="off"
+        class="cf-field__input"
+        [class.cf-field__input--error]="nameCtrl.invalid && nameCtrl.touched"
+        [attr.aria-invalid]="nameCtrl.invalid && nameCtrl.touched ? 'true' : null"
+        aria-describedby="name-error"
+      />
+
+      @if (nameCtrl.invalid && nameCtrl.touched) {
+        <em id="name-error" class="cf-field__error" role="alert" aria-live="polite">
+          @if (nameCtrl.errors?.['required']) { El nombre es obligatorio. }
+          @if (nameCtrl.errors?.['minlength']) { Mínimo 2 caracteres. }
+          @if (nameCtrl.errors?.['maxlength']) { Máximo 255 caracteres. }
+        </em>
+      }
+    </p>
+
+    <!-- ── Description ───────────────────────────────────────────────── -->
+    <p class="cf-field">
+      <label for="description" class="cf-field__label">Description</label>
+
+      <textarea
+        id="description"
+        formControlName="description"
+        placeholder="Add a short description for your customers..."
+        rows="4"
+        class="cf-field__input cf-field__input--textarea"
+        [class.cf-field__input--error]="descriptionCtrl.invalid && descriptionCtrl.touched"
+        [attr.aria-invalid]="descriptionCtrl.invalid && descriptionCtrl.touched ? 'true' : null"
+        aria-describedby="description-error"
+      ></textarea>
+
+      @if (descriptionCtrl.invalid && descriptionCtrl.touched) {
+        <em id="description-error" class="cf-field__error" role="alert" aria-live="polite">
+          @if (descriptionCtrl.errors?.['required']) { La descripción es obligatoria. }
+          @if (descriptionCtrl.errors?.['maxlength']) { Máximo 500 caracteres. }
+        </em>
+      }
+    </p>
+
+    <!-- ── Visible on Menu (is_active) ───────────────────────────────── -->
+    <section class="cf-toggle-row" aria-labelledby="toggle-label">
+      <span class="cf-toggle-row__text">
+        <strong id="toggle-label" class="cf-toggle-row__title">Visible on Menu</strong>
+        <small class="cf-toggle-row__subtitle">Show this category to your customers</small>
+      </span>
+
+      <label class="cf-toggle" for="is_active" aria-label="Activar visibilidad en menú">
+        <input
+          id="is_active"
+          type="checkbox"
+          formControlName="is_active"
+          class="cf-toggle__input"
+          role="switch"
+          [attr.aria-checked]="form.get('is_active')?.value"
+        />
+        <span class="cf-toggle__track" aria-hidden="true">
+          <span class="cf-toggle__thumb"></span>
+        </span>
+      </label>
+    </section>
+
+    <!-- ── Acciones ───────────────────────────────────────────────────── -->
+    <footer class="cf-form__footer">
+      <button
+        type="submit"
+        class="cf-btn cf-btn--primary"
+        [disabled]="isSubmitting || form.invalid"
+        [attr.aria-busy]="isSubmitting ? 'true' : null"
+      >
+        @if (isSubmitting) {
+          <span class="cf-btn__spinner" aria-hidden="true"></span>
+          <span>Saving...</span>
+        } @else {
+          Save Category
+        }
+      </button>
+
+      <button
+        type="button"
+        class="cf-btn cf-btn--ghost"
+        (click)="onCancel()"
+        [disabled]="isSubmitting"
+      >
+        Cancel
+      </button>
+    </footer>
+
+  </form>
+</main>

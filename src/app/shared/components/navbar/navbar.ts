@@ -41,7 +41,7 @@ export class Navbar {
 
   readonly navItems = signal<NavItem[]>([
     { id: 'inicio', label: 'Inicio', icon: Home, route: '/admin/home' },
-    { id: 'carta', label: 'Carta', icon: UtensilsCrossed, route: '/admin/menu' },
+    { id: 'carta', label: 'Carta', icon: UtensilsCrossed, route: '/admin/products' },
     { id: 'categoria', label: 'Categoría', icon: Grid3x3, route: '/admin/categories' },
     { id: 'configuracion', label: 'Configuración', icon: Settings, route: '/admin/settings' },
   ]);

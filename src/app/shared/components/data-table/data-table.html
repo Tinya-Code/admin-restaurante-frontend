@@ -1,5 +1,9 @@
 <!-- data-table.html -->
+<<<<<<< HEAD
 <div class="relative w-full bg-white border border-gray-200 overflow-visible">
+=======
+<div class="relative w-full min-h-50  bg-white border border-gray-200 overflow-hidden">
+>>>>>>> 968ef27a7c6790781948e8e6b50f08f0c6afd14d
   
   <!-- Estado de carga -->
   @if (loading()) {
@@ -15,7 +19,7 @@
   <div class="w-full overflow-x-auto">
     @if (dataSource().length === 0 && !loading()) {
       <div class="py-16 px-8 text-center">
-        <lucide-angular name="inbox" class="w-12 h-12 mx-auto mb-4 text-gray-300 opacity-50" />
+        <lucide-angular [img]="icons.inbox" class="w-12 h-12 mx-auto mb-4 text-gray-300 opacity-50" />
         <p class="text-sm text-gray-500 tracking-wide">{{ emptyMessage() }}</p>
       </div>
     } @else {
@@ -70,14 +74,80 @@
                   @for (column of mobileColumns(); track trackByKey($index, column); let i = $index) {
                     @if (i === 0) {
                       <h3 class="text-sm font-medium text-gray-900 truncate max-w-45 sm:max-w-60">
+<<<<<<< HEAD
                         {{ getCellValue(row, column) }}
+=======
+                        @if (column.pipe === 'currency') {
+                          {{ getCellValue(row, column) | currency }}
+                        } @else if (column.pipe === 'date') {
+                          {{ getCellValue(row, column) | dateFormat: `short` }}
+                        } @else if (column.pipe === 'number') {
+                          {{ getCellValue(row, column) | number:(column.pipeFormat || '1.0-2') }}
+                        } @else if (column.pipe === 'percent') {
+                          {{ getCellValue(row, column) | percent:(column.pipeFormat || '1.0-2') }}
+                        } @else if (column.pipe === 'uppercase') {
+                          {{ getCellValue(row, column) | uppercase }}
+                        } @else if (column.pipe === 'lowercase') {
+                          {{ getCellValue(row, column) | lowercase }}
+                        } @else {
+                          {{ getCellValue(row, column) }}
+                        }
+>>>>>>> 968ef27a7c6790781948e8e6b50f08f0c6afd14d
                       </h3>
                     } @else if (i === 1) {
                       <p class="text-xs text-gray-500 truncate max-w-45 sm:max-w-60">
+<<<<<<< HEAD
                         {{ getCellValue(row, column) }}
                       </p>
                     }
                   }
+=======
+                        @if (column.pipe === 'currency') {
+                          {{ getCellValue(row, column) | currency }}
+                        } @else if (column.pipe === 'date') {
+                          {{ getCellValue(row, column) | dateFormat: `short` }}
+                        } @else if (column.pipe === 'number') {
+                          {{ getCellValue(row, column) | number:(column.pipeFormat || '1.0-2') }}
+                        } @else if (column.pipe === 'percent') {
+                          {{ getCellValue(row, column) | percent:(column.pipeFormat || '1.0-2') }}
+                        } @else if (column.pipe === 'uppercase') {
+                          {{ getCellValue(row, column) | uppercase }}
+                        } @else if (column.pipe === 'lowercase') {
+                          {{ getCellValue(row, column) | lowercase }}
+                        } @else {
+                          {{ getCellValue(row, column) }}
+                        }
+                      </p>
+                    }
+                  }
+                  
+                  <!-- Resto de campos: Metadata inline -->
+                  @if (mobileColumns().length > 2) {
+                    <div class="flex items-center gap-3 mt-1 flex-wrap max-w-45 sm:max-w-60">
+                      @for (column of mobileColumns(); track trackByKey($index, column); let i = $index) {
+                        @if (i >= 2) {
+                          <span class="text-xs text-gray-900 font-medium">
+                            @if (column.pipe === 'currency') {
+                              {{ getCellValue(row, column) | currency }}
+                            } @else if (column.pipe === 'date') {
+                              {{ getCellValue(row, column) | dateFormat: `short`  }}
+                            } @else if (column.pipe === 'number') {
+                              {{ getCellValue(row, column) | number:(column.pipeFormat || '1.0-2') }}
+                            } @else if (column.pipe === 'percent') {
+                              {{ getCellValue(row, column) | percent:(column.pipeFormat || '1.0-2') }}
+                            } @else if (column.pipe === 'uppercase') {
+                              {{ getCellValue(row, column) | uppercase }}
+                            } @else if (column.pipe === 'lowercase') {
+                              {{ getCellValue(row, column) | lowercase }}
+                            } @else {
+                              {{ getCellValue(row, column) }}
+                            }
+                          </span>
+                        }
+                      }
+                    </div>
+                  }
+>>>>>>> 968ef27a7c6790781948e8e6b50f08f0c6afd14d
                 </div>
 
                 <!-- Acciones móviles -->
@@ -108,9 +178,13 @@
                     </button>
 
                     @if (openMenuIndex() === rowIndex) {
+<<<<<<< HEAD
                       <div
                         class="absolute right-0 top-full mt-1 w-40 bg-white border border-gray-200 rounded shadow-lg z-50"
                       >
+=======
+                      <div class="absolute right-8 top-full mt-1 w-40 bg-white border border-gray-200 rounded shadow-lg z-20">
+>>>>>>> 968ef27a7c6790781948e8e6b50f08f0c6afd14d
                         <ul class="py-1 text-sm">
                           @for (action of actions(); track action.label) {
                             <li>
@@ -149,10 +223,28 @@
               @for (column of columns(); track trackByKey($index, column)) {
                 <td
                   [style.text-align]="column.align || 'left'"
-                  class="hidden md:table-cell px-4 py-4 text-gray-900 font-light cursor-pointer"
+                  class="hidden md:table-cell line-clamp-3 truncate px-4 py-4 text-gray-900 font-light cursor-pointer"
                   (click)="onRowClick(row)"
                 >
+<<<<<<< HEAD
                   {{ getCellValue(row, column) }}
+=======
+                  @if (column.pipe === 'currency') {
+                    {{ getCellValue(row, column) | currency }}
+                  } @else if (column.pipe === 'date') {
+                    {{ getCellValue(row, column) | dateFormat: `short`  }}
+                  } @else if (column.pipe === 'number') {
+                    {{ getCellValue(row, column) | number:(column.pipeFormat || '1.0-2') }}
+                  } @else if (column.pipe === 'percent') {
+                    {{ getCellValue(row, column) | percent:(column.pipeFormat || '1.0-2') }}
+                  } @else if (column.pipe === 'uppercase') {
+                    {{ getCellValue(row, column) | uppercase }}
+                  } @else if (column.pipe === 'lowercase') {
+                    {{ getCellValue(row, column) | lowercase }}
+                  } @else {
+                    {{ getCellValue(row, column) }}
+                  }
+>>>>>>> 968ef27a7c6790781948e8e6b50f08f0c6afd14d
                 </td>
               }
 
@@ -175,11 +267,18 @@
                   </label>
                 </td>
               }
+<<<<<<< HEAD
 
               <!-- Acciones desktop -->
               <td class="hidden md:table-cell px-4 py-4 text-right relative">
                 <button
                   type="button"
+=======
+              
+              <td class="hidden md:table-cell px-4 py-4 text-right ">
+                <div class="relative inline-block">
+                <button 
+>>>>>>> 968ef27a7c6790781948e8e6b50f08f0c6afd14d
                   (click)="toggleMenu(rowIndex, $event)"
                   class="p-2 rounded hover:bg-gray-100 transition-colors"
                 >
@@ -187,10 +286,15 @@
                 </button>
 
                 @if (openMenuIndex() === rowIndex) {
+<<<<<<< HEAD
                   <div
                     class="absolute right-0 mt-2 w-44 bg-white border border-gray-200 rounded shadow-lg z-50"
                   >
                     <ul class="py-1 text-sm text-gray-700">
+=======
+                  <div class="absolute z-50 right-6 -top-18 mt-2 w-48 bg-white border border-gray-200 rounded shadow-lg ">
+                    <ul class="py-1 text-sm">
+>>>>>>> 968ef27a7c6790781948e8e6b50f08f0c6afd14d
                       @for (action of actions(); track action.label) {
                         <li>
                           <button
@@ -209,6 +313,7 @@
                     </ul>
                   </div>
                 }
+                </div>
               </td>
             </tr>
           }
