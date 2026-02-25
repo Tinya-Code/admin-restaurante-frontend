@@ -1,4 +1,5 @@
-<section class=" flex flex-col justify-center items-center">
-    <app-product-form/>
+<section class="relative flex flex-col p-4 sm:p-6 lg:p-8 space-y-2">
+    <app-back-button/>
+    <app-product-form [product]="productData" (formSubmit)="onFormSubmit($event)" (formCancel)="onFormCancel()"/>
 
 </section>

@@ -1,5 +1,5 @@
 import { CommonModule } from '@angular/common';
-import { ChangeDetectionStrategy, Component, computed, signal } from '@angular/core';
+import { ChangeDetectionStrategy, Component, inject, OnInit, signal } from '@angular/core';
 import {
   Box,
   Edit,
@@ -9,7 +9,7 @@ import {
   QrCode,
   Share2,
 } from 'lucide-angular';
-import products from '../../../../../data/products.json';
+import { take } from 'rxjs';
 import {
   DataTable,
   PaginationMeta,
@@ -17,6 +17,8 @@ import {
   TableColumn,
 } from '../../../../../shared/components/data-table/data-table';
 import { StatsCard } from '../../components/stats-card/stats-card';
+import { DashboardService } from '../../services/dashboardService';
+import { Storage } from '../../../../../core/services/storage';
 
 interface Product {
   id: string;
@@ -39,7 +41,6 @@ interface Category {
   update_at: string;
 }
 
-
 @Component({
   selector: 'app-dashboard-page',
   standalone: true,
@@ -48,40 +49,38 @@ interface Category {
   styleUrl: './dashboard-page.css',
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
-export class DashboardPage {
+export class DashboardPage implements OnInit{
   // Data from JSON files
   private products: Product[] = [];
   private categories: Category[] = [];
+  private storage = inject(Storage);
+  private dashboardService = inject(DashboardService);
 
   constructor() {
     // Load data from JSON files
-    this.loadData();
+  
   }
-
+ngOnInit(): void {
+  this.storage.set("restaurant_id","5a53d32f-834d-43df-a9ed-5db9b6badef9")
+    this.loadData();
+}
   private loadData(): void {
-    this.products = products;
+    this.dashboardService
+      .getDashboardStats()
+      .pipe(take(1))
+      .subscribe((stats) => {
+        this.recentProducts.set(stats.recentProducts);
+        this.totalProducts.set(stats.totalProducts);
+        this.totalCategories.set(stats.totalCategories);
+      });
   }
 
   // Computed values from real data
-  readonly totalProducts = computed(() => this.products.length);
-  readonly totalCategories = computed(
-    () => this.categories.filter((category) => category.is_active).length
-  );
+  readonly totalProducts = signal<number>(0);
+  readonly totalCategories = signal<number>(0);
 
   // Get 5 most recent products
-  readonly recentProducts = computed(() => {
-    return this.products
-      .sort((a, b) => new Date(b.created_at).getTime() - new Date(a.created_at).getTime())
-      .slice(0, 5)
-      .map((product) => ({
-        id: product.id,
-        name: product.name,
-        category: product.category_name,
-        price: product.price,
-        image: product.image_url,
-        created_at: product.created_at,
-      }));
-  });
+  readonly recentProducts = signal<Product[]>([]);
 
   readonly paginationMeta = signal<PaginationMeta>({
     limit: 5,

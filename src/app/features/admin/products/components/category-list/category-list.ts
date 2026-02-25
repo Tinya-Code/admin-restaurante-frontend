@@ -16,7 +16,7 @@ export class CategoryList implements OnInit {
     this.categoryList.set(datos as Category[]);
   }
 
-  CategorySelect = signal<string>(`todos`);
+  CategorySelect = signal<string>('');
 
   @Output()
   categoryChange = new EventEmitter<string>()
