@@ -1,47 +1,85 @@
-import { HttpInterceptorFn, HttpEvent } from '@angular/common/http';
-import { from, Observable } from 'rxjs';
-import { catchError } from 'rxjs/operators';
-import { firstValueFrom } from 'rxjs';
+import { HttpInterceptorFn, HttpErrorResponse } from '@angular/common/http';
+import { inject } from '@angular/core';
+import { Router } from '@angular/router';
+import { catchError, switchMap, throwError } from 'rxjs';
+import { from } from 'rxjs';
+import { AuthService } from '../../features/auth/services/authService';
+import { environment } from '../../../environments/environment';
 
+/**
+ * Interceptor funcional para Angular 20
+ * Agrega el token de Firebase a las peticiones al backend
+ */
 export const authInterceptor: HttpInterceptorFn = (req, next) => {
-  
+  const authService = inject(AuthService);
+  const router = inject(Router);
+
   // Solo agregar token a peticiones a nuestro backend
-  if (requiresAuth(req.url)) {
-    
-    // Agregar token directamente
-    const authReq = req.clone({
-      setHeaders: {
-        Authorization: 'Bearer test-token-123'
-      }
-    });
-    
-    console.log('🔐 Interceptor: Token agregado a', req.url);
-    console.log('📋 Headers enviados:', authReq.headers);
-    
-    return next(authReq).pipe(
-      catchError((error) => handleError(error))
-    );
+  if (!shouldAttachToken(req.url)) {
+    return next(req).pipe(catchError(error => handleError(error, router, authService)));
   }
-  
-  // Si no requiere auth, dejar pasar la petición original
-  console.log('⚡ Pasando sin auth:', req.url);
-  return next(req);
+
+  // Obtener token y agregarlo a la petición
+  return from(authService.getIdToken()).pipe(
+    switchMap(token => {
+      let authReq = req;
+
+      if (token) {
+        authReq = req.clone({
+          setHeaders: {
+            Authorization: `Bearer ${token}`
+          }
+        });
+        console.log('🔐 Token agregado a:', req.url);
+      } else {
+        console.warn('⚠️ No hay token disponible para:', req.url);
+      }
+
+      return next(authReq);
+    }),
+    catchError(error => handleError(error, router, authService))
+  );
 };
 
-function requiresAuth(url: string): boolean {
-  // Definir qué endpoints requieren autenticación
-  const authRequiredEndpoints = ['/search/products', '/api/'];
-  return authRequiredEndpoints.some(endpoint => url.includes(endpoint));
+/**
+ * Determina si la URL requiere token
+ */
+function shouldAttachToken(url: string): boolean {
+  // Solo agregar token a peticiones a nuestro backend
+  if (!url.startsWith(environment.apiURL)) {
+    return false;
+  }
+
+  // No agregar token al endpoint de login (ya que el guard lo maneja)
+  if (url.includes('/auth/login')) {
+    return true; // Sí necesita token para validar
+  }
+
+  return true;
 }
 
-function handleError(error: any): Observable<never> {
-  console.error('❌ HTTP Error:', error);
-  
-  // Manejar errores de autenticación
+/**
+ * Maneja errores HTTP
+ */
+function handleError(
+  error: HttpErrorResponse,
+  router: Router,
+  authService: AuthService
+) {
+  console.error('❌ HTTP Error:', {
+    status: error.status,
+    message: error.message,
+    url: error.url
+  });
+
   if (error.status === 401) {
-    console.warn('🔓 No autorizado - redirigir a login');
-    // TODO: Redirigir a login o refresh token
+    console.warn('🔓 No autorizado - cerrando sesión');
+    authService.closeSession();
   }
-  
-  throw error;
+
+  if (error.status === 403) {
+    console.warn('🚫 Acceso prohibido');
+  }
+
+  return throwError(() => error);
 }
