@@ -31,15 +31,16 @@ export class CategoryForm implements OnInit {
   isSubmitting = false;
 
   /**
-   * Obtenidos de localStorage mediante Storage.
-   * No se incluyen como controles del formulario ni son visibles en UI.
+   * menu_id se obtiene de localStorage mediante Storage.
+   * restaurant_id lo gestiona internamente el Category,
+   * por lo que no se necesita aquí.
    */
-  private restaurantId!: string;
+  //private restaurantId!: string;
   private menuId!: string;
 
   // ── Ciclo de vida ────────────────────────────────────────────────────────
   ngOnInit(): void {
-    this.restaurantId = this.storage.get<string>('restaurant_id') ?? '';
+    //this.restaurantId = this.storage.get<string>('restaurant_id') ?? '';
     this.menuId = this.storage.get<string>('menu_id') ?? '';
 
     this.form = this.fb.group({
@@ -73,12 +74,13 @@ export class CategoryForm implements OnInit {
     const { name, description, is_active, display_order } = this.form.getRawValue();
 
     /**
-     * Se construye el DTO base con los campos siempre presentes.
-     * display_order se añade solo si el usuario ingresó un valor;
+     * El servicio ya inyecta restaurant_id desde Storage internamente,
+     * por lo que solo se envían los campos propios del formulario.
+     * display_order se incluye únicamente si el usuario ingresó un valor;
      * de lo contrario el backend aplica su default (0).
      */
     const dto: CategoryCreate = {
-      restaurant_id: this.restaurantId,
+      restaurant_id: this.storage.get<string>('restaurant_id') ?? '',
       menu_id: this.menuId,
       name: (name as string).trim(),
       description: (description as string).trim(),
@@ -93,7 +95,7 @@ export class CategoryForm implements OnInit {
         this.notification.success('Categoría creada correctamente.');
         this.router.navigate(['/admin/categories']);
       },
-      error: (err) => {
+      error: (err: { status: number }) => {
         this.isSubmitting = false;
 
         if (err?.status === 409) {
