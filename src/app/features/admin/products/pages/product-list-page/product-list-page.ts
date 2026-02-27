@@ -124,19 +124,19 @@ export class ProductListPage {
 
     this.category.set(category);
     this.currentPage.set(1); // Resetear a primera página
-    this.getController(); // dispara petición con debounce manual
+    this.debounceController(); // dispara petición con debounce manual
   }
 
   /**
    * Cambia la palabra de búsqueda.
-   * Solo actualiza signal (no dispara aún).
+   * Actualiza signal y dispara búsqueda con debounce.
    */
   onSearchChange(searchWord: string): void {
     if (this.searchWord() === searchWord) return;
 
     this.searchWord.set(searchWord);
     this.currentPage.set(1); // Resetear a primera página
-    // Puedes decidir aquí si quieres llamar getController()
+    this.debounceController(); // dispara petición con debounce manual
   }
 
   /**
@@ -170,30 +170,14 @@ export class ProductListPage {
 
   // ============================================================
   // ================= CONTROL DE PETICIONES ====================
-  // ============================================================
+  // ======================= DEBOUNCE ===========================
 
-  /**
-   * Contenedor para debounce manual.
-   * Guarda el ID del setTimeout activo.
-   */
   private peticionOut: any;
-
-  /**
-   * Controlador de peticiones con debounce manual.
-   *
-   * - Cancela timeout anterior si existe.
-   * - Programa nueva petición después de 500ms.
-   *
-   * Esto evita disparar múltiples requests seguidos
-   * mientras el usuario interactúa rápido.
-   */
-  private getController(): void {
-
+  private debounceController(): void {
     // Si hay una petición pendiente, la cancelamos
     if (this.peticionOut) {
       clearTimeout(this.peticionOut);
     }
-
     // Programamos nueva ejecución
     this.peticionOut = setTimeout(() => {
       this.loadProducts(
@@ -209,15 +193,7 @@ export class ProductListPage {
   // ===================== DATA LAYER ===========================
   // ============================================================
 
-  /**
-   * Método principal que carga productos.
-   *
-   * Aquí debería:
-   * - activar loading
-   * - llamar API real
-   * - actualizar signals
-   * - manejar errores
-   */
+  // Método principal que carga productos
   private async loadProducts(
     page?: number,
     limit?: number,
@@ -287,14 +263,7 @@ export class ProductListPage {
     }
   }
 
-  /**
-   * Método de request al backend con paginación y filtros.
-   * 
-   * Aquí debería:
-   * - construir los parámetros de la query
-   * - hacer la petición HTTP
-   * - retornar la respuesta
-   */
+  /* Método de request al backend con paginación y filtros.*/
   async getProduct(
     category: string,
     searchWord: string = '',
