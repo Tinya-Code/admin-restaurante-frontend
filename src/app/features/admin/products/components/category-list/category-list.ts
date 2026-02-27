@@ -1,7 +1,7 @@
 import { Component, OnInit, signal, Output, EventEmitter } from '@angular/core';
 import { Category } from '../../../../../core/models/category.model';
 import { CommonModule } from '@angular/common';
-import { Api } from '../../../../../core/http/api';
+import  { SearchService } from '../../services/search';
 import { firstValueFrom } from 'rxjs';
 
 @Component({
@@ -13,12 +13,12 @@ import { firstValueFrom } from 'rxjs';
 export class CategoryList implements OnInit {
   categoryList = signal<Category[]>([]);
 
-  constructor(private api: Api) {}
+  constructor(private searchService: SearchService) {}
 
   async ngOnInit(): Promise<void> {
     try {
       const response = await firstValueFrom(
-        this.api.get<Category[]>('/search/categories')
+        this.searchService.searchCategories()
       );
       
       this.categoryList.set(response.data || []);

@@ -6,7 +6,7 @@ import type { Product } from '../../../../../core/models/product.model';
 import { CategoryList } from "../../components/category-list/category-list";
 import { SearchBar } from "../../../../../shared/components/search-bar/search-bar";
 import { Notification } from '../../../../../core/services/notification';
-
+import { SearchService } from '../../services/search';
 import { ApiResponse } from "../../../../../core/models/api-response.model";
 import { Api } from "../../../../../core/http/api";
 import { firstValueFrom } from 'rxjs';
@@ -19,6 +19,15 @@ import { Button } from '../../../../../shared/components/button/button';
   styleUrl: './product-list-page.css',
 })
 export class ProductListPage {
+
+  // ============================================================
+  // ===================== INYECCIÓN DE SERVICIOS ============
+  // ============================================================
+  
+  private notification = inject(Notification);
+  private router = inject(Router);
+  private api = inject(Api);
+  private searchService = inject(SearchService);
 
   // ============================================================
   // ===================== STATE (Signals) ======================
@@ -47,9 +56,6 @@ export class ProductListPage {
   // Paginación reactiva
   currentPage = signal<number>(1);
   currentLimit = signal<number>(10);
-
-  private notification = inject(Notification);
-  private router = inject(Router)
 
 
   // ============================================================
@@ -95,10 +101,6 @@ export class ProductListPage {
       handler: (row) => this.deleteProduct(row),
     },
   ];
-
-  // ============================================================
-  // ===================== LIFECYCLE ============================
-  // ============================================================
 
   // ============================================================
   // ===================== LIFECYCLE ============================
@@ -208,11 +210,6 @@ export class ProductListPage {
   // ============================================================
 
   /**
-   * Injectamos servicio de Api
-   */
-  private api = inject(Api);
-  
-  /**
    * Método principal que carga productos.
    *
    * Aquí debería:
@@ -253,7 +250,12 @@ export class ProductListPage {
     this.loading.set(true);
 
     try {
-      const response = await this.getProduct(finalCategory, finalSearchWord, finalPage, finalLimit);
+      const response: ApiResponse<Product[]> = await firstValueFrom(this.searchService.searchProducts({
+        category: finalCategory,
+        keyword: finalSearchWord,
+        page: finalPage,
+        limit: finalLimit
+      }));
 
       this.products.set(response.data || []); 
       
