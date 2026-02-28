@@ -1,4 +1,4 @@
-import { Component, OnInit, signal, Output, EventEmitter } from '@angular/core';
+import { Component, OnInit, signal, Output, EventEmitter, inject } from '@angular/core';
 import { Category } from '../../../../../core/models/category.model';
 import { CommonModule } from '@angular/common';
 import  { SearchService } from '../../services/search';
@@ -13,7 +13,7 @@ import { firstValueFrom } from 'rxjs';
 export class CategoryList implements OnInit {
   categoryList = signal<Category[]>([]);
 
-  constructor(private searchService: SearchService) {}
+  private searchService = inject(SearchService);
 
   async ngOnInit(): Promise<void> {
     try {

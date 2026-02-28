@@ -1,4 +1,4 @@
-import { Injectable } from '@angular/core';
+import { Injectable, inject } from '@angular/core';
 import { Observable } from 'rxjs';
 import { Api } from '../../../../core/http/api';
 import { ApiResponse } from '../../../../core/models/api-response.model';
@@ -9,7 +9,7 @@ import { Product } from '../../../../core/models/product.model';
 })
 export class SearchService {
   
-  constructor(private api: Api) {}
+  private api = inject(Api);
 
   /**
    * Buscar productos con filtros múltiples
