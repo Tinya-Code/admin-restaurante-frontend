@@ -1,4 +1,4 @@
-<form [formGroup]="word" (ngSubmit)="onsearch()" class="relative w-full md:min-w-100 flex items-center">
+<form [formGroup]="word" (keyup)="onsearch()" class="relative w-full md:min-w-100 flex items-center">
   <input
     formControlName="searchWord"
     type="text"

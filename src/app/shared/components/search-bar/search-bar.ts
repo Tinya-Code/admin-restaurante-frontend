@@ -16,7 +16,7 @@ export class SearchBar {
 
   // signal para almacenar la palabra buscada
   word = this.fb.group({
-    searchWord: [``, [Validators.minLength(4), Validators.maxLength(100)]],
+    searchWord: [``, [Validators.minLength(2), Validators.maxLength(100)]],
   });
 
   // Metodo para buscar productos
