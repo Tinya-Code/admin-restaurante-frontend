@@ -263,52 +263,6 @@ export class ProductListPage {
     }
   }
 
-  /* Método de request al backend con paginación y filtros.*/
-  async getProduct(
-    category: string,
-    searchWord: string = '',
-    page: number = 1,
-    limit: number = 10
-  ): Promise<ApiResponse<Product[]>> {
-
-    try {
-      // Construir query string para búsqueda
-      const queryParams = new URLSearchParams();
-      
-      // si no existe searchWord, no se agrega el parámetro
-      if (searchWord) {
-        queryParams.append('keyword', searchWord);
-      }
-      
-      if (category) {
-        queryParams.append('category', category);
-      }
-      
-      // Agregar parámetros de paginación
-      queryParams.append('page', page.toString());
-      queryParams.append('limit', limit.toString());
-      
-      // Construir URL completa con todos los params juntos
-      const queryString = queryParams.toString();
-      const url = queryString ? `/search/products?${queryString}` : '/search/products';
-      
-      console.log('🔐 Enviando petición (interceptor agregará token):', url);
-      
-      const response: ApiResponse<Product[]> = await firstValueFrom(
-        this.api.get<Product[]>(url)  // ← Interceptor agrega el token
-      );
-      
-      return response;
-
-    } catch (error) {
-      console.log(
-        `error en conseguir productos de categoria ${category} o por palabra clave ${searchWord}`,
-        error
-      );
-      throw error;
-    }
-  }
-
   // ============================================================
   // ===================== ACTION METHODS =======================
   // ============================================================
