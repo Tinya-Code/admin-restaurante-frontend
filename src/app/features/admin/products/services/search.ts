@@ -13,13 +13,13 @@ export class SearchService {
 
   searchProducts(params: {
     category?: string;
-    keyword?: string;
+    searchword?: string;
     page?: number;
     limit?: number;
   }): Observable<ApiResponse<Product[]>> {
     const queryParams = new URLSearchParams();
     
-    if (params.keyword) queryParams.append('keyword', params.keyword);
+    if (params.searchword) queryParams.append('searchword', params.searchword);
     if (params.category) queryParams.append('category', params.category);
     if (params.page) queryParams.append('page', params.page.toString());
     if (params.limit) queryParams.append('limit', params.limit.toString());

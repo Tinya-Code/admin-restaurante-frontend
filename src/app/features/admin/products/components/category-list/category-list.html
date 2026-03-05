@@ -4,7 +4,7 @@
     class="hidden sm:flex items-center justify-center gap-3 flex-wrap rounded-sm bg-white/70 backdrop-blur border border-gray-200 px-4 py-3 "
   >
     <button
-      (click)="add('todos')"
+      (click)="addCategory('todos')"
       [class.bg-[#42b0cc]]="CategorySelect() === 'all'"
       class="px-4 py-2 rounded-sm text-sm font-medium text-gray-700 hover:bg-indigo-100 hover:text-indigo-700 transition whitespace-nowrap"
     >
@@ -14,7 +14,7 @@
     <!-- Chips dinámicos por categoría -->
     @for (item of categoryList(); track item.id) {
       <button
-        (click)="add(item.name)"
+        (click)="addCategory(item.name)"
         [ngClass]="{
           'bg-[#42b0cc] text-white': CategorySelect() === item.name,
           'bg-gray-100 text-gray-700': CategorySelect() !== item.name,
@@ -30,7 +30,7 @@
   <div class="sm:hidden flex justify-end">
     <div class="relative ">
       <select
-        (change)="add(categorySelect.value)"
+        (change)="addCategory(categorySelect.value)"
         #categorySelect
         class="w-full appearance-none rounded-sm border border-gray-300 bg-white py-2.5 pl-4 pr-10 text-smtext-gray-700 shadow-sm focus:border-indigo-500 focus:ring-2 focus:ring-indigo-100"
       >

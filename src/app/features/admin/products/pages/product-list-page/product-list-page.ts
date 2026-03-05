@@ -26,7 +26,6 @@ export class ProductListPage {
   
   private notification = inject(Notification);
   private router = inject(Router);
-  private api = inject(Api);
   private searchService = inject(SearchService);
 
   // ============================================================
@@ -198,14 +197,14 @@ export class ProductListPage {
     page?: number,
     limit?: number,
     category?: string,
-    searchWord?: string
+    searchword?: string
   ): Promise<void> {
 
     // Usar valores de los signals si no se proporcionan
     const finalPage = page ?? this.currentPage();
     const finalLimit = limit ?? this.currentLimit();
     const finalCategory = category ?? this.category();
-    const finalSearchWord = searchWord ?? this.searchWord();
+    const finalSearchWord = searchword ?? this.searchWord();
 
     // Validaciones básicas
     if (finalPage < 1) {
@@ -228,7 +227,7 @@ export class ProductListPage {
     try {
       const response: ApiResponse<Product[]> = await firstValueFrom(this.searchService.searchProducts({
         category: finalCategory,
-        keyword: finalSearchWord,
+        searchword: finalSearchWord,
         page: finalPage,
         limit: finalLimit
       }));

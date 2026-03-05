@@ -1,4 +1,4 @@
-import { Component, OnInit, signal, Output, EventEmitter, inject } from '@angular/core';
+import { Component, OnInit, signal, output, inject } from '@angular/core';
 import { Category } from '../../../../../core/models/category.model';
 import { CommonModule } from '@angular/common';
 import  { SearchService } from '../../services/search';
@@ -31,11 +31,11 @@ export class CategoryList implements OnInit {
   }
 
   CategorySelect = signal<string>('');
-  // evento para emitir la categoria seleccionada
-  @Output()
-  categoryChange = new EventEmitter<string>()
 
-  add(category: string): void {
+  // Output para emitir la categoria buscada (Signal Output)
+  categoryChange = output<string>()
+
+  addCategory(category: string): void {
     this.CategorySelect.set(category);
     this.categoryChange.emit(category);
     console.log('Categoría seleccionada:', category);
