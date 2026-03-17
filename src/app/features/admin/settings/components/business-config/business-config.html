@@ -8,47 +8,58 @@
         @for (day of daysOfWeek; track $index) {
         <div
           [formGroupName]="day"
-          class="flex items-center justify-between p-3 bg-gray-50 rounded-lg border border-gray-200"
+          class="flex flex-col p-3 bg-gray-50 rounded-lg border border-gray-200"
         >
-          <!-- Día -->
-          <div class="w-28 text-sm font-medium text-gray-700">
-            {{ getDayName(day) }}
+          <div class="flex items-center justify-between">
+            <!-- Día -->
+            <div class="w-28 text-sm font-medium text-gray-700">
+              {{ getDayName(day) }}
+            </div>
+
+            <!-- Toggle -->
+            <label class="relative inline-flex items-center cursor-pointer">
+              <input
+                type="checkbox"
+                formControlName="isOpen"
+                (change)="onDayIsOpenChange(day, $event)"
+                class="sr-only peer"
+              />
+              <div
+                class="w-11 h-6 bg-gray-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-blue-300 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-blue-600"
+              ></div>
+            </label>
+
+            <!-- Horarios -->
+            <div class="flex items-center space-x-2 flex-1 justify-center">
+              <input
+                type="time"
+                formControlName="open"
+                class="px-2 py-1 border border-gray-300 rounded text-sm"
+                [style.display]="isDayOpen(day) ? 'block' : 'none'"
+              />
+
+              <span class="text-gray-500" [style.display]="isDayOpen(day) ? 'block' : 'none'"
+                >—</span
+              >
+
+              <input
+                type="time"
+                formControlName="close"
+                class="px-2 py-1 border border-gray-300 rounded text-sm"
+                [style.display]="isDayOpen(day) ? 'block' : 'none'"
+              />
+              @if (!isDayOpen(day)) {
+              <span class="text-sm text-gray-400">Cerrado</span>
+              }
+            </div>
           </div>
 
-          <!-- Toggle -->
-          <label class="relative inline-flex items-center cursor-pointer">
-            <input
-              type="checkbox"
-              formControlName="isOpen"
-              (change)="onDayIsOpenChange(day, $event)"
-              class="sr-only peer"
-            />
-            <div
-              class="w-11 h-6 bg-gray-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-blue-300 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-blue-600"
-            ></div>
-          </label>
-
-          <!-- Horarios -->
-          <div class="flex items-center space-x-2 flex-1 justify-center">
-            <input
-              type="time"
-              formControlName="open"
-              class="px-2 py-1 border border-gray-300 rounded text-sm"
-              [style.display]="isDayOpen(day) ? 'block' : 'none'"
-            />
-
-            <span class="text-gray-500" [style.display]="isDayOpen(day) ? 'block' : 'none'">—</span>
-
-            <input
-              type="time"
-              formControlName="close"
-              class="px-2 py-1 border border-gray-300 rounded text-sm"
-              [style.display]="isDayOpen(day) ? 'block' : 'none'"
-            />
-            @if (!isDayOpen(day)) {
-            <span class="text-sm text-gray-400">Cerrado</span>
-            }
+          <!-- Error de rango de horas -->
+          @if (getDayTimeRangeError(day)) {
+          <div class="mt-2 text-xs text-red-600">
+            {{ getDayTimeRangeError(day) }}
           </div>
+          }
         </div>
         }
       </div>

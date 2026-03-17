@@ -109,17 +109,52 @@ export class BusinessConfig implements OnInit {
   }
 
   private createDayFormGroup(): FormGroup {
-    return this.fb.group({
-      open: [
-        '09:00',
-        [Validators.required, Validators.pattern(/^([01]?[0-9]|2[0-3]):[0-5][0-9]$/)],
-      ],
-      close: [
-        '22:00',
-        [Validators.required, Validators.pattern(/^([01]?[0-9]|2[0-3]):[0-5][0-9]$/)],
-      ],
-      isOpen: [false],
-    });
+    return this.fb.group(
+      {
+        open: [
+          '09:00',
+          [Validators.required, Validators.pattern(/^([01]?[0-9]|2[0-3]):[0-5][0-9]$/)],
+        ],
+        close: [
+          '22:00',
+          [Validators.required, Validators.pattern(/^([01]?[0-9]|2[0-3]):[0-5][0-9]$/)],
+        ],
+        isOpen: [false],
+      },
+      { validators: this.timeRangeValidator() }
+    );
+  }
+
+  private timeRangeValidator() {
+    return (group: FormGroup) => {
+      const openControl = group.get('open');
+      const closeControl = group.get('close');
+      const isOpenControl = group.get('isOpen');
+
+      // Skip validation if the day is closed
+      if (!isOpenControl?.value) {
+        return null;
+      }
+
+      if (openControl?.value && closeControl?.value) {
+        const openTime = this.convertToMinutes(openControl.value);
+        const closeTime = this.convertToMinutes(closeControl.value);
+
+        // Cierre debe ser mayor que apertura
+        if (closeTime <= openTime) {
+          return {
+            timeRange: 'La hora de cierre debe ser mayor que la hora de apertura',
+          };
+        }
+      }
+
+      return null;
+    };
+  }
+
+  private convertToMinutes(time: string): number {
+    const [hours, minutes] = time.split(':').map(Number);
+    return hours * 60 + minutes;
   }
 
   private initializeDeliveryZones(zones: Array<{ name: string; fee: number }>): void {
@@ -138,7 +173,7 @@ export class BusinessConfig implements OnInit {
         this.fb.group({
           name: [name, Validators.required],
           fee: [fee, [Validators.required, Validators.min(0)]],
-        }),
+        })
       );
     }
   }
@@ -192,6 +227,16 @@ export class BusinessConfig implements OnInit {
 
     if (control?.hasError('pattern')) {
       return 'Formato inválido (HH:MM)';
+    }
+
+    return '';
+  }
+
+  getDayTimeRangeError(day: DayOfWeek): string {
+    const dayGroup = this.getDayFormGroup(day);
+
+    if (dayGroup?.hasError('timeRange')) {
+      return dayGroup.getError('timeRange');
     }
 
     return '';
