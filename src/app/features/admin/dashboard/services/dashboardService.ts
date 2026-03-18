@@ -3,7 +3,6 @@ import { map, Observable, switchMap } from 'rxjs';
 import { EndpointsService } from '../../../../core/constants/endpoints';
 import { Api } from '../../../../core/http/api';
 import { ApiResponse } from '../../../../core/models/api-response.model';
-import { Storage } from '../../../../core/services/storage';
 export interface Product {
   id: string;
   category_name: string;
@@ -49,15 +48,10 @@ export interface RecentProductsResponse {
 export class DashboardService {
   private api = inject(Api);
   private endpoints = inject(EndpointsService);
-  private storage = inject(Storage);
-
-  private restaurantId: string = this.storage.get<string>('restaurant_id') || '';
 
   getProductsCount(): Observable<number> {
     return this.api
-      .get<ProductsCountResponse>(this.endpoints.productsCount(), {
-        params: { restaurant_id: this.restaurantId },
-      })
+      .get<ProductsCountResponse>(this.endpoints.productsCount())
       .pipe(
         map((response: ApiResponse<ProductsCountResponse>) => {
           if (response.success && response.data) {
@@ -70,9 +64,7 @@ export class DashboardService {
 
   getCategoriesCount(): Observable<number> {
     return this.api
-      .get<CategoriesCountResponse>(this.endpoints.categoriesCount(), {
-        params: { restaurant_id: this.restaurantId },
-      })
+      .get<CategoriesCountResponse>(this.endpoints.categoriesCount())
       .pipe(
         map((response: ApiResponse<CategoriesCountResponse>) => {
           if (response.success && response.data) {
@@ -85,9 +77,7 @@ export class DashboardService {
 
   getRecentProducts(): Observable<Product[]> {
     return this.api
-      .get<RecentProductsResponse>(this.endpoints.recentProducts(), {
-        params: { restaurant_id: this.restaurantId },
-      })
+      .get<RecentProductsResponse>(this.endpoints.recentProducts())
       .pipe(
         map((response: ApiResponse<RecentProductsResponse>) => {
           if (response.success && response.data) {
