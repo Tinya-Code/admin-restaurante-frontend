@@ -1,0 +1,94 @@
+.whatsapp-config {
+  padding: 1.5rem;
+  background: var(--color-surface);
+}
+
+.form-group {
+  position: relative;
+}
+
+.form-group label {
+  color: var(--color-text-primary);
+  font-weight: 500;
+}
+
+.form-group input,
+.form-group textarea {
+  background: var(--color-surface);
+  border-color: var(--color-border);
+  color: var(--color-text-primary);
+  transition: all 0.2s ease;
+}
+
+.form-group input:focus,
+.form-group textarea:focus {
+  border-color: var(--color-primary);
+  box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.1);
+}
+
+.form-group input.border-red-500,
+.form-group textarea.border-red-500 {
+  border-color: #ef4444;
+  box-shadow: 0 0 0 3px rgba(239, 68, 68, 0.1);
+}
+
+.form-group .text-red-600 {
+  color: #ef4444;
+}
+
+.form-group .text-gray-500 {
+  color: var(--color-text-muted);
+}
+
+.form-group .text-gray-600 {
+  color: var(--color-text-secondary);
+}
+
+.form-group .text-gray-700 {
+  color: var(--color-text-primary);
+}
+
+/* Estilos para el prefijo +51 */
+.form-group .absolute.left-3 {
+  color: var(--color-text-secondary);
+  font-weight: 500;
+}
+
+/* Estilos para el contador de caracteres */
+.form-group .text-xs {
+  font-size: 0.75rem;
+}
+
+/* Estilos para variables disponibles */
+.form-group .bg-gray-50 {
+  background: var(--color-background);
+  border: 1px solid var(--color-border);
+}
+
+.form-group .bg-gray-200 {
+  background: #e5e7eb;
+  color: var(--color-text-secondary);
+  padding: 0.125rem 0.25rem;
+  border-radius: 0.25rem;
+  font-family: 'Courier New', monospace;
+}
+
+/* Estados hover */
+.form-group input:hover,
+.form-group textarea:hover {
+  border-color: #d1d5db;
+}
+
+/* Estados disabled */
+.form-group input:disabled,
+.form-group textarea:disabled {
+  background: var(--color-background);
+  color: var(--color-text-muted);
+  cursor: not-allowed;
+}
+
+/* Animaciones */
+.form-group input,
+.form-group textarea {
+  transition: border-color 0.15s ease-in-out, box-shadow 0.15s ease-in-out;
+}

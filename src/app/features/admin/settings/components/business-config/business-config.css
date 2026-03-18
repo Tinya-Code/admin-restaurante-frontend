@@ -1,0 +1,85 @@
+/* Custom styles for BusinessConfig component - Only non-Tailwind styles */
+
+/* CSS Custom Properties (Theme variables) */
+.business-config {
+  --color-surface: #ffffff;
+  --color-background: #f9fafb;
+  --color-border: #e5e7eb;
+  --color-text-primary: #111827;
+  --color-text-secondary: #6b7280;
+  --color-text-muted: #9ca3af;
+  --color-primary: #3b82f6;
+  --color-primary-hover: #2563eb;
+  --color-primary-light: #eff6ff;
+}
+
+/* Component-specific styles that can't be done with Tailwind */
+.business-config {
+  padding: 1.5rem;
+  background: var(--color-surface);
+}
+
+.section {
+  margin-bottom: 2rem;
+}
+
+/* Custom hover effects for business hours rows */
+.business-hours-row {
+  transition: all 0.2s ease;
+}
+
+.business-hours-row:hover {
+  background: var(--color-primary-light);
+  border-color: var(--color-primary);
+}
+
+.business-hours-row .opacity-50 {
+  opacity: 0.5;
+  pointer-events: none;
+}
+
+/* Custom time input styling */
+.business-hours-row input[type="time"] {
+  font-size: 0.875rem;
+  padding: 0.25rem 0.5rem;
+}
+
+.business-hours-row input[type="checkbox"] {
+  accent-color: var(--color-primary);
+}
+
+/* Custom hover effects for delivery zones */
+.delivery-zone-item {
+  transition: all 0.2s ease;
+}
+
+.delivery-zone-item:hover {
+  background: var(--color-primary-light);
+  border-color: var(--color-primary);
+}
+
+/* Custom button hover effects */
+.form-group button:hover:not(:disabled) {
+  transform: translateY(-1px);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+}
+
+.form-group button:disabled {
+  cursor: not-allowed;
+  opacity: 0.6;
+}
+
+/* Custom focus styles that override Tailwind defaults */
+.form-group input:focus-visible,
+.form-group select:focus-visible {
+  outline: 2px solid var(--color-primary);
+  outline-offset: 2px;
+}
+
+/* Custom animations */
+.form-group input,
+.form-group select,
+.business-hours-row,
+.delivery-zone-item {
+  transition: all 0.15s ease-in-out;
+}
