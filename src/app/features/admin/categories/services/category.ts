@@ -10,7 +10,6 @@ import {
   CategoryPatch,
   CategoryList,
 } from '../../../../core/models/category.model';
-import { Storage } from '../../../../core/services/storage';
 
 
 @Injectable({
@@ -19,13 +18,11 @@ import { Storage } from '../../../../core/services/storage';
 export class CategoryService {
   private api = inject(Api);
   private endpoints = inject(EndpointsService);
-  private storage = inject(Storage);
 
   /**
    * Obtener lista de categorías con filtros y paginación
    */
   getCategories(params: {
-    menu_id?: string;
     is_active?: boolean;
     page?: number;
     limit?: number;
@@ -33,12 +30,8 @@ export class CategoryService {
     order?: 'ASC' | 'DESC';
     search?: string;
   }): Observable<ApiResponse<CategoryList>> {
-    const restaurantId = this.storage.get<string>('restaurant_id');
     return this.api.get<CategoryList>(this.endpoints.categories(), {
-      params: {
-        restaurant_id: restaurantId ?? '',
-        ...params,
-      },
+      params,
     });
   }
 
@@ -47,11 +40,7 @@ export class CategoryService {
   }
 
   createCategory(data: CategoryCreate): Observable<ApiResponse<Category>> {
-    const restaurantId = this.storage.get<string>('restaurant_id');
-    return this.api.post<Category>(this.endpoints.categories(), {
-      ...data,
-      restaurant_id: restaurantId ?? '',
-    });
+    return this.api.post<Category>(this.endpoints.categories(), data);
   }
 
   updateCategory(categoryId: string, data: CategoryUpdate): Observable<ApiResponse<Category>> {

@@ -9,14 +9,14 @@ import {
 import { Api } from '../../../../core/http/api';
 import { EndpointsService } from '../../../../core/constants/endpoints';
 import { ApiResponse } from '../../../../core/models/api-response.model';
-import { Storage } from '../../../../core/services/storage';
+
 @Injectable({
   providedIn: 'root',
 })
 export class ProductService {
   private readonly api = inject(Api);
   private readonly endpoints = inject(EndpointsService);
-  private readonly storage = inject(Storage);
+
 
   getProducts(params?: {
     page?: number;
@@ -27,12 +27,11 @@ export class ProductService {
     max_price?: number;
     search?: string;
   }): Observable<ApiResponse<ProductI[]>> {
-    const restaurantId = this.storage.get<string>('restaurant_id');
+
 
     const finalParams: any = {
       page: params?.page,
       limit: params?.limit,
-      restaurant_id: restaurantId,
     };
 
     if (params?.category_id) finalParams.category_id = params.category_id;
@@ -77,18 +76,12 @@ export class ProductService {
   ): FormData {
     const formData = new FormData();
 
-    // Añadir restaurant_id automáticamente
-    const restaurantId = this.storage.get<string>('restaurant_id');
-    if (restaurantId) {
-      formData.append('restaurant_id', restaurantId);
-    }
-
     // Campos del producto
-    formData.append('category_id', data.category_id!);
-    formData.append('name', data.name!);
+    if (data.category_id) formData.append('category_id', data.category_id);
+    if (data.name) formData.append('name', data.name);
     if (data.description) formData.append('description', data.description);
-    formData.append('price', String(data.price));
-    formData.append('is_available', String(data.is_available));
+    if (data.price !== undefined) formData.append('price', String(data.price));
+    if (data.is_available !== undefined) formData.append('is_available', String(data.is_available));
 
     // Imagen opcional
     if (image) {
