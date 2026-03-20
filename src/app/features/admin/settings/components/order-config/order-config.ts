@@ -84,6 +84,17 @@ export class OrderConfig {
     this.orderForm.get('enabled')?.valueChanges.subscribe((enabled) => {
       this.toggleDependentFields(enabled === true);
     });
+
+    // Enable/disable delivery fee based on delivery switch
+    this.orderForm.get('delivery_enabled')?.valueChanges.subscribe((enabled) => {
+      const deliveryFeeControl = this.orderForm.get('delivery_fee');
+
+      if (enabled) {
+        deliveryFeeControl?.enable();
+      } else {
+        deliveryFeeControl?.disable();
+      }
+    });
   }
 
   private toggleDependentFields(enable: boolean): void {
