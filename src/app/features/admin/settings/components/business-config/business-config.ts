@@ -14,7 +14,6 @@ import {
   DAY_NAMES_ES,
   DayOfWeek,
   DAYS_OF_WEEK,
-  LATAM_TIMEZONES,
   MAX_DELIVERY_ZONES,
 } from '../../services/settings.models';
 
@@ -36,7 +35,6 @@ export class BusinessConfig implements OnInit {
       saturday: { open: '10:00', close: '23:00', isOpen: true },
       sunday: { open: '10:00', close: '20:00', isOpen: true },
     },
-    timezone: 'America/Lima',
     delivery_zones: [],
     social_media: {
       facebook: '',
@@ -51,7 +49,6 @@ export class BusinessConfig implements OnInit {
   private readonly fb = inject(FormBuilder);
   readonly daysOfWeek = DAYS_OF_WEEK;
   readonly dayNames = DAY_NAMES_ES;
-  readonly timezones = LATAM_TIMEZONES;
   readonly maxDeliveryZones = MAX_DELIVERY_ZONES;
 
   businessForm = this.createBusinessForm();
@@ -69,7 +66,6 @@ export class BusinessConfig implements OnInit {
   private createBusinessForm(): FormGroup {
     return this.fb.group({
       business_hours: this.fb.group({}),
-      timezone: ['America/Lima', Validators.required],
       delivery_zones: this.fb.array([]),
       social_media: this.fb.group({
         facebook: [''],
