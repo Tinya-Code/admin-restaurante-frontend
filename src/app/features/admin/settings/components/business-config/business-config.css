@@ -13,12 +13,6 @@
   --color-primary-light: #eff6ff;
 }
 
-/* Component-specific styles that can't be done with Tailwind */
-.business-config {
-  padding: 1.5rem;
-  background: var(--color-surface);
-}
-
 .section {
   margin-bottom: 2rem;
 }
@@ -48,16 +42,6 @@
   accent-color: var(--color-primary);
 }
 
-/* Custom hover effects for delivery zones */
-.delivery-zone-item {
-  transition: all 0.2s ease;
-}
-
-.delivery-zone-item:hover {
-  background: var(--color-primary-light);
-  border-color: var(--color-primary);
-}
-
 /* Custom button hover effects */
 .form-group button:hover:not(:disabled) {
   transform: translateY(-1px);
@@ -82,4 +66,14 @@
 .business-hours-row,
 .delivery-zone-item {
   transition: all 0.15s ease-in-out;
+}
+
+input[type="time"]::-webkit-calendar-picker-indicator {
+  display: none;
+}
+
+input[type="number"]::-webkit-outer-spin-button,
+input[type="number"]::-webkit-inner-spin-button {
+  -webkit-appearance: none;
+  margin: 0;
 }

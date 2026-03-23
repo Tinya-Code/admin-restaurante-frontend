@@ -1,4 +1,4 @@
-<div class="min-h-screen bg-gray-50 p-6">
+<div class="min-h-screen bg-gray-50 md:p-6 p-4">
   <!-- Header -->
   <div class="mb-6 flex items-center justify-between">
     <div>
@@ -20,55 +20,38 @@
   <!-- Content -->
   @if (!isLoading()) {
   <div class="space-y-6">
-    <!-- Tabs -->
-    <div class="flex gap-2 border-b border-gray-200 pb-2">
+    <!-- Tabs - Responsive with horizontal scroll on small screens -->
+    <div class="flex gap-2 border-b border-gray-200 pb-2 overflow-x-auto scrollbar-hide">
+      @for (tab of tabs; track tab.id) {
       <button
         type="button"
-        (click)="switchTab('whatsapp')"
-        class="flex items-center gap-2 rounded-md px-4 py-2 text-sm font-medium transition"
-        [class.bg-gray-900]="activeTab() === 'whatsapp'"
-        [class.text-white]="activeTab() === 'whatsapp'"
-        [class.text-gray-700]="activeTab() !== 'whatsapp'"
-        [class.hover:bg-gray-200]="activeTab() !== 'whatsapp'"
+        (click)="switchTab(tab.id)"
+        class="flex items-center gap-1 sm:gap-2 rounded-md px-2 sm:px-4 py-2 text-xs sm:text-sm font-medium transition whitespace-nowrap shrink-0"
+        [class.bg-gray-900]="activeTab() === tab.id"
+        [class.text-white]="activeTab() === tab.id"
+        [class.text-gray-700]="activeTab() !== tab.id"
+        [class.hover:bg-gray-200]="activeTab() !== tab.id"
       >
-        <lucide-icon [img]="MessageCircle" class="h-[18px] w-[18px] shrink-0"></lucide-icon>
-        WhatsApp @if (tabValidation()['whatsapp'] === false && activeTab() !== 'whatsapp') {
-        <lucide-icon [img]="AlertTriangle" class="h-[16px] w-[16px] text-red-500"></lucide-icon>
+        <lucide-icon
+          [img]="tab.icon"
+          class="h-4 w-4 sm:h-[18px] sm:w-[18px] shrink-0"
+        ></lucide-icon>
+        <span>{{ tab.label }}</span>
+        @if (tabValidation()[tab.id] === false && activeTab() !== tab.id) {
+        <lucide-icon
+          [img]="AlertTriangle"
+          class="h-3 w-3 sm:h-[16px] sm:w-[16px] text-red-500"
+        ></lucide-icon>
         }
       </button>
-      <button
-        type="button"
-        (click)="switchTab('order')"
-        class="flex items-center gap-2 rounded-md px-4 py-2 text-sm font-medium transition"
-        [class.bg-gray-900]="activeTab() === 'order'"
-        [class.text-white]="activeTab() === 'order'"
-        [class.text-gray-700]="activeTab() !== 'order'"
-        [class.hover:bg-gray-200]="activeTab() !== 'order'"
-      >
-        <lucide-icon [img]="ClipboardList" class="h-[18px] w-[18px] shrink-0"></lucide-icon>
-        Órdenes @if (tabValidation()['order'] === false && activeTab() !== 'order') {
-        <lucide-icon [img]="AlertTriangle" class="h-[16px] w-[16px] text-red-500"></lucide-icon>
-        }
-      </button>
-      <button
-        type="button"
-        (click)="switchTab('business')"
-        class="flex items-center gap-2 rounded-md px-4 py-2 text-sm font-medium transition"
-        [class.bg-gray-900]="activeTab() === 'business'"
-        [class.text-white]="activeTab() === 'business'"
-        [class.text-gray-700]="activeTab() !== 'business'"
-        [class.hover:bg-gray-200]="activeTab() !== 'business'"
-      >
-        <lucide-icon [img]="Building" class="h-[18px] w-[18px] shrink-0"></lucide-icon>
-        Negocio @if (tabValidation()['business'] === false && activeTab() !== 'business') {
-        <lucide-icon [img]="AlertTriangle" class="h-[16px] w-[16px] text-red-500"></lucide-icon>
-        }
-      </button>
+      }
     </div>
 
     <!-- Panel WhatsApp -->
-
-    <div class="rounded-lg bg-white p-6 shadow-sm" [class.hidden]="activeTab() !== 'whatsapp'">
+    <div
+      class="rounded-lg bg-white p-4 md:p-6 shadow-sm"
+      [class.hidden]="activeTab() !== 'whatsapp'"
+    >
       <div class="mb-4 flex items-center gap-2">
         <lucide-icon [img]="MessageCircle" class="h-5 w-5"></lucide-icon>
         <h2 class="text-lg font-semibold">Configuración de WhatsApp</h2>
@@ -86,8 +69,7 @@
     </div>
 
     <!-- Panel Órdenes -->
-
-    <div class="rounded-lg bg-white p-6 shadow-sm" [class.hidden]="activeTab() !== 'order'">
+    <div class="rounded-lg bg-white md:p-6 p-4 shadow-sm" [class.hidden]="activeTab() !== 'order'">
       <div class="mb-4 flex items-center gap-2">
         <lucide-icon [img]="ClipboardList" class="h-5 w-5"></lucide-icon>
         <h2 class="text-lg font-semibold">Configuración de Órdenes</h2>
@@ -105,7 +87,10 @@
     </div>
 
     <!-- Panel Negocio -->
-    <div class="rounded-lg bg-white p-6 shadow-sm" [class.hidden]="activeTab() !== 'business'">
+    <div
+      class="rounded-lg bg-white md:p-6 p-4 shadow-sm"
+      [class.hidden]="activeTab() !== 'business'"
+    >
       <div class="mb-4 flex items-center gap-2">
         <lucide-icon [img]="Building" class="h-5 w-5"></lucide-icon>
         <h2 class="text-lg font-semibold">Configuración del Negocio</h2>
@@ -131,14 +116,13 @@
       Tienes cambios sin guardar
     </div>
     }
-
     <!-- Botones -->
-    <div class="flex justify-end gap-3 pt-4">
+    <div class="flex md:justify-end justify-center gap-3 pt-4">
       <button
         type="button"
         (click)="cancelChanges()"
         [disabled]="!canCancel()"
-        class="rounded-md border border-gray-300 px-4 py-2 text-sm hover:bg-gray-100 disabled:opacity-50"
+        class="flex-1 md:flex-none rounded-md border border-gray-300 px-4 py-2 text-sm hover:bg-gray-100 disabled:opacity-50"
       >
         Cancelar
       </button>
@@ -147,7 +131,7 @@
         type="button"
         (click)="saveSettings()"
         [disabled]="!canSave()"
-        class="flex items-center gap-2 rounded-md bg-gray-900 px-4 py-2 text-sm text-white hover:bg-gray-800 disabled:opacity-50"
+        class="flex flex-1 md:flex-none items-center gap-2 rounded-md bg-gray-900 px-4 py-2 text-sm text-white hover:bg-gray-800 disabled:opacity-50"
       >
         @if (isSaving()) {
         <div
