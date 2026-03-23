@@ -63,7 +63,9 @@ export class OrderConfig {
 
   private initializeForm(): void {
     if (this.config()) {
-      this.orderForm.patchValue(this.config());
+      this.orderForm.patchValue(this.config(), { emitEvent: false });
+      const isValid = this.orderForm.valid;
+      this.isValid.emit(isValid);
     }
     // Initialize disabled state
     this.toggleDependentFields(this.orderForm.get('enabled')?.value === true);

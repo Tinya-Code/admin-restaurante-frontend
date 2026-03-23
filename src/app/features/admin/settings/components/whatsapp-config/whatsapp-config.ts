@@ -41,7 +41,9 @@ export class WhatsAppConfig implements OnInit {
     });
 
     if (this.config()) {
-      this.whatsappForm.patchValue(this.config());
+      this.whatsappForm.patchValue(this.config(), { emitEvent: false });
+      const isValid = this.whatsappForm.valid;
+      this.isValid.emit(isValid);
     }
   }
 

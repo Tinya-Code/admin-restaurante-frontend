@@ -89,7 +89,9 @@ export class BusinessConfig implements OnInit {
   private patchInitialValues(): void {
     if (this.config()) {
       this.initializeDeliveryZones(this.config().delivery_zones);
-      this.businessForm.patchValue(this.config());
+      this.businessForm.patchValue(this.config(), { emitEvent: false });
+      const isValid = this.businessForm.valid;
+      this.isValid.emit(isValid);
     }
   }
 
@@ -117,7 +119,7 @@ export class BusinessConfig implements OnInit {
         ],
         isOpen: [false],
       },
-      { validators: this.timeRangeValidator() }
+      { validators: this.timeRangeValidator() },
     );
   }
 
@@ -169,7 +171,7 @@ export class BusinessConfig implements OnInit {
         this.fb.group({
           name: [name, Validators.required],
           fee: [fee, [Validators.required, Validators.min(0)]],
-        })
+        }),
       );
     }
   }
