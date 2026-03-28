@@ -7,9 +7,11 @@ import {
 } from '../../../../../shared/components/data-table/data-table';
 import { Edit, Trash2, Eye, Inbox, Router as RouterIcon } from 'lucide-angular';
 import type { Product } from '../../../../../core/models/product.model';
+import type { Category } from '../../../../../core/models/category.model';
 import { CategoryList } from '../../components/category-list/category-list';
 import { SearchBar } from '../../../../../shared/components/search-bar/search-bar';
 import { ProductService } from '../../services/product';
+import { CategoryService } from '../../../categories/services/category';
 import { Notification } from '../../../../../core/services/notification';
 import { firstValueFrom } from 'rxjs';
 import { Button } from '../../../../../shared/components/button/button';
@@ -43,11 +45,14 @@ export class ProductListPage {
   currentPage = signal<number>(1);
   currentLimit = signal<number>(10);
 
+  categoriesData = signal<Category[]>([]);
+
   // ============================================================
   // ===================== SERVICES =============================
   // ============================================================
 
   private productService = inject(ProductService);
+  private categoryService = inject(CategoryService);
   private notification = inject(Notification);
   private router = inject(Router)
 
@@ -99,6 +104,7 @@ export class ProductListPage {
   // ============================================================
 
   ngOnInit(): void {
+    this.loadCategories();
     this.loadProducts();
   }
 
@@ -137,6 +143,17 @@ export class ProductListPage {
   // ============================================================
   // ===================== DATA LAYER ===========================
   // ============================================================
+
+  private async loadCategories(): Promise<void> {
+    try {
+      const response = await firstValueFrom(
+        this.categoryService.getCategories({ limit: 100, is_active: true })
+      );
+      this.categoriesData.set(response.data || []);
+    } catch (error) {
+      console.error('Error cargando categorías para el filtro', error);
+    }
+  }
 
   private async loadProducts(
     page?: number,

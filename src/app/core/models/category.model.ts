@@ -10,17 +10,16 @@ export interface Category {
   update_at: string;
 }
 // (POST)
-export type CategoryCreate = Omit<Category, 'id' | 'created_at' | 'update_at' | 'display_order'> & {
+export type CategoryCreate = Omit<Category, 'id' | 'created_at' | 'update_at' | 'display_order' | 'restaurant_id' | 'menu_id'> & {
   display_order?: number; // Opcional en el DTO, se omite si el usuario no lo proporciona
+  restaurant_id?: string;
+  menu_id?: string;
 };
 
 // (PATCH)
-export type CategoryPatch = Partial<
+export type CategoryUpdate = Partial<
   Omit<Category, 'id' | 'restaurant_id' | 'created_at' | 'update_at'>
 >;
-
-// (PUT)
-export type CategoryUpdate = Omit<Category, 'created_at' | 'update_at'>;
 
 // (GET)
 export type CategoryList = Category[];

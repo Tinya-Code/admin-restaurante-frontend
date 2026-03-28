@@ -1,9 +1,11 @@
-import { Component, inject, OnInit } from '@angular/core';
+import { Component, inject, OnInit, signal } from '@angular/core';
 import { ProductForm } from '../../components/product-form/product-form';
 import { Product, ProductCreate, ProductPatch, ProductUpdate } from '../../../../../core/models/product.model';
 import { ProductService } from '../../services/product';
+import { CategoryService } from '../../../categories/services/category';
 import { Notification } from '../../../../../core/services/notification';
 import { ActivatedRoute } from '@angular/router';
+import { Category } from '../../../../../core/models/category.model';
 import { BackButton } from "../../../../../shared/components/back-button/back-button";
 @Component({
   selector: 'app-product-form-page',
@@ -13,11 +15,23 @@ import { BackButton } from "../../../../../shared/components/back-button/back-bu
 })
 export class ProductFormPage implements OnInit {
   private readonly productService = inject(ProductService);
+  private readonly categoryService = inject(CategoryService);
   private readonly notification = inject(Notification);
   private readonly route = inject(ActivatedRoute);
 productData: Product | undefined = undefined;
+categoriesData = signal<Category[]>([]);
 
 ngOnInit(): void {
+  this.categoryService.getCategories({ limit: 100, is_active: true }).subscribe({
+    next: (res) => {
+      this.categoriesData.set(res.data || []);
+    },
+    error: (err) => {
+      this.notification.error('Error al cargar categorías');
+      console.error(err);
+    }
+  });
+
   const id = this.route.snapshot.paramMap.get('id');
   if (id) {
     this.productService.getProductById(id).subscribe({

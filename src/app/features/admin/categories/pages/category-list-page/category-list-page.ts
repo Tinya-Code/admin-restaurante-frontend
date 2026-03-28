@@ -41,21 +41,9 @@ export class CategoryListPage {
   private router = inject(Router);
 
   readonly columns: TableColumn[] = [
-    { key: 'name', label: 'Nombre', width: '250px', mobileOrder: 1 },
-    {
-      key: 'created_at',
-      label: 'Creado',
-      width: '150px',
-      hideOnMobile: true,
-      pipe: 'date',
-    },
-    {
-      key: 'updated_at',
-      label: 'Actualizado',
-      width: '150px',
-      hideOnMobile: true,
-      pipe: 'date',
-    },
+    { key: 'name', label: 'Nombre', mobileOrder: 1 },
+    { key: 'description', label: 'Descripción', hideOnMobile: true },
+    { key: 'display_order', label: 'Orden', width: '100px', align: 'center', hideOnMobile: true },
   ];
 
   readonly tableActions: TableAction[] = [
@@ -120,12 +108,17 @@ export class CategoryListPage {
     this.loading.set(true);
 
     try {
+      const queryParams: any = {
+        page: finalPage,
+        limit: finalLimit,
+      };
+      
+      if (finalSearchWord) {
+        queryParams.search = finalSearchWord;
+      }
+
       const response = await firstValueFrom(
-        this.categoryService.getCategories({
-          page: finalPage,
-          limit: finalLimit,
-          search: finalSearchWord,
-        }),
+        this.categoryService.getCategories(queryParams),
       );
 
       this.categories.set(response.data || []);
@@ -170,8 +163,16 @@ export class CategoryListPage {
   }
 
   private deleteCategory(category: any): void {
-    console.log('Eliminar:', category);
-    this.notification.warning(`Categoría ${category.name} eliminada`);
-    // Aquí podrías llamar a categoryService.deleteCategory(category.id)
+    if (confirm(`¿Estás seguro de eliminar la categoría ${category.name}?`)) {
+      this.categoryService.deleteCategory(category.id).subscribe({
+        next: () => {
+          this.notification.warning(`Categoría ${category.name} eliminada`);
+          this.loadCategories();
+        },
+        error: () => {
+          this.notification.error('Error al eliminar categoría');
+        }
+      });
+    }
   }
 }
