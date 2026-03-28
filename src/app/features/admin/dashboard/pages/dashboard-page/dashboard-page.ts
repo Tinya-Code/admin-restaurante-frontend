@@ -19,27 +19,8 @@ import {
 import { StatsCard } from '../../components/stats-card/stats-card';
 import { DashboardService } from '../../services/dashboardService';
 import { Storage } from '../../../../../core/services/storage';
-
-interface Product {
-  id: string;
-  category_name: string;
-  name: string;
-  description: string;
-  price: number;
-  image_url: string | null;
-  is_available: boolean;
-  created_at: string;
-  updated_at: string;
-}
-
-interface Category {
-  id: string;
-  restaurant_id: string;
-  name: string;
-  is_active: boolean;
-  created_at: string;
-  update_at: string;
-}
+import { Product } from '../../../../../core/models/product.model';
+import { Category } from '../../../../../core/models/category.model';
 
 @Component({
   selector: 'app-dashboard-page',
@@ -61,7 +42,6 @@ export class DashboardPage implements OnInit{
   
   }
 ngOnInit(): void {
-  this.storage.set("restaurant_id","5a53d32f-834d-43df-a9ed-5db9b6badef9")
     this.loadData();
 }
   private loadData(): void {
@@ -99,12 +79,7 @@ ngOnInit(): void {
       width: '250px',
       mobileOrder: 1,
     },
-    {
-      key: 'category',
-      label: 'Categoría',
-      width: '150px',
-      mobileOrder: 2,
-    },
+
     {
       key: 'price',
       label: 'Precio',
@@ -112,7 +87,7 @@ ngOnInit(): void {
       align: 'right',
       pipe: 'currency',
       pipeFormat: 'USD',
-      mobileOrder: 3,
+      mobileOrder: 2,
     },
     {
       key: 'created_at',

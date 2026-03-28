@@ -1,28 +1,10 @@
 import { inject, Injectable } from '@angular/core';
-import { map, Observable, switchMap } from 'rxjs';
+import { forkJoin, map, Observable } from 'rxjs';
 import { EndpointsService } from '../../../../core/constants/endpoints';
 import { Api } from '../../../../core/http/api';
 import { ApiResponse } from '../../../../core/models/api-response.model';
-export interface Product {
-  id: string;
-  category_name: string;
-  name: string;
-  description: string;
-  price: number;
-  image_url: string | null;
-  is_available: boolean;
-  created_at: string;
-  updated_at: string;
-}
-
-export interface Category {
-  id: string;
-  restaurant_id: string;
-  name: string;
-  is_active: boolean;
-  created_at: string;
-  update_at: string;
-}
+import { Product } from '../../../../core/models/product.model';
+import { Category } from '../../../../core/models/category.model';
 
 export interface DashboardStats {
   totalProducts: number;
@@ -75,13 +57,17 @@ export class DashboardService {
       );
   }
 
-  getRecentProducts(): Observable<Product[]> {
+  getRecentProducts(limit: number = 5): Observable<Product[]> {
     return this.api
-      .get<RecentProductsResponse>(this.endpoints.recentProducts())
+      .get<any>(this.endpoints.recentProducts(), { params: { limit } })
       .pipe(
-        map((response: ApiResponse<RecentProductsResponse>) => {
+        map((response: ApiResponse<any>) => {
           if (response.success && response.data) {
-            return response.data.products;
+            // Soportar tanto si el backend envía un Array directo o un objeto con un array "products"
+            if (Array.isArray(response.data)) {
+              return response.data;
+            }
+            return response.data.products || [];
           }
           throw new Error(response.message || 'Error al obtener productos recientes');
         })
@@ -89,20 +75,10 @@ export class DashboardService {
   }
 
   getDashboardStats(): Observable<DashboardStats> {
-    return this.getProductsCount().pipe(
-      switchMap((productsCount: number) => {
-        return this.getCategoriesCount().pipe(
-          switchMap((categoriesCount: number) => {
-            return this.getRecentProducts().pipe(
-              map((recentProducts: Product[]) => ({
-                totalProducts: productsCount,
-                totalCategories: categoriesCount,
-                recentProducts,
-              }))
-            );
-          })
-        );
-      })
-    );
+    return forkJoin({
+      totalProducts: this.getProductsCount(),
+      totalCategories: this.getCategoriesCount(),
+      recentProducts: this.getRecentProducts()
+    });
   }
 }

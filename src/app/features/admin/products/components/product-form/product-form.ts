@@ -19,7 +19,7 @@ export class ProductForm implements OnInit {
   readonly loading = input<boolean>(false);
 
   // Outputs
-  readonly formSubmit = output<{ data: ProductCreate | ProductUpdate; image?: File }>();
+  readonly formSubmit = output<ProductCreate | ProductUpdate>();
   readonly formCancel = output<void>();
 
   // Signals
@@ -65,9 +65,9 @@ export class ProductForm implements OnInit {
       is_available: product.is_available,
     });
 
-    if (product.image_url) {
-      this.imagePreview.set(product.image_url);
-    }
+    // if (product.image_url) {
+    //   this.imagePreview.set(product.image_url);
+    // }
   }
 
   onFileSelected(event: Event): void {
@@ -133,10 +133,7 @@ export class ProductForm implements OnInit {
     const formValue = this.productForm.value;
     const data = this.buildSubmitData(formValue);
 
-    this.formSubmit.emit({
-      data,
-      image: this.selectedFile() || undefined,
-    });
+    this.formSubmit.emit(data);
   }
 
   private buildSubmitData(formValue: any): ProductCreate | ProductUpdate {
@@ -153,13 +150,13 @@ export class ProductForm implements OnInit {
       return {
         id: this.product()!.id,
         ...baseData,
-        image_url: this.product()!.image_url,
+        // image_url: this.product()!.image_url,
       } as ProductUpdate;
     }
 
     return {
       ...baseData,
-      image_url: undefined,
+      // image_url: undefined,
     } as ProductCreate;
   }
 

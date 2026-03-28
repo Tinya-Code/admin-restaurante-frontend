@@ -51,7 +51,7 @@ export class DataTable {
   readonly dataSource = input.required<any[]>();
   readonly meta = input.required<PaginationMeta>();
   readonly columns = input.required<TableColumn[]>();
-  readonly imageKey = input<string>('');
+  readonly imageKey = input<string | undefined>(undefined);
   readonly statusKey = input<string>('is_available');
   readonly actions = input<TableAction[]>([]);
   readonly showToggle = input<boolean>(false);
@@ -166,8 +166,12 @@ getCellValue(row: any, column: TableColumn): any {
 }
 
   getImageUrl(row: any): string {
+    const key = this.imageKey();
+    if (!key) {
+      return 'https://i.pinimg.com/1200x/47/49/9a/47499a5cd90f926e9506b4a47435a0eb.jpg';
+    }
     return (
-      row[this.imageKey()] ||
+      row[key] ||
       'https://i.pinimg.com/1200x/47/49/9a/47499a5cd90f926e9506b4a47435a0eb.jpg'
     );
   }

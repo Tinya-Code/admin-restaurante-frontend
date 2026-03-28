@@ -49,7 +49,6 @@
     <h2 class="text-xl font-semibold text-gray-900 mb-6">Productos Recientes</h2>
 
     <app-data-table
-      [imageKey]="'image'"
       [dataSource]="recentProducts()"
       [meta]="paginationMeta()"
       [columns]="columns"
