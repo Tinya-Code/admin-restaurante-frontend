@@ -88,7 +88,6 @@ export interface BusinessConfig {
       isOpen: boolean;
     };
   };
-  timezone: string; // de LATAM_TIMEZONES
   delivery_zones: Array<{
     name: string;
     fee: number;
@@ -134,7 +133,6 @@ export interface BusinessConfigForm {
       closed: boolean;
     };
   };
-  timezone: string;
   delivery_zones: Array<{
     name: string;
     fee: number;

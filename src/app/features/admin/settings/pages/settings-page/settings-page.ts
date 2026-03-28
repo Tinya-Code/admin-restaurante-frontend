@@ -9,6 +9,7 @@ import {
 } from 'lucide-angular';
 import { Subject, takeUntil } from 'rxjs';
 
+import { Notification } from '../../../../../core/services/notification';
 import { BusinessConfig } from '../../components/business-config/business-config';
 import { OrderConfig } from '../../components/order-config/order-config';
 import { WhatsAppConfig } from '../../components/whatsapp-config/whatsapp-config';
@@ -22,12 +23,20 @@ import { SettingsService } from '../../services/settings.service';
 })
 export class SettingsPage implements OnInit, OnDestroy {
   private settingsService = inject(SettingsService);
+  private notificationService = inject(Notification);
   private destroy$ = new Subject<void>();
 
   readonly MessageCircle = MessageCircle;
   readonly ClipboardList = ClipboardList;
   readonly Building = Building;
   readonly AlertTriangle = TriangleAlert;
+
+  // Tab configuration for template
+  readonly tabs = [
+    { id: 'whatsapp', label: 'WhatsApp', icon: MessageCircle },
+    { id: 'order', label: 'Órdenes', icon: ClipboardList },
+    { id: 'business', label: 'Negocio', icon: Building },
+  ];
 
   // Signals for reactive state management
   currentSettings = signal<BusinessSettings | null>(null);
@@ -37,7 +46,12 @@ export class SettingsPage implements OnInit, OnDestroy {
   activeTab = signal('whatsapp');
 
   // Tab validation signals
-  tabValidation = signal({
+  tabValidation = signal<{
+    whatsapp: boolean;
+    order: boolean;
+    business: boolean;
+    [key: string]: boolean;
+  }>({
     whatsapp: false,
     order: false,
     business: false,
@@ -89,13 +103,16 @@ export class SettingsPage implements OnInit, OnDestroy {
 
   onConfigChange(section: keyof BusinessSettings, config: any): void {
     const settings = this.currentSettings();
-    if (settings) {
-      this.currentSettings.set({
-        ...settings,
-        [section]: config,
-      });
-      this.hasUnsavedChanges.set(true);
-    }
+    if (!settings) return;
+    const previous = settings[section];
+    const isDifferent = !this.isEqual(previous, config);
+
+    if (!isDifferent) return;
+    this.currentSettings.set({
+      ...settings,
+      [section]: config,
+    });
+    this.hasUnsavedChanges.set(true);
   }
 
   // Computed signals for derived state
@@ -197,11 +214,11 @@ export class SettingsPage implements OnInit, OnDestroy {
   }
 
   private showSuccess(message: string): void {
-    console.log(message);
+    this.notificationService.success(message);
   }
 
   private showError(message: string): void {
-    console.error(message);
+    this.notificationService.error(message);
   }
 
   // Computed signals for template access
@@ -210,4 +227,23 @@ export class SettingsPage implements OnInit, OnDestroy {
   hasChanges = computed(() => this.hasUnsavedChanges());
   canSave = computed(() => this.hasUnsavedChanges() && this.isFormValid() && !this.saving());
   canCancel = computed(() => this.hasUnsavedChanges() && !this.saving());
+
+  isEqual(a: any, b: any): boolean {
+    return JSON.stringify(this.sortObject(a)) === JSON.stringify(this.sortObject(b));
+  }
+
+  sortObject(obj: any): any {
+    if (Array.isArray(obj)) return obj.map(this.sortObject);
+
+    if (obj !== null && typeof obj === 'object') {
+      return Object.keys(obj)
+        .sort()
+        .reduce((result: any, key) => {
+          result[key] = this.sortObject(obj[key]);
+          return result;
+        }, {});
+    }
+
+    return obj;
+  }
 }

@@ -63,7 +63,9 @@ export class OrderConfig {
 
   private initializeForm(): void {
     if (this.config()) {
-      this.orderForm.patchValue(this.config());
+      this.orderForm.patchValue(this.config(), { emitEvent: false });
+      const isValid = this.orderForm.valid;
+      this.isValid.emit(isValid);
     }
     // Initialize disabled state
     this.toggleDependentFields(this.orderForm.get('enabled')?.value === true);
@@ -83,6 +85,17 @@ export class OrderConfig {
     // Enable/disable fields based on order system status
     this.orderForm.get('enabled')?.valueChanges.subscribe((enabled) => {
       this.toggleDependentFields(enabled === true);
+    });
+
+    // Enable/disable delivery fee based on delivery switch
+    this.orderForm.get('delivery_enabled')?.valueChanges.subscribe((enabled) => {
+      const deliveryFeeControl = this.orderForm.get('delivery_fee');
+
+      if (enabled) {
+        deliveryFeeControl?.enable();
+      } else {
+        deliveryFeeControl?.disable();
+      }
     });
   }
 
