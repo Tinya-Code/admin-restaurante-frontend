@@ -1,7 +1,7 @@
 import { Component, inject, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { LucideAngularModule, Utensils, Loader } from 'lucide-angular';
-import { AuthService } from '../../services/authService';
+import { AuthApiService } from '../../services/auth-api.service';
 
 @Component({
   selector: 'app-login-form',
@@ -11,7 +11,7 @@ import { AuthService } from '../../services/authService';
   styleUrl: './login-form.css',
 })
 export class LoginForm {
-  private authService = inject(AuthService);
+  private authService = inject(AuthApiService);
 
   // Iconos
   readonly Utensils = Utensils;

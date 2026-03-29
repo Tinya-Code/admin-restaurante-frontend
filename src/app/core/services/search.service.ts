@@ -1,5 +1,5 @@
-import { Injectable, inject } from '@angular/core';
-import { Observable, map } from 'rxjs';
+import { Injectable, inject, signal } from '@angular/core';
+import { Observable, map, of, tap } from 'rxjs';
 import { Api } from '../http/api';
 import { EndpointsService } from '../constants/endpoints';
 import { ApiResponse } from '../models/api-response.model';
@@ -9,10 +9,27 @@ import { SearchParams, SearchResult } from '../models/search.model';
   providedIn: 'root',
 })
 export class SearchService {
-  private api = inject(Api);
-  private endpoints = inject(EndpointsService);
+  private readonly api = inject(Api);
+  private readonly endpoints = inject(EndpointsService);
+
+  // Cache state
+  private readonly _cache = signal<ApiResponse<SearchResult[]> | null>(null);
+  private readonly _lastParams = signal<string>('');
+
+  public readonly cache = this._cache.asReadonly();
+
+  checkCache(params?: any): boolean {
+    const paramString = JSON.stringify(params || {});
+    return !!this._cache() && this._lastParams() === paramString;
+  }
 
   search(params: SearchParams): Observable<ApiResponse<SearchResult[]>> {
+    const paramString = JSON.stringify(params || {});
+
+    if (this._cache() && this._lastParams() === paramString) {
+      return of(this._cache()!);
+    }
+
     return this.api.get<SearchResult[]>(this.endpoints.search(), {
       params: params as any,
     }).pipe(
@@ -29,7 +46,16 @@ export class SearchService {
           };
         }
         return response;
+      }),
+      tap(response => {
+        this._cache.set(response);
+        this._lastParams.set(paramString);
       })
     );
+  }
+
+  clearCache(): void {
+    this._cache.set(null);
+    this._lastParams.set('');
   }
 }

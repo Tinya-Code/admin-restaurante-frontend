@@ -2,9 +2,9 @@ import { RouterLink, Router } from '@angular/router';
 import { Component, signal, ChangeDetectionStrategy, inject,  } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { LucideAngularModule, LogOut, User, Settings, ChevronDown, Route as RouteIcon } from 'lucide-angular';
-import { Auth } from '../../../core/services/auth';
+import { AuthService } from '../../../core/services/auth.service';
 
-import { Notification } from '../../../core/services/notification';
+import { NotificationService } from '../../../core/services/notification.service';
 interface UserProfile {
   name: string;
   email: string;
@@ -19,37 +19,38 @@ interface UserProfile {
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class Header {
-  private notification= inject(Notification);
-  private router = inject(Router);
-  private auth = inject(Auth);
-  isOpen = false;
+  private readonly notification = inject(NotificationService);
+  private readonly router = inject(Router);
+  private readonly auth = inject(AuthService);
 
-
-  readonly logOut = LogOut;
+  // Icons
+  readonly logOutIcon = LogOut;
   readonly userIcon = User;
-  readonly settings = Settings;
-  readonly chevronDown = ChevronDown;
+  readonly settingsIcon = Settings;
+  readonly chevronDownIcon = ChevronDown;
+
   // State
   readonly isMenuOpen = signal(false);
- readonly user = this.auth.user;
-  getUserInitials(): string {
-    const currentUser = this.user();
-    if (!currentUser) return '';
-    return currentUser.name
-      .split(' ')
-      .map((n) => n[0])
-      .join('')
-      .toUpperCase()
-      .slice(0, 2);
-  }
+  readonly user = this.auth.user;
 
   // Config
   readonly appLogo = signal<string>(
-    'https://i.pinimg.com/736x/67/ac/89/67ac897b4b12c0d82a8c1c6d9c79287d.jpg',
+    'https://i.pinimg.com/736x/67/ac/89/67ac897b4b12c0d82a8c1c6d9c79287d.jpg'
   );
   readonly clientLogo = signal<string | null>(null);
-    toggleOpen() {
-    this.isOpen = !this.isOpen;
+
+  getUserInitials(): string {
+    const currentUser = this.user();
+    if (!currentUser || !currentUser.name) return '??';
+    
+    const names = currentUser.name.trim().split(/\s+/);
+    if (names.length === 0) return '??';
+    
+    if (names.length === 1) {
+      return names[0].slice(0, 2).toUpperCase();
+    }
+    
+    return (names[0][0] + names[names.length - 1][0]).toUpperCase();
   }
 
   toggleMenu(): void {
@@ -60,21 +61,25 @@ export class Header {
     this.isMenuOpen.set(false);
   }
 
-  logout(): void {
-    this.notification.info("Cerrando sesión...")
-    this.auth.logOut();
-    this.router.navigate(['/login']);
-    this.closeMenu();
-
+  async logout(): Promise<void> {
+    try {
+      this.notification.info('Cerrando sesión...');
+      this.closeMenu();
+      await this.auth.logOut();
+      await this.router.navigate(['/login']);
+    } catch (error) {
+      console.error('Logout error:', error);
+      this.notification.error('Error al cerrar sesión');
+    }
   }
 
   goToProfile(): void {
-    console.log('Ir a perfil');
+    this.router.navigate(['/admin/settings']);
     this.closeMenu();
   }
 
   goToSettings(): void {
-    console.log('Ir a configuración');
+    this.router.navigate(['/admin/settings']);
     this.closeMenu();
   }
 

@@ -3,7 +3,7 @@ import { inject } from '@angular/core';
 import { Router } from '@angular/router';
 import { catchError, switchMap, throwError } from 'rxjs';
 import { from } from 'rxjs';
-import { AuthService } from '../../features/auth/services/authService';
+import { AuthApiService } from '../../features/auth/services/auth-api.service';
 import { environment } from '../../../environments/environment';
 
 /**
@@ -11,7 +11,7 @@ import { environment } from '../../../environments/environment';
  * Agrega el token de Firebase a las peticiones al backend
  */
 export const authInterceptor: HttpInterceptorFn = (req, next) => {
-  const authService = inject(AuthService);
+  const authService = inject(AuthApiService);
   const router = inject(Router);
 
   // Solo agregar token a peticiones a nuestro backend
@@ -64,7 +64,7 @@ function shouldAttachToken(url: string): boolean {
 function handleError(
   error: HttpErrorResponse,
   router: Router,
-  authService: AuthService
+  authService: AuthApiService
 ) {
   console.error('❌ HTTP Error:', {
     status: error.status,

@@ -17,8 +17,8 @@ import {
   TableColumn,
 } from '../../../../../shared/components/data-table/data-table';
 import { StatsCard } from '../../components/stats-card/stats-card';
-import { DashboardService } from '../../services/dashboardService';
-import { Storage } from '../../../../../core/services/storage';
+import { DashboardService } from '../../services/dashboard.service';
+import { StorageService } from '../../../../../core/services/storage.service';
 import { Product } from '../../../../../core/models/product.model';
 import { Category } from '../../../../../core/models/category.model';
 
@@ -34,8 +34,9 @@ export class DashboardPage implements OnInit{
   // Data from JSON files
   private products: Product[] = [];
   private categories: Category[] = [];
-  private storage = inject(Storage);
   private dashboardService = inject(DashboardService);
+
+  readonly loading = signal(false);
 
   constructor() {
     // Load data from JSON files
@@ -45,6 +46,11 @@ ngOnInit(): void {
     this.loadData();
 }
   private loadData(): void {
+    const isCached = this.dashboardService.checkCache();
+    if (!isCached) {
+      this.loading.set(true);
+    }
+
     this.dashboardService
       .getDashboardStats()
       .pipe(take(1))
@@ -52,6 +58,7 @@ ngOnInit(): void {
         this.recentProducts.set(stats.recentProducts);
         this.totalProducts.set(stats.totalProducts);
         this.totalCategories.set(stats.totalCategories);
+        this.loading.set(false);
       });
   }
 

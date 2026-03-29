@@ -1,5 +1,5 @@
-import { inject, Injectable } from '@angular/core';
-import { forkJoin, map, Observable } from 'rxjs';
+import { inject, Injectable, signal } from '@angular/core';
+import { forkJoin, map, Observable, of, tap } from 'rxjs';
 import { EndpointsService } from '../../../../core/constants/endpoints';
 import { Api } from '../../../../core/http/api';
 import { ApiResponse } from '../../../../core/models/api-response.model';
@@ -28,8 +28,19 @@ export interface RecentProductsResponse {
   providedIn: 'root',
 })
 export class DashboardService {
-  private api = inject(Api);
-  private endpoints = inject(EndpointsService);
+  private readonly api = inject(Api);
+  private readonly endpoints = inject(EndpointsService);
+
+  private readonly _dashboardStats = signal<DashboardStats | null>(null);
+  private readonly _lastFetchTime = signal<number>(0);
+
+  public readonly dashboardStats = this._dashboardStats.asReadonly();
+
+  checkCache(): boolean {
+    const CACHE_DURATION = 5 * 60 * 1000;
+    const now = Date.now();
+    return !!this._dashboardStats() && (now - this._lastFetchTime() < CACHE_DURATION);
+  }
 
   getProductsCount(): Observable<number> {
     return this.api
@@ -75,10 +86,27 @@ export class DashboardService {
   }
 
   getDashboardStats(): Observable<DashboardStats> {
+    const CACHE_DURATION = 5 * 60 * 1000; // 5 minutes
+    const now = Date.now();
+
+    if (this._dashboardStats() && (now - this._lastFetchTime() < CACHE_DURATION)) {
+      return of(this._dashboardStats()!);
+    }
+
     return forkJoin({
       totalProducts: this.getProductsCount(),
       totalCategories: this.getCategoriesCount(),
       recentProducts: this.getRecentProducts()
-    });
+    }).pipe(
+      tap(stats => {
+        this._dashboardStats.set(stats);
+        this._lastFetchTime.set(now);
+      })
+    );
+  }
+
+  clearCache(): void {
+    this._dashboardStats.set(null);
+    this._lastFetchTime.set(0);
   }
 }

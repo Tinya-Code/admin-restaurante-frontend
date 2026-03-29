@@ -1,15 +1,15 @@
-import { Injectable, inject } from '@angular/core';
-import { Observable } from 'rxjs';
+import { Injectable, inject, signal } from '@angular/core';
+import { Observable, of, tap } from 'rxjs';
 import { map } from 'rxjs/operators';
 import {
   Product as ProductI,
   ProductCreate,
   ProductUpdate,
-  ProductPatch,
 } from '../../../../core/models/product.model';
 import { Api } from '../../../../core/http/api';
 import { EndpointsService } from '../../../../core/constants/endpoints';
 import { ApiResponse } from '../../../../core/models/api-response.model';
+import { SearchService } from '../../../../core/services/search.service';
 
 @Injectable({
   providedIn: 'root',
@@ -17,6 +17,18 @@ import { ApiResponse } from '../../../../core/models/api-response.model';
 export class ProductService {
   private readonly api = inject(Api);
   private readonly endpoints = inject(EndpointsService);
+  private readonly searchService = inject(SearchService);
+
+  // Cache state
+  private readonly _cache = signal<ApiResponse<ProductI[]> | null>(null);
+  private readonly _lastParams = signal<string>('');
+
+  public readonly cache = this._cache.asReadonly();
+
+  checkCache(params?: any): boolean {
+    const paramString = JSON.stringify(params || {});
+    return !!this._cache() && this._lastParams() === paramString;
+  }
 
   getProducts(params?: {
     page?: number;
@@ -27,6 +39,13 @@ export class ProductService {
     max_price?: number;
     search?: string;
   }): Observable<ApiResponse<ProductI[]>> {
+    const paramString = JSON.stringify(params || {});
+    
+    // Return cache if it exists and params are identical
+    if (this._cache() && this._lastParams() === paramString) {
+      return of(this._cache()!);
+    }
+
     const finalParams: any = {
       page: params?.page,
       limit: params?.limit,
@@ -53,7 +72,17 @@ export class ProductService {
         }
         return response;
       }),
+      tap((response) => {
+        this._cache.set(response);
+        this._lastParams.set(paramString);
+      })
     );
+  }
+
+  clearCache(): void {
+    this._cache.set(null);
+    this._lastParams.set('');
+    this.searchService.clearCache();
   }
 
   getProductById(id: string): Observable<ApiResponse<ProductI>> {
@@ -61,28 +90,38 @@ export class ProductService {
   }
 
   createProduct(data: ProductCreate, _image?: File): Observable<ApiResponse<ProductI>> {
-    // TODO: La subida de imágenes ha sido temporalmente deshabilitada en el API
-    return this.api.post<ProductI>(this.endpoints.products(), data);
+    return this.api.post<ProductI>(this.endpoints.products(), data).pipe(
+      tap(() => this.clearCache())
+    );
   }
 
   updateProduct(id: string, data: ProductUpdate, _image?: File): Observable<ApiResponse<ProductI>> {
-    // Parche parcial según documentación para no requerir toda la entidad
-    return this.api.patch<ProductI>(this.endpoints.productById(id), data);
+    return this.api.patch<ProductI>(this.endpoints.productById(id), data).pipe(
+      tap(() => this.clearCache())
+    );
   }
 
   patchProduct(id: string, data: Partial<ProductI>, _image?: File): Observable<ApiResponse<ProductI>> {
-    return this.api.patch<ProductI>(this.endpoints.productById(id), data);
+    return this.api.patch<ProductI>(this.endpoints.productById(id), data).pipe(
+      tap(() => this.clearCache())
+    );
   }
 
   deleteProduct(id: string): Observable<ApiResponse<void>> {
-    return this.api.delete<void>(this.endpoints.productById(id));
+    return this.api.delete<void>(this.endpoints.productById(id)).pipe(
+      tap(() => this.clearCache())
+    );
   }
 
   disableProduct(id: string): Observable<ApiResponse<ProductI>> {
-    return this.api.patch<ProductI>(this.endpoints.productDisable(id), {});
+    return this.api.patch<ProductI>(this.endpoints.productDisable(id), {}).pipe(
+      tap(() => this.clearCache())
+    );
   }
 
   reorderProducts(updates: { id: string; display_order: number }[]): Observable<ApiResponse<void>> {
-    return this.api.patch<void>(this.endpoints.productReorderBulk(), { updates });
+    return this.api.patch<void>(this.endpoints.productReorderBulk(), { updates }).pipe(
+      tap(() => this.clearCache())
+    );
   }
 }

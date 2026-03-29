@@ -10,7 +10,7 @@ import {
   User 
 } from '@angular/fire/auth';
 import { BehaviorSubject, Observable, firstValueFrom } from 'rxjs';
-import { Notification } from '../../../core/services/notification';
+import { NotificationService } from '../../../core/services/notification.service';
 import { environment } from '../../../../environments/environment';
 
 export interface AuthUser {
@@ -31,10 +31,10 @@ export interface AuthState {
 @Injectable({
   providedIn: 'root',
 })
-export class AuthService {
+export class AuthApiService {
   private auth = inject(Auth);
   private http = inject(HttpClient);
-  private notification = inject(Notification);
+  private notification = inject(NotificationService);
   private router = inject(Router);
 
   private readonly API_URL = environment.apiURL;
