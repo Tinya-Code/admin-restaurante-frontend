@@ -1,98 +1,44 @@
 [
   {
-    "id": "cat_001",
-    "restaurant_id": "rest_001",
-    "name": "Electrónica",
+    "id": "seed_cat_1",
+    "name": "Entradas",
+    "description": "Aperitivos y entradas pequeñas para comenzar",
     "is_active": true,
-    "created_at": "2024-01-10T08:30:00Z",
-    "update_at": "2024-03-01T14:20:00Z"
+    "display_order": 1
   },
   {
-    "id": "cat_002",
-    "restaurant_id": "rest_001",
-    "name": "Deportes",
+    "id": "seed_cat_2",
+    "name": "Platos de Fondo",
+    "description": "Nuestra selección de platos principales",
     "is_active": true,
-    "created_at": "2024-01-10T08:30:00Z",
-    "update_at": "2024-02-15T11:10:00Z"
+    "display_order": 2
   },
   {
-    "id": "cat_003",
-    "restaurant_id": "rest_001",
-    "name": "Hogar",
+    "id": "seed_cat_3",
+    "name": "Pizzas Artesanales",
+    "description": "Pizzas hechas al horno de piedra",
     "is_active": true,
-    "created_at": "2024-01-12T09:15:00Z",
-    "update_at": "2024-01-12T09:15:00Z"
+    "display_order": 3
   },
   {
-    "id": "cat_004",
-    "restaurant_id": "rest_001",
-    "name": "Libros",
+    "id": "seed_cat_4",
+    "name": "Bebidas y Refrescos",
+    "description": "Bebidas frías y calientes",
     "is_active": true,
-    "created_at": "2024-01-15T10:00:00Z",
-    "update_at": "2024-03-05T16:45:00Z"
+    "display_order": 4
   },
   {
-    "id": "cat_005",
-    "restaurant_id": "rest_001",
-    "name": "Deportes",
+    "id": "seed_cat_5",
+    "name": "Cervezas y Vinos",
+    "description": "Selección de licores y acompañamientos",
     "is_active": true,
-    "created_at": "2024-01-18T14:30:00Z",
-    "update_at": "2024-02-20T12:30:00Z"
+    "display_order": 5
   },
   {
-    "id": "cat_006",
-    "restaurant_id": "rest_001",
+    "id": "seed_cat_6",
     "name": "Postres",
+    "description": "El toque dulce para terminar",
     "is_active": true,
-    "created_at": "2024-01-20T11:45:00Z",
-    "update_at": "2024-01-20T11:45:00Z"
-  },
-  {
-    "id": "cat_007",
-    "restaurant_id": "rest_002",
-    "name": "Sushi",
-    "is_active": true,
-    "created_at": "2024-02-01T13:20:00Z",
-    "update_at": "2024-03-10T10:15:00Z"
-  },
-  {
-    "id": "cat_008",
-    "restaurant_id": "rest_002",
-    "name": "Bebidas",
-    "is_active": true,
-    "created_at": "2024-02-01T13:20:00Z",
-    "update_at": "2024-02-28T09:30:00Z"
-  },
-  {
-    "id": "cat_009",
-    "restaurant_id": "rest_002",
-    "name": "Especialidades",
-    "is_active": false,
-    "created_at": "2024-02-05T16:10:00Z",
-    "update_at": "2024-03-12T14:00:00Z"
-  },
-  {
-    "id": "cat_010",
-    "restaurant_id": "rest_003",
-    "name": "Desayunos",
-    "is_active": true,
-    "created_at": "2024-02-10T07:45:00Z",
-    "update_at": "2024-02-10T07:45:00Z"
-  },
-  {
-    "id": "cat_011",
-    "restaurant_id": "rest_003",
-    "name": "Comida Rápida",
-    "is_active": true,
-    "created_at": "2024-02-12T12:30:00Z",
-    "update_at": "2024-03-08T11:20:00Z"
-  },
-  {
-    "id": "cat_012",
-    "restaurant_id": "rest_004",
-    "name": "Menú Infantil",
-    "is_active": true,
-    "created_at": "2024-02-15T10:00:00Z",
-    "update_at": "2024-02-25T15:40:00Z"
+    "display_order": 6
   }
 ]
