@@ -13,6 +13,7 @@ import { Notification } from '../../../../../core/services/notification';
 import { firstValueFrom } from 'rxjs';
 import { Button } from '../../../../../shared/components/button/button';
 import { Router } from '@angular/router';
+import { SearchService } from '../../../../../core/services/search.service';
 
 @Component({
   selector: 'app-category-list-page',
@@ -37,6 +38,7 @@ export class CategoryListPage {
   currentLimit = signal<number>(10);
 
   private categoryService = inject(CategoryService);
+  private searchService = inject(SearchService);
   private notification = inject(Notification);
   private router = inject(Router);
 
@@ -108,20 +110,27 @@ export class CategoryListPage {
     this.loading.set(true);
 
     try {
-      const queryParams: any = {
-        page: finalPage,
-        limit: finalLimit,
-      };
+      let response;
       
       if (finalSearchWord) {
-        queryParams.search = finalSearchWord;
+        response = await firstValueFrom(
+          this.searchService.search({
+            q: finalSearchWord,
+            type: 'categories',
+            page: finalPage,
+            limit: finalLimit
+          })
+        );
+      } else {
+        response = await firstValueFrom(
+          this.categoryService.getCategories({
+            page: finalPage,
+            limit: finalLimit,
+          }),
+        );
       }
 
-      const response = await firstValueFrom(
-        this.categoryService.getCategories(queryParams),
-      );
-
-      this.categories.set(response.data || []);
+      this.categories.set((response.data as any) || []);
       this.meta.set(
         response.meta || {
           limit: finalLimit,

@@ -16,6 +16,7 @@ import { Notification } from '../../../../../core/services/notification';
 import { firstValueFrom } from 'rxjs';
 import { Button } from '../../../../../shared/components/button/button';
 import { Router } from '@angular/router';
+import { SearchService } from '../../../../../core/services/search.service';
 
 @Component({
   selector: 'app-product-list-page',
@@ -53,6 +54,7 @@ export class ProductListPage {
 
   private productService = inject(ProductService);
   private categoryService = inject(CategoryService);
+  private searchService = inject(SearchService);
   private notification = inject(Notification);
   private router = inject(Router)
 
@@ -112,16 +114,18 @@ export class ProductListPage {
   // ===================== EVENT HANDLERS =======================
   // ============================================================
 
-  onCategoryChange(category: string): void {
+  onCategoryChange(category?: string): void {
     if (this.category() === category) return;
     this.category.set(category);
     this.currentPage.set(1);
+    this.loadProducts();
   }
 
   onSearchChange(searchWord: string): void {
     if (this.searchWord() === searchWord) return;
     this.searchWord.set(searchWord);
     this.currentPage.set(1);
+    this.loadProducts();
   }
 
   onPageChange(page: number): void {
@@ -177,16 +181,31 @@ export class ProductListPage {
     this.loading.set(true);
 
     try {
-      const response = await firstValueFrom(
-        this.productService.getProducts({
-          page: finalPage,
-          limit: finalLimit,
-          category_id: finalCategory,
-          search: finalSearchWord,
-        }),
-      );
+      let response;
 
-      this.products.set(response.data || []);
+      if (finalSearchWord) {
+        // El endpoint /search no acepta category_id según la documentación,
+        // pero podemos filtrar los resultados o simplemente no mostrar categorías si solo queremos productos.
+        // Aquí pasamos type: 'product'.
+        response = await firstValueFrom(
+          this.searchService.search({
+            q: finalSearchWord,
+            type: 'products',
+            page: finalPage,
+            limit: finalLimit,
+          })
+        );
+      } else {
+        response = await firstValueFrom(
+          this.productService.getProducts({
+            page: finalPage,
+            limit: finalLimit,
+            category_id: finalCategory,
+          }),
+        );
+      }
+
+      this.products.set((response.data as any) || []);
       this.meta.set(
         response.meta || {
           limit: finalLimit,

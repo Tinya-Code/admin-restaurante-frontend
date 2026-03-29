@@ -59,4 +59,9 @@ export class EndpointsService {
   recentProducts(): string {
     return `${this.statistics()}/products/recent`;
   }
+
+  // Search endpoint
+  search(): string {
+    return `/search`;
+  }
 }
