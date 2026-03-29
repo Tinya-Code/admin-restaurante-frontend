@@ -17,6 +17,7 @@ import {
   TableColumn,
 } from '../../../../../shared/components/data-table/data-table';
 import { StatsCard } from '../../components/stats-card/stats-card';
+import { InitialDataButton } from '../../../../../shared/components/initial-data-button/initial-data-button';
 import { DashboardService } from '../../services/dashboard.service';
 import { StorageService } from '../../../../../core/services/storage.service';
 import { Product } from '../../../../../core/models/product.model';
@@ -25,7 +26,7 @@ import { Category } from '../../../../../core/models/category.model';
 @Component({
   selector: 'app-dashboard-page',
   standalone: true,
-  imports: [CommonModule, StatsCard, DataTable, LucideAngularModule],
+  imports: [CommonModule, StatsCard, DataTable, LucideAngularModule, InitialDataButton],
   templateUrl: './dashboard-page.html',
   styleUrl: './dashboard-page.css',
   changeDetection: ChangeDetectionStrategy.OnPush,
