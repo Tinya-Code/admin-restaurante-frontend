@@ -1,11 +1,11 @@
 import { Location } from '@angular/common';
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { provideRouter } from '@angular/router';
-import { Navbar, NavItem } from './navbar';
+import { Sidebar, NavItem } from './sidebar';
 
-fdescribe('Navbar', () => {
-  let component: Navbar;
-  let fixture: ComponentFixture<Navbar>;
+fdescribe('Sidebar', () => {
+  let component: Sidebar;
+  let fixture: ComponentFixture<Sidebar>;
   let mockLocation: jasmine.SpyObj<Location>;
 
   beforeEach(async () => {
@@ -13,13 +13,13 @@ fdescribe('Navbar', () => {
     mockLocation.path.and.returnValue('/admin/home');
 
     await TestBed.configureTestingModule({
-      imports: [Navbar],
+      imports: [Sidebar],
       providers: [{ provide: Location, useValue: mockLocation }, provideRouter([])],
     }).compileComponents();
   });
 
   beforeEach(() => {
-    fixture = TestBed.createComponent(Navbar);
+    fixture = TestBed.createComponent(Sidebar);
     component = fixture.componentInstance;
     fixture.detectChanges();
   });

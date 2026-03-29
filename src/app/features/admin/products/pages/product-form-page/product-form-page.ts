@@ -1,9 +1,9 @@
 import { Component, inject, OnInit, signal } from '@angular/core';
 import { ProductForm } from '../../components/product-form/product-form';
 import { Product, ProductCreate, ProductPatch, ProductUpdate } from '../../../../../core/models/product.model';
-import { ProductService } from '../../services/product';
-import { CategoryService } from '../../../categories/services/category';
-import { Notification } from '../../../../../core/services/notification';
+import { ProductService } from '../../services/product.service';
+import { CategoryService } from '../../../categories/services/category.service';
+import { NotificationService } from '../../../../../core/services/notification.service';
 import { ActivatedRoute } from '@angular/router';
 import { Category } from '../../../../../core/models/category.model';
 import { BackButton } from "../../../../../shared/components/back-button/back-button";
@@ -17,7 +17,7 @@ import { Router } from '@angular/router';
 export class ProductFormPage implements OnInit {
   private readonly productService = inject(ProductService);
   private readonly categoryService = inject(CategoryService);
-  private readonly notification = inject(Notification);
+  private readonly notification = inject(NotificationService);
   private readonly route = inject(ActivatedRoute);
   private readonly router = inject(Router);
   productData: Product | undefined = undefined;

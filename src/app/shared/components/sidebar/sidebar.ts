@@ -19,16 +19,16 @@ export interface NavItem {
 }
 
 @Component({
-  selector: 'app-navbar',
+  selector: 'app-sidebar',
   imports: [CommonModule, LucideAngularModule],
-  templateUrl: './navbar.html',
-  styleUrl: './navbar.css',
+  templateUrl: './sidebar.html',
+  styleUrl: './sidebar.css',
   host: {
     '[class.mobile]': 'isMobile()',
     '[class.desktop]': '!isMobile()',
   },
 })
-export class Navbar {
+export class Sidebar {
   private readonly router = inject(Router);
   private readonly location = inject(Location);
 

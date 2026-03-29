@@ -2,8 +2,8 @@ import { Component, inject, OnInit } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
 import { CategoryForm } from '../../components/category-form/category-form';
 import { Category, CategoryCreate, CategoryUpdate } from '../../../../../core/models/category.model';
-import { CategoryService } from '../../services/category';
-import { Notification } from '../../../../../core/services/notification';
+import { CategoryService } from '../../services/category.service';
+import { NotificationService } from '../../../../../core/services/notification.service';
 import { BackButton } from '../../../../../shared/components/back-button/back-button';
 
 @Component({
@@ -14,7 +14,7 @@ import { BackButton } from '../../../../../shared/components/back-button/back-bu
 })
 export class CategoryFormPage implements OnInit {
   private readonly categoryService = inject(CategoryService);
-  private readonly notification = inject(Notification);
+  private readonly notification = inject(NotificationService);
   private readonly route = inject(ActivatedRoute);
   private readonly router = inject(Router);
 

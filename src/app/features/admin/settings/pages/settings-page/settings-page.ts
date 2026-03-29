@@ -9,7 +9,7 @@ import {
 } from 'lucide-angular';
 import { Subject, takeUntil } from 'rxjs';
 
-import { Notification } from '../../../../../core/services/notification';
+import { NotificationService } from '../../../../../core/services/notification.service';
 import { BusinessConfig } from '../../components/business-config/business-config';
 import { OrderConfig } from '../../components/order-config/order-config';
 import { WhatsAppConfig } from '../../components/whatsapp-config/whatsapp-config';
@@ -23,7 +23,7 @@ import { SettingsService } from '../../services/settings.service';
 })
 export class SettingsPage implements OnInit, OnDestroy {
   private settingsService = inject(SettingsService);
-  private notificationService = inject(Notification);
+  private notificationService = inject(NotificationService);
   private destroy$ = new Subject<void>();
 
   readonly MessageCircle = MessageCircle;
@@ -67,7 +67,11 @@ export class SettingsPage implements OnInit, OnDestroy {
   }
 
   private loadSettings(): void {
-    this.loading.set(true);
+    const isCached = this.settingsService.checkCache();
+    if (!isCached) {
+      this.loading.set(true);
+    }
+
     const businessId =
       sessionStorage.getItem('businessId') || '803a50be-7740-4eaf-b399-2b1ad06f1406';
 

@@ -1,5 +1,5 @@
 
-<header class="sticky top-0 z-50 w-full bg-white border-b border-gray-200 shadow-sm">
+<header class="sticky top-0 z-50 w-full bg-white border-b border-gray-200  transition-all duration-300">
   <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
     <div class="flex items-center justify-between h-16">
       <!-- Logo Section -->
@@ -57,7 +57,7 @@
 
           <!-- Chevron Icon -->
           <lucide-angular
-            [img]="chevronDown"
+            [img]="chevronDownIcon"
             class="w-4 h-4 text-gray-500 transition-transform"
             [class.rotate-180]="isMenuOpen()"
           />
@@ -80,7 +80,7 @@
 
             <!-- Menu Items -->
             <div class="py-1">
-              <!-- Profile -->
+              <!-- Profile 
               <button
                 type="button"
                 (click)="goToProfile()"
@@ -89,14 +89,14 @@
                 <lucide-angular [img]="userIcon" class="w-4 h-4 text-gray-500" />
                 <span>Mi Perfil</span>
               </button>
-
+-->
               <!-- Settings -->
               <button
                 type="button"
                 (click)="goToSettings()"
                 class="w-full flex items-center gap-3 px-4 py-2.5 text-sm text-gray-700 hover:bg-gray-50 transition-colors"
               >
-                <lucide-angular [img]="settings" class="w-4 h-4 text-gray-500" />
+                <lucide-angular [img]="settingsIcon" class="w-4 h-4 text-gray-500" />
                 <span>Configuración</span>
               </button>
 
@@ -109,7 +109,7 @@
                 (click)="logout()"
                 class="w-full flex items-center gap-3 px-4 py-2.5 text-sm text-red-600 hover:bg-red-50 transition-colors"
               >
-                <lucide-angular [img]="logOut" class="w-4 h-4" />
+                <lucide-angular [img]="logOutIcon" class="w-4 h-4" />
                 <span>Cerrar sesión</span>
               </button>
             </div>

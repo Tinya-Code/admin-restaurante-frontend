@@ -1,10 +1,14 @@
-<div class="admin-layout">
+<div class="flex flex-col h-screen overflow-hidden">
   <app-header />
 
-  <div class="admin-body">
-    <app-navbar [isMobile]="isMobile()" />
+  <div class="flex flex-1 overflow-hidden">
+    <!-- Desktop Sidebar (Sticky/Fixed) -->
+    <app-sidebar [isMobile]="isMobile()" class="hidden md:block shrink-0 h-full overflow-y-auto" />
+    
+    <!-- Mobile Navigation (Bottom) is handled inside Sidebar component -->
+    <app-sidebar [isMobile]="isMobile()" class="md:hidden" />
 
-    <main class="content mb-20">
+    <main class="flex-1 overflow-y-auto bg-gray-50 p-4 md:p-8 pb-24 md:pb-8">
       <router-outlet />
     </main>
   </div>

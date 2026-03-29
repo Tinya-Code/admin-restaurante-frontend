@@ -1,27 +1,39 @@
-import { inject, Injectable } from '@angular/core';
-import { BehaviorSubject, tap } from 'rxjs';
-import { Api } from '../../../../core/http/api';
+import { inject, Injectable, signal } from '@angular/core';
+import { Observable, of, tap } from 'rxjs';
 import { BusinessConfig, BusinessSettings, OrderConfig, WhatsAppConfig } from './settings.models';
+import { ApiResponse } from '../../../../core/models/api-response.model';
+import { Api } from '../../../../core/http/api';
 
 @Injectable({
   providedIn: 'root',
 })
 export class SettingsService {
-  private api = inject(Api);
+  private readonly api = inject(Api);
 
-  // BehaviorSubject para manejar estado actual
-  private currentSettingsSubject = new BehaviorSubject<BusinessSettings | null>(null);
-  public currentSettings$ = this.currentSettingsSubject.asObservable();
+  // Signal state management
+  private readonly _settings = signal<BusinessSettings | null>(null);
+  public readonly settings = this._settings.asReadonly();
 
-  /**
-   * Obtener configuración del negocio por ID
-   * Usa endpoint existente: GET /business-settings/{id}
-   */
-  getBusinessSettings(id: string) {
+  checkCache(): boolean {
+    return !!this._settings();
+  }
+
+  getBusinessSettings(id: string): Observable<ApiResponse<BusinessSettings>> {
+    const cached = this._settings();
+    if (cached) {
+      return of({
+        success: true,
+        status: 'success',
+        code: '200',
+        data: cached,
+        message: 'Loaded from cache',
+      });
+    }
+
     return this.api.get<BusinessSettings>(`/business-settings/${id}`).pipe(
       tap((response) => {
         if (response.success && response.data) {
-          this.currentSettingsSubject.next(response.data);
+          this._settings.set(response.data);
         }
       })
     );
@@ -41,7 +53,7 @@ export class SettingsService {
       .pipe(
         tap((response) => {
           if (response.success && response.data) {
-            this.currentSettingsSubject.next(response.data);
+            this._settings.set(response.data);
           }
         })
       );
@@ -69,17 +81,17 @@ export class SettingsService {
   }
 
   /**
-   * Obtener configuración actual del BehaviorSubject
+   * Obtener configuración actual del Signal
    */
   getCurrentSettings(): BusinessSettings | null {
-    return this.currentSettingsSubject.value;
+    return this._settings();
   }
 
   /**
    * Limpiar caché de configuración
    */
   clearSettingsCache(): void {
-    this.currentSettingsSubject.next(null);
+    this._settings.set(null);
   }
 
   /**

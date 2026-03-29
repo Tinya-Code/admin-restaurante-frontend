@@ -10,12 +10,15 @@ import {
 import { toSignal } from '@angular/core/rxjs-interop';
 import { map } from 'rxjs';
 
+import { CacheManagerService } from './cache-manager.service';
+
 @Injectable({
   providedIn: 'root',
 })
-export class Auth {
+export class AuthService {
   // inyectamos el servicio de autenticacion de firebase
   private auth = inject(fireAuth);
+  private cacheManager = inject(CacheManagerService);
 readonly user = toSignal(
   authState(this.auth).pipe(
     map((firebaseUser) =>
@@ -66,6 +69,7 @@ readonly user = toSignal(
 
   // metodo para cerrar secion
   async logOut(): Promise<void> {
+    this.cacheManager.clearAll();
     await this.auth.signOut();
   }
 }

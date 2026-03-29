@@ -8,11 +8,11 @@ import {
 import { Edit, Trash2, Eye, Inbox, Router as RouterIcon } from 'lucide-angular';
 import type { Product } from '../../../../../core/models/product.model';
 import type { Category } from '../../../../../core/models/category.model';
-import { CategoryList } from '../../components/category-list/category-list';
+import { CategoryList } from '../../../categories/components/category-list/category-list';
 import { SearchBar } from '../../../../../shared/components/search-bar/search-bar';
-import { ProductService } from '../../services/product';
-import { CategoryService } from '../../../categories/services/category';
-import { Notification } from '../../../../../core/services/notification';
+import { ProductService } from '../../services/product.service';
+import { CategoryService } from '../../../categories/services/category.service';
+import { NotificationService } from '../../../../../core/services/notification.service';
 import { firstValueFrom } from 'rxjs';
 import { Button } from '../../../../../shared/components/button/button';
 import { Router } from '@angular/router';
@@ -55,7 +55,7 @@ export class ProductListPage {
   private productService = inject(ProductService);
   private categoryService = inject(CategoryService);
   private searchService = inject(SearchService);
-  private notification = inject(Notification);
+  private notification = inject(NotificationService);
   private router = inject(Router)
 
   // ============================================================
@@ -145,6 +145,7 @@ export class ProductListPage {
     this.productService.patchProduct(event.row.id, { is_available: event.enabled }).subscribe({
       next: () => {
         this.notification.success(`Producto ${event.row.name} ${event.enabled ? 'habilitado' : 'deshabilitado'}`);
+        this.loadProducts();
       },
       error: () => {
         this.notification.error('Error al cambiar el estado del producto');
@@ -178,31 +179,25 @@ export class ProductListPage {
     const finalCategory = category_id ?? this.category();
     const finalSearchWord = searchWord ?? this.searchWord();
 
-    this.loading.set(true);
+    const fetchParams = finalSearchWord 
+      ? { q: finalSearchWord, type: 'products', page: finalPage, limit: finalLimit }
+      : { page: finalPage, limit: finalLimit, category_id: finalCategory };
+
+    const isCached = finalSearchWord
+      ? this.searchService.checkCache(fetchParams)
+      : this.productService.checkCache(fetchParams);
+
+    if (!isCached) {
+      this.loading.set(true);
+    }
 
     try {
       let response;
 
       if (finalSearchWord) {
-        // El endpoint /search no acepta category_id según la documentación,
-        // pero podemos filtrar los resultados o simplemente no mostrar categorías si solo queremos productos.
-        // Aquí pasamos type: 'product'.
-        response = await firstValueFrom(
-          this.searchService.search({
-            q: finalSearchWord,
-            type: 'products',
-            page: finalPage,
-            limit: finalLimit,
-          })
-        );
+        response = await firstValueFrom(this.searchService.search(fetchParams as any));
       } else {
-        response = await firstValueFrom(
-          this.productService.getProducts({
-            page: finalPage,
-            limit: finalLimit,
-            category_id: finalCategory,
-          }),
-        );
+        response = await firstValueFrom(this.productService.getProducts(fetchParams));
       }
 
       this.products.set((response.data as any) || []);
@@ -217,7 +212,9 @@ export class ProductListPage {
         },
       );
 
-      this.notification.success('Productos cargados correctamente');
+      if (!isCached) {
+        this.notification.success('Productos cargados correctamente');
+      }
     } catch (error) {
       console.error('Error cargando productos', error);
       this.products.set([]);

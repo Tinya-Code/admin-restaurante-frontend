@@ -1,0 +1,62 @@
+@if (!isMobile()) {
+<aside 
+  class="flex flex-col z-40 bg-white border-r border-gray-200 transition-all duration-300 sticky top-16 h-full overflow-y-auto"
+  [class.w-70]="!isCollapsed()"
+  [class.w-20]="isCollapsed()"
+>
+  <ul class="flex flex-col gap-1 p-4 flex-1">
+    @for (item of navItems(); track item.id) {
+    <li>
+      <button
+        (click)="onItemClick(item.id)"
+        class="flex items-center gap-3 px-4 py-3 rounded-lg transition-all duration-200 w-full text-left group"
+        [class.bg-teal-50]="isActive(item.id)"
+        [class.text-teal-600]="isActive(item.id)"
+        [class.text-gray-600]="!isActive(item.id)"
+        [class.hover:bg-gray-50]="!isActive(item.id)"
+        [class.hover:text-gray-900]="!isActive(item.id)"
+        [attr.aria-label]="item.label"
+      >
+        <lucide-icon 
+            [img]="item.icon" 
+            class="w-5 h-5 shrink-0"
+            [class.text-teal-600]="isActive(item.id)"
+            [class.text-gray-400]="!isActive(item.id)"
+            [class.group-hover:text-gray-600]="!isActive(item.id)"
+        ></lucide-icon>
+        @if (!isCollapsed()) {
+        <span class="font-medium whitespace-nowrap">{{ item.label }}</span>
+        }
+      </button>
+    </li>
+    }
+  </ul>
+
+  <div class="p-4 border-t border-gray-100 flex justify-end" [class.justify-center]="isCollapsed()">
+    <button
+      (click)="toggleCollapse()"
+      class="flex items-center justify-center w-8 h-8 rounded-md bg-gray-50 text-gray-500 hover:bg-gray-100 hover:text-gray-700 transition-colors"
+    >
+      <lucide-icon [img]="isCollapsed() ? ChevronRightIcon : ChevronLeftIcon" class="w-4 h-4"></lucide-icon>
+    </button>
+  </div>
+</aside>
+} @else {
+<nav class="fixed bottom-0 left-0 right-0 z-1000 flex items-center justify-around bg-white border-t border-gray-200 px-2 py-3 shadow-[0_-2px_10px_rgba(0,0,0,0.05)]">
+  <ul class="flex w-full justify-around items-center">
+    @for (item of navItems(); track item.id) {
+    <li class="flex-1">
+      <button
+        (click)="onItemClick(item.id)"
+        class="flex flex-col items-center gap-1 w-full transition-colors"
+        [class.text-teal-600]="isActive(item.id)"
+        [class.text-gray-400]="!isActive(item.id)"
+      >
+        <lucide-icon [img]="item.icon" class="w-6 h-6"></lucide-icon>
+        <span class="text-[10px] font-medium uppercase tracking-wider">{{ item.label }}</span>
+      </button>
+    </li>
+    }
+  </ul>
+</nav>
+}

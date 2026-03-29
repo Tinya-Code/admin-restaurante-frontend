@@ -1,74 +1,56 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
-
 import { LoginForm } from './login-form';
-import { Notification } from '../../../../core/services/notification';
-import { AuthService } from '../../services/authService';
-import { ReactiveFormsModule } from '@angular/forms';
+import { AuthApiService } from '../../services/auth-api.service';
+import { LucideAngularModule } from 'lucide-angular';
 
 describe('LoginForm', () => {
-
   let fixture: ComponentFixture<LoginForm>;
   let component: LoginForm;
-  let notification: jasmine.SpyObj<Notification>;
-  let authService: jasmine.SpyObj<AuthService>;
+  let authService: jasmine.SpyObj<AuthApiService>;
 
   beforeEach(async () => {
-    notification = jasmine.createSpyObj<Notification>('Notification', ['error']);
-    authService = jasmine.createSpyObj<AuthService>('AuthService', ['loginGoogle']);
+    authService = jasmine.createSpyObj<AuthApiService>('AuthApiService', ['loginWithGoogle']);
 
     await TestBed.configureTestingModule({
-      imports: [ReactiveFormsModule],
+      imports: [LoginForm, LucideAngularModule],
       providers: [
-        { provide: Notification, useValue: notification },
-        { provide: AuthService, useValue: authService }
+        { provide: AuthApiService, useValue: authService }
       ]
-    })
-    .compileComponents();
+    }).compileComponents();
 
-    const fixture = TestBed.createComponent(LoginForm);
+    fixture = TestBed.createComponent(LoginForm);
     component = fixture.componentInstance;
     fixture.detectChanges();
   });
 
-  // test para la validacion de datos del formulario
-  it(`deve mostrar los string ingresados de password y email`,()=>{
-    component.loginForm.setValue({email: `testAngular@gmail.com`, password: `password123`});
-
-    // verificamosque elresultado sea valido
-    expect(component.loginForm.value).toEqual({email: `testAngular@gmail.com`, password: `password123`});
-  })
-
-  // Test para el metodo onSubmit cuando el formulario es invalido
-  it(`mostrar error si el formulario es invalido`, () => {
-    component.loginForm.setValue({ email: 'testAngular', password: '12345' });
-    component.onSubmit();
-
-    expect(notification.error).toHaveBeenCalledWith('Por favor, complete el formulario correctamente.');
-  })
-  // test para limpia el formulario
-  it(`deebe limpiar campos del formulario`, ()=>{
-    component.loginForm.setValue({email: `wordToTest`, password: `passwordToTest`});
-    component.claerForm();
-
-    expect(component.loginForm.value).toEqual({email: null, password: null});
-    expect(component.loginForm.valid).toBeFalse();
-  });
-  // test para el metodo activar login google
-  it(`debe llamar al servicio de autenticacion google`, async ()=>{
-    authService.loginGoogle.and.resolveTo();
-    await component.Google();
-
-    expect(authService.loginGoogle).toHaveBeenCalled();
+  it('should create', () => {
+    expect(component).toBeTruthy();
   });
 
-  // test para el metodo activar login google con error
-  it('debe manejar error en loginGoogle', async () => {
-    authService.loginGoogle.and.rejectWith('Error');
+  it('should call authService.loginWithGoogle when loginWithGoogle is called', async () => {
+    authService.loginWithGoogle.and.resolveTo();
+    
+    await component.loginWithGoogle();
 
-    const result = await component.Google();
-
-    expect(result).toBeFalse();
+    expect(authService.loginWithGoogle).toHaveBeenCalled();
     expect(component.isLoading()).toBeFalse();
   });
 
+  it('should handle error in loginWithGoogle', async () => {
+    authService.loginWithGoogle.and.rejectWith(new Error('Login failed'));
+    
+    await component.loginWithGoogle();
+
+    expect(authService.loginWithGoogle).toHaveBeenCalled();
+    expect(component.isLoading()).toBeFalse();
+  });
+
+  it('should prevent concurrent login attempts', async () => {
+    component.isLoading.set(true);
+    authService.loginWithGoogle.calls.reset();
+
+    await component.loginWithGoogle();
+
+    expect(authService.loginWithGoogle).not.toHaveBeenCalled();
+  });
 });

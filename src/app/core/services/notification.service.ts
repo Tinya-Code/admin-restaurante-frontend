@@ -5,7 +5,7 @@ import type { ToastType, IToast } from '../models/toast.model';
 @Injectable({
   providedIn: 'root',
 })
-export class Notification {
+export class NotificationService {
     private _toasts = signal<IToast[]>([]);
 
     // Expose readonly signal for consumption

@@ -8,8 +8,8 @@ import {
 import { Edit, Trash2, Eye } from 'lucide-angular';
 import type { Category } from '../../../../../core/models/category.model';
 import { SearchBar } from '../../../../../shared/components/search-bar/search-bar';
-import { CategoryService } from '../../services/category';
-import { Notification } from '../../../../../core/services/notification';
+import { CategoryService } from '../../services/category.service';
+import { NotificationService } from '../../../../../core/services/notification.service';
 import { firstValueFrom } from 'rxjs';
 import { Button } from '../../../../../shared/components/button/button';
 import { Router } from '@angular/router';
@@ -39,7 +39,7 @@ export class CategoryListPage {
 
   private categoryService = inject(CategoryService);
   private searchService = inject(SearchService);
-  private notification = inject(Notification);
+  private notification = inject(NotificationService);
   private router = inject(Router);
 
   readonly columns: TableColumn[] = [
@@ -83,6 +83,7 @@ export class CategoryListPage {
         this.notification.success(
           `Categoría ${event.row.name} ${event.enabled ? 'habilitada' : 'deshabilitada'}`,
         );
+        this.loadCategories();
       },
       error: () => {
         this.notification.error('No se pudo actualizar el estado');
@@ -107,27 +108,25 @@ export class CategoryListPage {
     const finalLimit = limit ?? this.currentLimit();
     const finalSearchWord = searchWord ?? this.searchWord();
 
-    this.loading.set(true);
+    const fetchParams = finalSearchWord
+      ? { q: finalSearchWord, type: 'categories', page: finalPage, limit: finalLimit }
+      : { page: finalPage, limit: finalLimit };
+
+    const isCached = finalSearchWord
+      ? this.searchService.checkCache(fetchParams)
+      : this.categoryService.checkCache(fetchParams);
+
+    if (!isCached) {
+      this.loading.set(true);
+    }
 
     try {
       let response;
       
       if (finalSearchWord) {
-        response = await firstValueFrom(
-          this.searchService.search({
-            q: finalSearchWord,
-            type: 'categories',
-            page: finalPage,
-            limit: finalLimit
-          })
-        );
+        response = await firstValueFrom(this.searchService.search(fetchParams as any));
       } else {
-        response = await firstValueFrom(
-          this.categoryService.getCategories({
-            page: finalPage,
-            limit: finalLimit,
-          }),
-        );
+        response = await firstValueFrom(this.categoryService.getCategories(fetchParams));
       }
 
       this.categories.set((response.data as any) || []);
@@ -142,7 +141,9 @@ export class CategoryListPage {
         },
       );
 
-      this.notification.success('Categorías cargadas correctamente');
+      if (!isCached) {
+        this.notification.success('Categorías cargadas correctamente');
+      }
     } catch (error) {
       console.error('Error cargando categorías', error);
       this.categories.set([]);
