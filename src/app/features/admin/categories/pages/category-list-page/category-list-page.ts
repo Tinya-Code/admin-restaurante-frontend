@@ -127,7 +127,7 @@ export class CategoryListPage {
           limit: finalLimit,
           current_page: finalPage,
           total_pages: 1,
-          total_items: 0,
+          total_items: response.data?.length || 0,
           has_next: false,
           has_prev: false,
         },

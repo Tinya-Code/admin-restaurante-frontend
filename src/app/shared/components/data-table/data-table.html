@@ -164,7 +164,8 @@
                     </button>
 
                     @if (openMenuIndex() === rowIndex) {
-                      <div class="absolute right-8 top-full mt-1 w-40 bg-white border border-gray-200 rounded shadow-lg z-20">
+                      <div class="absolute right-8 w-40 bg-white border border-gray-200 rounded shadow-lg z-50 transition-all origin-top-right"
+                           [ngClass]="rowIndex >= (dataSource().length - 2) && dataSource().length > 2 ? 'bottom-full mb-1' : 'top-full mt-1'">
                         <ul class="py-1 text-sm">
                           @for (action of actions(); track action.label) {
                             <li>
@@ -238,7 +239,8 @@
                 </button>
 
                 @if (openMenuIndex() === rowIndex) {
-                  <div class="absolute z-50 right-6 -top-18 mt-2 w-48 bg-white border border-gray-200 rounded shadow-lg ">
+                  <div class="absolute right-6 w-48 bg-white border border-gray-200 rounded shadow-lg z-50 transition-all origin-top-right"
+                       [ngClass]="rowIndex >= (dataSource().length - 2) && dataSource().length > 2 ? 'bottom-full mb-1' : 'top-full mt-1'">
                     <ul class="py-1 text-sm">
                       @for (action of actions(); track action.label) {
                         <li>

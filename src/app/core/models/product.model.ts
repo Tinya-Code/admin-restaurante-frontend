@@ -5,8 +5,9 @@ export interface Product {
   name: string;
   description?: string;     
   price: number;
-  image_url?: string;    
+  // image_url?: string; // Deshabilitado temporalmente
   is_available: boolean;
+  display_order: number;
   created_at: string;     
   updated_at: string;       
 }

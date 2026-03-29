@@ -137,7 +137,15 @@ export class ProductListPage {
   }
 
   onToggleChange(event: { row: any; enabled: boolean }): void {
-    console.log('Toggle:', event);
+    // Usamos el patchProduct para actualizar disponibilidad
+    this.productService.patchProduct(event.row.id, { is_available: event.enabled }).subscribe({
+      next: () => {
+        this.notification.success(`Producto ${event.row.name} ${event.enabled ? 'habilitado' : 'deshabilitado'}`);
+      },
+      error: () => {
+        this.notification.error('Error al cambiar el estado del producto');
+      }
+    });
   }
 
   // ============================================================
@@ -184,7 +192,7 @@ export class ProductListPage {
           limit: finalLimit,
           current_page: finalPage,
           total_pages: 1,
-          total_items: 0,
+          total_items: response.data?.length || 0,
           has_next: false,
           has_prev: false,
         },
@@ -224,7 +232,16 @@ export class ProductListPage {
   }
 
   private deleteProduct(product: any): void {
-    console.log('Eliminar:', product);
-    this.notification.warning(`Producto ${product.name} eliminado`);
+    if (confirm(`¿Estás seguro de eliminar definitivamente el producto ${product.name}?`)) {
+      this.productService.deleteProduct(product.id).subscribe({
+        next: () => {
+          this.notification.warning(`Producto ${product.name} eliminado definitivamente`);
+          this.loadProducts();
+        },
+        error: () => {
+          this.notification.error('Error al eliminar producto');
+        }
+      });
+    }
   }
 }

@@ -7,6 +7,7 @@ import { Notification } from '../../../../../core/services/notification';
 import { ActivatedRoute } from '@angular/router';
 import { Category } from '../../../../../core/models/category.model';
 import { BackButton } from "../../../../../shared/components/back-button/back-button";
+import { Router } from '@angular/router';
 @Component({
   selector: 'app-product-form-page',
   imports: [ProductForm, BackButton],
@@ -18,8 +19,10 @@ export class ProductFormPage implements OnInit {
   private readonly categoryService = inject(CategoryService);
   private readonly notification = inject(Notification);
   private readonly route = inject(ActivatedRoute);
-productData: Product | undefined = undefined;
-categoriesData = signal<Category[]>([]);
+  private readonly router = inject(Router);
+  productData: Product | undefined = undefined;
+  categoriesData = signal<Category[]>([]);
+  isSubmitting = signal(false);
 
 ngOnInit(): void {
   this.categoryService.getCategories({ limit: 100, is_active: true }).subscribe({
@@ -47,34 +50,42 @@ ngOnInit(): void {
 }
 
 
-  onFormSubmit(event: { data: ProductCreate | ProductUpdate; image?: File }): void {
-    if ('id' in event.data) {
+  onFormSubmit(data: ProductCreate | ProductUpdate): void {
+    if (this.isSubmitting()) return;
+    this.isSubmitting.set(true);
+
+    if ('id' in data) {
       this.productService
-        .updateProduct(event.data.id, event.data as ProductUpdate, event.image)
+        .updateProduct(data.id, data as ProductUpdate)
         .subscribe({
           next: (res) => {
             this.notification.success('Producto actualizado correctamente');
-            console.log('Producto actualizado', res);
+            this.isSubmitting.set(false);
+            this.router.navigate(['/admin/products']);
           },
           error: (err) => {
             this.notification.error('Error al actualizar producto');
+            this.isSubmitting.set(false);
             console.error(err);
           },
         });
     } else {
-      this.productService.createProduct(event.data as ProductCreate, event.image).subscribe({
+      this.productService.createProduct(data as ProductCreate).subscribe({
         next: (res) => {
           this.notification.success('Producto creado correctamente');
-          console.log('Producto creado', res);
+          this.isSubmitting.set(false);
+          this.router.navigate(['/admin/products']);
         },
         error: (err) => {
           this.notification.error('Error al crear producto');
+          this.isSubmitting.set(false);
           console.error(err);
         },
       });
     }
   }
+
   onFormCancel(): void {
-    this.notification.info('Formulario cancelado');
+    this.router.navigate(['/admin/products']);
   }
 }

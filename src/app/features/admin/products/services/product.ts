@@ -1,5 +1,6 @@
 import { Injectable, inject } from '@angular/core';
 import { Observable } from 'rxjs';
+import { map } from 'rxjs/operators';
 import {
   Product as ProductI,
   ProductCreate,
@@ -17,7 +18,6 @@ export class ProductService {
   private readonly api = inject(Api);
   private readonly endpoints = inject(EndpointsService);
 
-
   getProducts(params?: {
     page?: number;
     limit?: number;
@@ -27,8 +27,6 @@ export class ProductService {
     max_price?: number;
     search?: string;
   }): Observable<ApiResponse<ProductI[]>> {
-
-
     const finalParams: any = {
       page: params?.page,
       limit: params?.limit,
@@ -36,58 +34,55 @@ export class ProductService {
 
     if (params?.category_id) finalParams.category_id = params.category_id;
     if (params?.search) finalParams.search = params.search;
+    if (params?.is_available !== undefined) finalParams.is_available = params.is_available;
+    if (params?.min_price !== undefined) finalParams.min_price = params.min_price;
+    if (params?.max_price !== undefined) finalParams.max_price = params.max_price;
 
-    return this.api.get<ProductI[]>(this.endpoints.products(), { params: finalParams });
+    return this.api.get<ProductI[]>(this.endpoints.products(), { params: finalParams }).pipe(
+      map((response) => {
+        if (response.meta) {
+          const anyMeta = response.meta as any;
+          response.meta = {
+            limit: anyMeta.itemsPerPage ?? anyMeta.limit ?? 10,
+            current_page: anyMeta.currentPage ?? anyMeta.current_page ?? 1,
+            total_pages: anyMeta.totalPages ?? anyMeta.total_pages ?? 1,
+            total_items: anyMeta.totalItems ?? anyMeta.total_items ?? 0,
+            has_next: (anyMeta.currentPage ?? anyMeta.current_page ?? 1) < (anyMeta.totalPages ?? anyMeta.total_pages ?? 1),
+            has_prev: (anyMeta.currentPage ?? anyMeta.current_page ?? 1) > 1,
+          };
+        }
+        return response;
+      }),
+    );
   }
 
   getProductById(id: string): Observable<ApiResponse<ProductI>> {
     return this.api.get<ProductI>(this.endpoints.productById(id));
   }
 
-  createProduct(data: ProductCreate, image?: File): Observable<ApiResponse<ProductI>> {
-    const formData = this.buildFormData(data, image);
-    return this.api.post<ProductI>(this.endpoints.products(), formData);
+  createProduct(data: ProductCreate, _image?: File): Observable<ApiResponse<ProductI>> {
+    // TODO: La subida de imágenes ha sido temporalmente deshabilitada en el API
+    return this.api.post<ProductI>(this.endpoints.products(), data);
   }
 
-  updateProduct(id: string, data: ProductUpdate, image?: File): Observable<ApiResponse<ProductI>> {
-    if (image) {
-      const formData = this.buildFormData(data, image);
-      return this.api.patch<ProductI>(this.endpoints.productById(id), formData);
-    }
+  updateProduct(id: string, data: ProductUpdate, _image?: File): Observable<ApiResponse<ProductI>> {
+    // Parche parcial según documentación para no requerir toda la entidad
     return this.api.patch<ProductI>(this.endpoints.productById(id), data);
   }
 
-  patchProduct(
-    id: string,
-    data: Partial<ProductI>,
-    image?: File,
-  ): Observable<ApiResponse<ProductI>> {
-    const formData = this.buildFormData(data, image);
-    return this.api.patch<ProductI>(this.endpoints.productById(id), formData);
+  patchProduct(id: string, data: Partial<ProductI>, _image?: File): Observable<ApiResponse<ProductI>> {
+    return this.api.patch<ProductI>(this.endpoints.productById(id), data);
   }
 
   deleteProduct(id: string): Observable<ApiResponse<void>> {
     return this.api.delete<void>(this.endpoints.productById(id));
   }
 
-  private buildFormData(
-    data: ProductCreate | ProductUpdate | Partial<ProductI>,
-    image?: File,
-  ): FormData {
-    const formData = new FormData();
+  disableProduct(id: string): Observable<ApiResponse<ProductI>> {
+    return this.api.patch<ProductI>(this.endpoints.productDisable(id), {});
+  }
 
-    // Campos del producto
-    if (data.category_id) formData.append('category_id', data.category_id);
-    if (data.name) formData.append('name', data.name);
-    if (data.description) formData.append('description', data.description);
-    if (data.price !== undefined) formData.append('price', String(data.price));
-    if (data.is_available !== undefined) formData.append('is_available', String(data.is_available));
-
-    // Imagen opcional
-    if (image) {
-      formData.append('image', image, image.name);
-    }
-
-    return formData;
+  reorderProducts(updates: { id: string; display_order: number }[]): Observable<ApiResponse<void>> {
+    return this.api.patch<void>(this.endpoints.productReorderBulk(), { updates });
   }
 }

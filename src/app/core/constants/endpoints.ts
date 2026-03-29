@@ -30,6 +30,14 @@ export class EndpointsService {
     return `/products/${productId}`;
   }
 
+  productDisable(productId: string): string {
+    return `/products/${productId}/disable`;
+  }
+
+  productReorderBulk(): string {
+    return `/products/reorder/bulk`;
+  }
+
   // Users endpoints
   userById(userId: string): string {
     return `${this.baseUrl}/users/${userId}`;
