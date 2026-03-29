@@ -60,6 +60,13 @@ export const routes: Routes = [
           ),
       },
       {
+        path: 'category-form/:id',
+        loadComponent: () =>
+          import('./features/admin/categories/pages/category-form-page/category-form-page').then(
+            (m) => m.CategoryFormPage
+          ),
+      },
+      {
         path: 'settings',
         loadComponent: () =>
           import('./features/admin/settings/pages/settings-page/settings-page').then(

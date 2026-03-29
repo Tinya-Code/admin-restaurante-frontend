@@ -54,7 +54,11 @@
           @for (row of dataSource(); track trackByIndex($index); let rowIndex = $index) {
             <tr class="border-b border-gray-200 last:border-b-0 hover:bg-gray-50 transition-colors flex flex-col md:table-row">
               
-              <td class="px-4 py-3 md:py-4 md:w-20 flex md:table-cell items-center gap-3 md:gap-0">
+              <td class="px-4 py-3 flex items-center gap-3 md:gap-0"
+                  [class.md:hidden]="!imageKey()"
+                  [class.md:table-cell]="!!imageKey()"
+                  [class.md:py-4]="!!imageKey()"
+                  [class.md:w-20]="!!imageKey()">
                 <!-- Imagen -->
                 @if(imageKey()){
                   <img 

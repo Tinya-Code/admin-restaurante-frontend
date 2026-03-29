@@ -4,7 +4,7 @@
     class="hidden sm:flex items-center justify-center gap-3 flex-wrap rounded-sm bg-white/70 backdrop-blur border border-gray-200 px-4 py-3 "
   >
     <button
-      (click)="add('todos')"
+      (click)="add('all')"
       [class.bg-[#42b0cc]]="CategorySelect() === 'all'"
       class="px-4 py-2 rounded-sm text-sm font-medium text-gray-700 hover:bg-indigo-100 hover:text-indigo-700 transition whitespace-nowrap"
     >
@@ -12,7 +12,7 @@
     </button>
 
     <!-- Chips dinámicos por categoría -->
-    @for (item of categoryList(); track item.id) {
+    @for (item of categories(); track item.id) {
       <button
         (click)="add(item.name)"
         [ngClass]="{
@@ -41,7 +41,7 @@
         <option [value]="`all`">Todos</option>
 
         <!-- Opciones dinámicas por categoría -->
-        @for (item of categoryList(); track item.id) {
+        @for (item of categories(); track item.id) {
           <option [value]="item.name">{{ item.name }}</option>
         }
       </select>

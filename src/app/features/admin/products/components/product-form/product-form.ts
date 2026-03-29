@@ -2,7 +2,8 @@ import { Component, OnInit, signal, input, output, inject, effect } from '@angul
 import { FormBuilder, FormGroup, Validators, ReactiveFormsModule } from '@angular/forms';
 import { CommonModule } from '@angular/common';
 import { Product, ProductCreate, ProductUpdate } from '../../../../../core/models/product.model';
-//import { Category } from '../../services/category.service';
+import { Category } from '../../../../../core/models/category.model';
+
 @Component({
   selector: 'app-product-form',
   imports: [ReactiveFormsModule, CommonModule],
@@ -14,15 +15,7 @@ export class ProductForm implements OnInit {
 
   // Inputs
   readonly product = input<Product | undefined>(undefined);
-
-  categories = signal<any[]>([
-    { id: '239f1742-fc12-4f17-bf2a-bd955890582b', name: 'Bebidas' },
-    { id: '2', name: 'Platos principales' },
-    { id: '3', name: 'Postres' },
-    { id: '4', name: 'Entradas' },
-  ]);
-
-  //readonly categories = input.required<Category[]>();
+  readonly categories = input<Category[]>([]);
   readonly loading = input<boolean>(false);
 
   // Outputs

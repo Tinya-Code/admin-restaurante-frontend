@@ -1,1 +1,9 @@
-<p>category-form-page works!</p>
+<section class="relative flex flex-col p-4 sm:p-6 lg:p-8 space-y-2">
+  <app-back-button/>
+  <app-category-form 
+    [category]="categoryData" 
+    [loading]="loading"
+    (formSubmit)="onFormSubmit($event)" 
+    (formCancel)="onFormCancel()">
+  </app-category-form>
+</section>

@@ -1,6 +1,5 @@
-import { Component, OnInit, signal, Output, EventEmitter } from '@angular/core';
+import { Component, input, signal, Output, EventEmitter } from '@angular/core';
 import { Category } from '../../../../../core/models/category.model';
-import datos from '../../../../../data/categories.json';
 import { CommonModule } from '@angular/common';
 
 @Component({
@@ -9,14 +8,9 @@ import { CommonModule } from '@angular/common';
   templateUrl: './category-list.html',
   styleUrl: './category-list.css',
 })
-export class CategoryList implements OnInit {
-  categoryList = signal<Category[]>([]);
-
-  ngOnInit(): void {
-    this.categoryList.set(datos as Category[]);
-  }
-
-  CategorySelect = signal<string>('');
+export class CategoryList {
+  readonly categories = input<Category[]>([]);
+  CategorySelect = signal<string>('all');
 
   @Output()
   categoryChange = new EventEmitter<string>()
