@@ -1,6 +1,9 @@
-import { Component, inject, output } from '@angular/core';
-import { LucideAngularModule, Search } from 'lucide-angular';
-import { ReactiveFormsModule, FormBuilder, Validators } from '@angular/forms';
+import { Component, inject, output, OnInit, DestroyRef } from '@angular/core';
+import { LucideAngularModule, Search, X } from 'lucide-angular';
+import { ReactiveFormsModule, FormBuilder } from '@angular/forms';
+import { debounceTime, distinctUntilChanged } from 'rxjs/operators';
+import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
+
 @Component({
   selector: 'app-search-bar',
   imports: [LucideAngularModule, ReactiveFormsModule],
@@ -8,31 +11,25 @@ import { ReactiveFormsModule, FormBuilder, Validators } from '@angular/forms';
   styleUrl: './search-bar.css',
 })
 export class SearchBar {
-  // Icon
+  // Icons
   searchIcon = Search;
+  clearIcon = X;
 
-  // iniciamos el form builder
   private fb = inject(FormBuilder);
+  
   searchChange = output<string>();
 
-  // signal para almacenar la palabra buscada
-  word = this.fb.group({
-    searchWord: [``, [Validators.minLength(4), Validators.maxLength(100)]],
+  searchForm = this.fb.group({
+    searchWord: [''],
   });
 
   clear(): void {
-    this.word.reset();
+    this.searchForm.patchValue({ searchWord: '' });
     this.searchChange.emit('');
   }
-  // adjudicamos al metodo onsearch la logica de busqueda con retorno de la palabra buscada para conprovar su funcionamiento
+
   onsearch(): void {
-    if (this.word.invalid) {
-      console.log('El termino de busqueda debe tener al menos 4 caracteres');
-      return;
-    }
-    const { searchWord } = this.word.value;
-    console.log(`Palabra buscada:`, searchWord);
-    this.searchChange.emit(searchWord as string);
-    console.log('Emitiendo palabra buscada al componente padre');
+    const value = this.searchForm.get('searchWord')?.value;
+    this.searchChange.emit(value || '');
   }
 }

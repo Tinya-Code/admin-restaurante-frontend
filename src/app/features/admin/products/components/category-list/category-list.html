@@ -14,10 +14,10 @@
     <!-- Chips dinámicos por categoría -->
     @for (item of categories(); track item.id) {
       <button
-        (click)="add(item.name)"
+        (click)="add(item.id)"
         [ngClass]="{
-          'bg-[#42b0cc] text-white': CategorySelect() === item.name,
-          'bg-gray-100 text-gray-700': CategorySelect() !== item.name,
+          'bg-[#42b0cc] text-white': CategorySelect() === item.id,
+          'bg-gray-100 text-gray-700': CategorySelect() !== item.id,
         }"
         class="px-4 py-2 rounded-sm text-sm font-medium hover:bg-indigo-200 hover:text-indigo-700 transition whitespace-nowrap"
       >
@@ -32,17 +32,17 @@
       <select
         (change)="add(categorySelect.value)"
         #categorySelect
-        class="w-full appearance-none rounded-sm border border-gray-300 bg-white py-2.5 pl-4 pr-10 text-smtext-gray-700 shadow-sm focus:border-indigo-500 focus:ring-2 focus:ring-indigo-100"
+        class="w-full appearance-none rounded-sm border border-gray-300 bg-white py-2.5 pl-4 pr-10 text-sm text-gray-700 shadow-sm focus:border-indigo-500 focus:ring-2 focus:ring-indigo-100"
       >
         <!-- Opción placeholder -->
         <option disabled selected>Categorías</option>
 
         <!-- Opción: mostrar todos -->
-        <option [value]="`all`">Todos</option>
+        <option value="all">Todos</option>
 
         <!-- Opciones dinámicas por categoría -->
         @for (item of categories(); track item.id) {
-          <option [value]="item.name">{{ item.name }}</option>
+          <option [value]="item.id">{{ item.name }}</option>
         }
       </select>
 

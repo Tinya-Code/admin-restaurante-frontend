@@ -13,11 +13,10 @@ export class CategoryList {
   CategorySelect = signal<string>('all');
 
   @Output()
-  categoryChange = new EventEmitter<string>()
+  categoryChange = new EventEmitter<string | undefined>()
 
-  add(category:string) :void {
-    this.CategorySelect.set(category);
-    this.categoryChange.emit(category)
-    console.log(category);
+  add(categoryId: string): void {
+    this.CategorySelect.set(categoryId);
+    this.categoryChange.emit(categoryId === 'all' ? undefined : categoryId);
   }
 }

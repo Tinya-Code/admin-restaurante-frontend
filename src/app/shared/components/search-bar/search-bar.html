@@ -1,13 +1,31 @@
-<form [formGroup]="word" (ngSubmit)="onsearch()" class="relative w-full md:min-w-100 flex items-center">
-  <input
-    formControlName="searchWord"
-    type="text"
-    placeholder="Buscar..."
-    class="w-full rounded-sm border border-gray-200 bg-white py-2.5 pl-10 pr-4 text-sm text-gray-700 placeholder-gray-400 outline-none transition focus:border-indigo-500 focus:ring-2 focus:ring-indigo-100"
-  />
-  <lucide-icon
-    [name]="searchIcon"
-    class="absolute right-3 text-black w-5 h-5 flex items-center justify-center pointer-events-none"
+<form [formGroup]="searchForm" (ngSubmit)="onsearch()" class="relative w-full md:min-w-120 flex items-center gap-2">
+  <div class="relative flex-grow">
+    <input
+      formControlName="searchWord"
+      type="text"
+      placeholder="Buscar productos o categorías..."
+      class="w-full rounded-sm border border-gray-200 bg-white py-2.5 pl-10 pr-10 text-sm text-gray-700 placeholder-gray-400 outline-none transition-all duration-200 focus:border-indigo-500 focus:ring-4 focus:ring-indigo-500/10 shadow-sm"
+    />
+    <lucide-icon
+      [name]="searchIcon"
+      class="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 w-4 h-4"
+    ></lucide-icon>
+
+    @if (searchForm.get('searchWord')?.value) {
+      <button
+        type="button"
+        (click)="clear()"
+        class="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600 focus:outline-none transition-colors"
+      >
+        <lucide-icon [name]="clearIcon" class="w-4 h-4"></lucide-icon>
+      </button>
+    }
+  </div>
+
+  <button
+    type="submit"
+    class="bg-indigo-600 hover:bg-indigo-700 text-white px-5 py-2.5 rounded-sm text-sm font-medium transition-all duration-200 shadow-sm hover:shadow-md active:scale-95"
   >
-  </lucide-icon>
+    Buscar
+  </button>
 </form>
