@@ -1,0 +1,147 @@
+<div class="space-y-4">
+  <!-- Header -->
+  <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+    <div>
+      <h3 class="text-lg font-semibold text-gray-900">Banners Publicitarios</h3>
+      <p class="text-sm text-gray-500">Imágenes que aparecerán en el inicio de tu menú</p>
+    </div>
+    
+    <button
+      type="button"
+      (click)="fileInput.click()"
+      [disabled]="uploading() || banners().length >= 2"
+      class="flex items-center justify-center gap-2 px-4 py-2 bg-amber-500 text-white rounded-xl hover:bg-amber-600 transition-all shadow-sm hover:shadow-md disabled:opacity-50 active:scale-95"
+    >
+      <lucide-icon [img]="uploading() ? AlertIcon : PlusIcon" class="w-4 h-4"></lucide-icon>
+      <span class="font-medium">{{ uploading() ? 'Subiendo...' : 'Nuevo Banner' }}</span>
+    </button>
+    <input
+      #fileInput
+      type="file"
+      class="hidden"
+      accept="image/*"
+      (change)="onFileSelected($event)"
+    />
+  </div>
+
+  <!-- Loading State -->
+  @if (loading()) {
+    <div class="flex items-center justify-center p-12">
+      <div class="relative">
+        <div class="w-12 h-12 rounded-full border-4 border-amber-100 border-t-amber-500 animate-spin"></div>
+      </div>
+    </div>
+  } @else if (banners().length === 0) {
+    <!-- Empty State -->
+    <div class="flex flex-col items-center justify-center p-12 border-2 border-dashed border-gray-200 rounded-2xl bg-gray-50/50">
+      <div class="w-16 h-16 bg-white rounded-full shadow-sm flex items-center justify-center mb-4">
+        <lucide-icon [img]="ImageIcon" class="w-8 h-8 text-amber-500"></lucide-icon>
+      </div>
+      <p class="text-gray-900 font-semibold mb-1">Sin banners configurados</p>
+      <p class="text-sm text-gray-400 text-center max-w-xs">Sube banners horizontales (1200x400 recomendado) para captar la atención de tus clientes.</p>
+    </div>
+  } @else {
+    <!-- List -->
+    <div class="grid grid-cols-1 gap-4">
+      @for (banner of banners(); track banner.id; let i = $index) {
+        <div 
+          class="flex flex-col sm:flex-row items-start sm:items-center gap-4 p-4 bg-white border border-gray-100 rounded-2xl transition-all group hover:border-amber-200 hover:shadow-sm"
+          [class.opacity-60]="!banner.is_active"
+        >
+          <!-- Order Controls -->
+          <div class="flex sm:flex-col gap-1 w-full sm:w-auto justify-end sm:justify-center order-2 sm:order-1">
+            <button 
+              (click)="moveUp(i)" 
+              [disabled]="i === 0"
+              class="p-1.5 hover:bg-amber-50 text-gray-400 hover:text-amber-600 rounded-lg transition-colors disabled:opacity-20"
+              title="Mover arriba"
+            >
+              <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 15l7-7 7 7"></path></svg>
+            </button>
+            <button 
+              (click)="moveDown(i)" 
+              [disabled]="i === banners().length - 1"
+              class="p-1.5 hover:bg-amber-50 text-gray-400 hover:text-amber-600 rounded-lg transition-colors disabled:opacity-20"
+              title="Mover abajo"
+            >
+              <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path></svg>
+            </button>
+          </div>
+
+          <!-- Preview & Overlay Controls -->
+          <div class="relative w-full sm:w-48 aspect-[2.5/1] sm:aspect-video rounded-xl overflow-hidden bg-gray-100 shrink-0 shadow-sm border border-gray-100 order-1 sm:order-2">
+            <img 
+              [src]="banner.image_url" 
+              class="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110" 
+              [alt]="banner.description"
+            >
+            
+            <!-- Inactive Overlay -->
+            @if (!banner.is_active) {
+              <div class="absolute inset-0 bg-gray-900/40 backdrop-blur-[2px] flex items-center justify-center">
+                <span class="px-2 py-1 bg-white/90 rounded text-[10px] font-bold text-gray-900 uppercase tracking-widest shadow-sm">Inactivo</span>
+              </div>
+            }
+
+            <!-- Hover Actions Overlay -->
+            <div class="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity flex items-end justify-center pb-2 gap-2">
+              <button
+                (click)="toggleStatus(banner)"
+                class="p-2 rounded-full bg-white/90 hover:bg-white text-gray-900 shadow-sm transition-all hover:scale-110"
+                [class.text-amber-500]="banner.is_active"
+                [title]="banner.is_active ? 'Desactivar' : 'Activar'"
+              >
+                <lucide-icon [img]="PowerIcon" class="w-3.5 h-3.5"></lucide-icon>
+              </button>
+              <button
+                (click)="deleteBanner(banner.id)"
+                class="p-2 rounded-full bg-white/90 hover:bg-red-500 hover:text-white text-red-500 shadow-sm transition-all hover:scale-110"
+                title="Eliminar"
+              >
+                <lucide-icon [img]="TrashIcon" class="w-3.5 h-3.5"></lucide-icon>
+              </button>
+            </div>
+          </div>
+
+          <!-- Info -->
+          <div class="flex-1 min-w-0 order-3 w-full">
+            <div class="flex flex-col">
+              <h4 class="text-sm font-semibold text-gray-900 truncate">{{ banner.description || 'Nuevo Banner' }}</h4>
+              <div class="flex items-center gap-2 mt-1">
+                <span class="px-2 py-0.5 bg-gray-100 text-gray-500 text-[10px] font-medium rounded-md uppercase tracking-wider">Posición {{ banner.display_order + 1 }}</span>
+                @if (banner.is_active) {
+                  <span class="w-1.5 h-1.5 rounded-full bg-green-500"></span>
+                  <span class="text-[10px] text-green-600 font-medium">Visible</span>
+                }
+              </div>
+            </div>
+          </div>
+        </div>
+      }
+    </div>
+  }
+  
+  <!-- Guidelines -->
+  <div class="bg-amber-50/50 rounded-2xl p-5 flex gap-4 items-start border border-amber-100/50">
+    <div class="p-2 bg-amber-100 rounded-xl">
+      <lucide-icon [img]="AlertIcon" class="w-5 h-5 text-amber-600"></lucide-icon>
+    </div>
+    <div class="text-xs text-amber-900/80 leading-relaxed">
+      <p class="font-bold text-amber-900 mb-1">Mejores resultados:</p>
+      <ul class="space-y-1 opacity-90">
+        <li class="flex items-center gap-1.5 font-medium">
+          <span class="w-1 h-1 rounded-full bg-amber-400"></span>
+          Usa imágenes de 1200x400 píxeles.
+        </li>
+        <li class="flex items-center gap-1.5 font-medium">
+          <span class="w-1 h-1 rounded-full bg-amber-400"></span>
+          Mantén el contenido principal al centro.
+        </li>
+        <li class="flex items-center gap-1.5 font-medium">
+          <span class="w-1 h-1 rounded-full bg-amber-400"></span>
+          Evita bordes con información clave.
+        </li>
+      </ul>
+    </div>
+  </div>
+</div>

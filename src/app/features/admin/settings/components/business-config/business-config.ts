@@ -9,19 +9,23 @@ import {
   output,
 } from '@angular/core';
 import { FormArray, FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
+import { LucideAngularModule, Clock, MapPin, Share2, Trash2, Plus, AlertCircle } from 'lucide-angular';
 import {
   BusinessConfig as BusinessConfigModel,
   DAY_NAMES_ES,
   DayOfWeek,
   DAYS_OF_WEEK,
   MAX_DELIVERY_ZONES,
-} from '../../services/settings.models';
+} from '../../../../../core/models/settings.models';
+
+import { Time12Pipe } from '../../../../../shared/pipes/time-12.pipe';
+import { BannerConfig } from '../banner-config/banner-config';
 
 @Component({
   selector: 'app-business-config',
-  imports: [CommonModule, ReactiveFormsModule],
+  standalone: true,
+  imports: [CommonModule, ReactiveFormsModule, LucideAngularModule, Time12Pipe, BannerConfig],
   templateUrl: './business-config.html',
-  styleUrl: './business-config.css',
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class BusinessConfig implements OnInit {
@@ -35,6 +39,7 @@ export class BusinessConfig implements OnInit {
       saturday: { open: '10:00', close: '23:00', isOpen: true },
       sunday: { open: '10:00', close: '20:00', isOpen: true },
     },
+    timezone: 'America/Lima',
     delivery_zones: [],
     social_media: {
       facebook: '',
@@ -44,12 +49,29 @@ export class BusinessConfig implements OnInit {
   });
 
   configChange = output<BusinessConfigModel>();
+  bannerChange = output<void>();
   isValid = output<boolean>();
+
+  readonly ClockIcon = Clock;
+  readonly MapPinIcon = MapPin;
+  readonly Share2Icon = Share2;
+  readonly Trash2Icon = Trash2;
+  readonly PlusIcon = Plus;
+  readonly AlertIcon = AlertCircle;
 
   private readonly fb = inject(FormBuilder);
   readonly daysOfWeek = DAYS_OF_WEEK;
   readonly dayNames = DAY_NAMES_ES;
   readonly maxDeliveryZones = MAX_DELIVERY_ZONES;
+
+  readonly timezones = [
+    'America/Lima',
+    'America/Mexico_City',
+    'America/Bogota',
+    'America/Santiago',
+    'America/Buenos_Aires',
+    'America/Madrid',
+  ];
 
   businessForm = this.createBusinessForm();
 
@@ -66,9 +88,10 @@ export class BusinessConfig implements OnInit {
   private createBusinessForm(): FormGroup {
     return this.fb.group({
       business_hours: this.fb.group({}),
+      timezone: ['America/Lima', Validators.required],
       delivery_zones: this.fb.array([]),
       social_media: this.fb.group({
-        facebook: [''],
+        facebook: ['', [Validators.pattern(/^(https?:\/\/)?(www\.)?facebook\.com\/[a-zA-Z0-9(\.\?)?]/)]],
         instagram: [''],
         tiktok: [''],
       }),
@@ -129,7 +152,6 @@ export class BusinessConfig implements OnInit {
       const closeControl = group.get('close');
       const isOpenControl = group.get('isOpen');
 
-      // Skip validation if the day is closed
       if (!isOpenControl?.value) {
         return null;
       }
@@ -138,7 +160,6 @@ export class BusinessConfig implements OnInit {
         const openTime = this.convertToMinutes(openControl.value);
         const closeTime = this.convertToMinutes(closeControl.value);
 
-        // Cierre debe ser mayor que apertura
         if (closeTime <= openTime) {
           return {
             timeRange: 'La hora de cierre debe ser mayor que la hora de apertura',
@@ -156,6 +177,11 @@ export class BusinessConfig implements OnInit {
   }
 
   private initializeDeliveryZones(zones: Array<{ name: string; fee: number }>): void {
+    if (!zones) return;
+    // Clear existing
+    while (this.deliveryZonesArray.length) {
+      this.deliveryZonesArray.removeAt(0);
+    }
     zones.forEach((zone) => {
       this.addDeliveryZone(zone.name, zone.fee);
     });
@@ -211,25 +237,6 @@ export class BusinessConfig implements OnInit {
     return this.businessForm.get(`business_hours.${day}.isOpen`)?.value === true;
   }
 
-  validateTimeFormat(time: string): boolean {
-    const timeRegex = /^([01]?[0-9]|2[0-3]):[0-5][0-9]$/;
-    return timeRegex.test(time);
-  }
-
-  getTimeErrorMessage(controlName: string): string {
-    const control = this.businessForm.get(controlName);
-
-    if (control?.hasError('required')) {
-      return 'La hora es requerida';
-    }
-
-    if (control?.hasError('pattern')) {
-      return 'Formato inválido (HH:MM)';
-    }
-
-    return '';
-  }
-
   getDayTimeRangeError(day: DayOfWeek): string {
     const dayGroup = this.getDayFormGroup(day);
 
@@ -254,16 +261,6 @@ export class BusinessConfig implements OnInit {
     return '';
   }
 
-  validateSocialMediaUrl(url: string): boolean {
-    if (!url) return true;
-    try {
-      new URL(url);
-      return true;
-    } catch {
-      return false;
-    }
-  }
-
   getSocialMediaErrorMessage(field: string): string {
     const control = this.businessForm.get(`social_media.${field}`);
 
@@ -272,9 +269,5 @@ export class BusinessConfig implements OnInit {
     }
 
     return '';
-  }
-
-  getFormValue(): BusinessConfig {
-    return this.businessForm.value as BusinessConfig;
   }
 }
