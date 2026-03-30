@@ -1,11 +1,11 @@
 import { Component, computed, signal } from '@angular/core';
 import { RouterOutlet } from '@angular/router';
 import { Header } from '../../shared/components/header/header';
-import { Navbar } from '../../shared/components/navbar/navbar';
+import { Sidebar } from '../../shared/components/sidebar/sidebar';
 
 @Component({
   selector: 'app-admin-layout',
-  imports: [Header, Navbar, RouterOutlet],
+  imports: [Header, Sidebar, RouterOutlet],
   templateUrl: './admin-layout.html',
   styleUrl: './admin-layout.css',
 })

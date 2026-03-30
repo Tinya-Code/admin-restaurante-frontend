@@ -1,6 +1,6 @@
 import { Component, inject, Signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { Notification } from '../../../core/services/notification';
+import { NotificationService } from '../../../core/services/notification.service';
 import { LucideAngularModule, X, CheckCircle, AlertCircle, Info, AlertTriangle } from 'lucide-angular';
 import type { IToast, ToastType } from '../../../core/models/toast.model';
 
@@ -11,7 +11,7 @@ import type { IToast, ToastType } from '../../../core/models/toast.model';
   styleUrl: './toast.css',
 })
 export class Toast {
-  toastService = inject(Notification);
+  toastService = inject(NotificationService);
 
   readonly X = X;
   readonly CheckCircle = CheckCircle;

@@ -1,0 +1,121 @@
+<div class="min-h-screen bg-gray-50 md:p-6 p-4">
+  <!-- Header -->
+  <div class="mb-6 flex items-center justify-between">
+    <div>
+      <h1 class="text-2xl font-semibold text-gray-900">Configuración</h1>
+      <p class="text-sm text-gray-600">Gestiona la configuración de tu restaurante</p>
+    </div>
+  </div>
+
+  <!-- Loading -->
+  @if (isLoading()) {
+  <div class="flex flex-col items-center justify-center py-20">
+    <div
+      class="h-10 w-10 animate-spin rounded-full border-4 border-gray-300 border-t-gray-800"
+    ></div>
+    <p class="mt-4 text-gray-600">Cargando configuración...</p>
+  </div>
+  }
+
+  <!-- Content -->
+  @if (!isLoading()) {
+  <div class="space-y-6">
+    <!-- Tabs - Responsive with horizontal scroll on small screens -->
+    <div class="flex gap-2 border-b border-gray-200 pb-2 overflow-x-auto scrollbar-hide">
+      @for (tab of tabs; track tab.id) {
+      <button
+        type="button"
+        (click)="switchTab(tab.id)"
+        class="flex items-center gap-1 sm:gap-2 rounded-md px-2 sm:px-4 py-2 text-xs sm:text-sm font-medium transition whitespace-nowrap shrink-0"
+        [class.bg-gray-900]="activeTab() === tab.id"
+        [class.text-white]="activeTab() === tab.id"
+        [class.text-gray-700]="activeTab() !== tab.id"
+        [class.hover:bg-gray-200]="activeTab() !== tab.id"
+      >
+        <lucide-icon
+          [img]="tab.icon"
+          class="h-4 w-4 sm:h-[18px] sm:w-[18px] shrink-0"
+        ></lucide-icon>
+        <span>{{ tab.label }}</span>
+        @if (tabValidation()[tab.id] === false && activeTab() !== tab.id) {
+        <lucide-icon
+          [img]="AlertTriangle"
+          class="h-3 w-3 sm:h-[16px] sm:w-[16px] text-red-500"
+        ></lucide-icon>
+        }
+      </button>
+      }
+    </div>
+
+    <!-- Panel WhatsApp -->
+    <div
+      class="rounded-lg bg-white p-4 md:p-6 shadow-sm"
+      [class.hidden]="activeTab() !== 'whatsapp'"
+    >
+      <div class="mb-4 flex items-center gap-2">
+        <lucide-icon [img]="MessageCircle" class="h-5 w-5"></lucide-icon>
+        <h2 class="text-lg font-semibold">Configuración de WhatsApp</h2>
+      </div>
+
+      <p class="mb-6 text-sm text-gray-600">
+        Configura la integración con WhatsApp para recibir pedidos
+      </p>
+
+      <app-whatsapp-config
+        [config]="whatsappConfig()"
+        (configChange)="onConfigChange('whatsapp_config', $event)"
+        (isValid)="onTabValidation('whatsapp', $event)"
+      ></app-whatsapp-config>
+    </div>
+
+    <!-- Panel Órdenes -->
+    <div class="rounded-lg bg-white md:p-6 p-4 shadow-sm" [class.hidden]="activeTab() !== 'order'">
+      <div class="mb-4 flex items-center gap-2">
+        <lucide-icon [img]="ClipboardList" class="h-5 w-5"></lucide-icon>
+        <h2 class="text-lg font-semibold">Configuración de Órdenes</h2>
+      </div>
+
+      <p class="mb-6 text-sm text-gray-600">
+        Gestiona las opciones de pedidos, delivery y métodos de pago
+      </p>
+
+      <app-order-config
+        [config]="orderConfig()"
+        (configChange)="onConfigChange('order_config', $event)"
+        (isValid)="onTabValidation('order', $event)"
+      ></app-order-config>
+    </div>
+
+    <!-- Panel Negocio -->
+    <div
+      class="rounded-lg bg-white md:p-6 p-4 shadow-sm"
+      [class.hidden]="activeTab() !== 'business'"
+    >
+      <div class="mb-4 flex items-center gap-2">
+        <lucide-icon [img]="Building" class="h-5 w-5"></lucide-icon>
+        <h2 class="text-lg font-semibold">Configuración del Negocio</h2>
+      </div>
+
+      <p class="mb-6 text-sm text-gray-600">
+        Administra horarios, zonas de delivery y redes sociales
+      </p>
+
+      <app-business-config
+        [config]="businessConfig()"
+        (configChange)="onConfigChange('business_config', $event)"
+        (isValid)="onTabValidation('business', $event)"
+        (bannerChange)="onBannerChange()"
+      ></app-business-config>
+    </div>
+  </div>
+
+  <!-- Acciones (Sticky Bar) -->
+  <app-settings-actions
+    [hasChanges]="hasChanges()"
+    [isValid]="isCurrentTabValid()"
+    [isSaving]="isSaving()"
+    (save)="saveSettings()"
+    (cancel)="cancelChanges()"
+  ></app-settings-actions>
+  }
+</div>

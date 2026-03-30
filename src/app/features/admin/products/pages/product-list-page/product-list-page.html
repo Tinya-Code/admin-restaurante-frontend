@@ -1,16 +1,19 @@
 <section class="relative flex flex-col p-4 sm:p-6 lg:p-8 space-y-2">
+  <header class="page-header">
+    <h1 class="text-2xl font-semibold text-gray-800">Gestión de Productos</h1>
+  </header>
 
-  <app-category-list (categoryChange)="onCategoryChange($event)" />
+  <app-category-list [categories]="categoriesData()" (categoryChange)="onCategoryChange($event)" />
   <div class="flex justify-between  flex-col md:flex-row gap-4 w-full ">
-    <app-search-bar />
+    <app-search-bar (searchChange)="onSearchChange($event)"/>
 
-    <app-button [link]="'/admin/product-form'" [id]="'123'" [name]="'agregar'" />
+    <app-button [link]="'/admin/product-form'" [name]="'agregar'" />
+    
   </div>
   <app-data-table
     [dataSource]="products()"
     [meta]="meta()"
     [columns]="columns"
-    [imageKey]="'image_url'"
     [statusKey]="'is_available'"
     [actions]="tableActions"
     [showToggle]="true"

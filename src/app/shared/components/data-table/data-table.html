@@ -1,5 +1,5 @@
 <!-- data-table.html -->
-<div class="relative w-full bg-white border border-gray-200 overflow-hidden">
+<div class="relative w-full min-h-30  bg-white border border-gray-200 overflow-hidden">
   
   @if (loading()) {
     <div class="absolute inset-0 bg-white/95 flex items-center justify-center z-10">
@@ -13,7 +13,7 @@
   <div class="w-full overflow-x-auto">
     @if (dataSource().length === 0 && !loading()) {
       <div class="py-16 px-8 text-center">
-        <lucide-angular name="inbox" class="w-12 h-12 mx-auto mb-4 text-gray-300 opacity-50" />
+        <lucide-angular [img]="icons.inbox" class="w-12 h-12 mx-auto mb-4 text-gray-300 opacity-50" />
         <p class="text-sm text-gray-500 tracking-wide">{{ emptyMessage() }}</p>
       </div>
     } @else {
@@ -54,7 +54,11 @@
           @for (row of dataSource(); track trackByIndex($index); let rowIndex = $index) {
             <tr class="border-b border-gray-200 last:border-b-0 hover:bg-gray-50 transition-colors flex flex-col md:table-row">
               
-              <td class="px-4 py-3 md:py-4 md:w-20 flex md:table-cell items-center gap-3 md:gap-0">
+              <td class="px-4 py-3 flex items-center gap-3 md:gap-0"
+                  [class.md:hidden]="!imageKey()"
+                  [class.md:table-cell]="!!imageKey()"
+                  [class.md:py-4]="!!imageKey()"
+                  [class.md:w-20]="!!imageKey()">
                 <!-- Imagen -->
                 @if(imageKey()){
                   <img 
@@ -160,7 +164,8 @@
                     </button>
 
                     @if (openMenuIndex() === rowIndex) {
-                      <div class="absolute right-0 top-full mt-1 w-40 bg-white border border-gray-200 rounded shadow-lg z-20">
+                      <div class="absolute right-8 w-40 bg-white border border-gray-200 rounded shadow-lg z-50 transition-all origin-top-right"
+                           [ngClass]="rowIndex >= (dataSource().length - 2) && dataSource().length > 2 ? 'bottom-full mb-1' : 'top-full mt-1'">
                         <ul class="py-1 text-sm">
                           @for (action of actions(); track action.label) {
                             <li>
@@ -188,7 +193,7 @@
               @for (column of columns(); track trackByKey($index, column)) {
                 <td 
                   [style.text-align]="column.align || 'left'"
-                  class="hidden md:table-cell px-4 py-4 text-gray-900 font-light cursor-pointer"
+                  class="hidden md:table-cell line-clamp-3 truncate px-4 py-4 text-gray-900 font-light cursor-pointer"
                   (click)="onRowClick(row)"
                 >
                   @if (column.pipe === 'currency') {
@@ -223,7 +228,8 @@
                 </td>
               }
               
-              <td class="hidden md:table-cell px-4 py-4 text-right relative">
+              <td class="hidden md:table-cell px-4 py-4 text-right ">
+                <div class="relative inline-block">
                 <button 
                   (click)="toggleMenu(rowIndex, $event)"
                   class="p-2 rounded hover:bg-gray-100 transition-colors"
@@ -233,7 +239,8 @@
                 </button>
 
                 @if (openMenuIndex() === rowIndex) {
-                  <div class="absolute right-0 mt-2 w-48 bg-white border border-gray-200 rounded shadow-lg z-20">
+                  <div class="absolute right-6 w-48 bg-white border border-gray-200 rounded shadow-lg z-50 transition-all origin-top-right"
+                       [ngClass]="rowIndex >= (dataSource().length - 2) && dataSource().length > 2 ? 'bottom-full mb-1' : 'top-full mt-1'">
                     <ul class="py-1 text-sm">
                       @for (action of actions(); track action.label) {
                         <li>
@@ -253,6 +260,7 @@
                     </ul>
                   </div>
                 }
+                </div>
               </td>
             </tr>
           }

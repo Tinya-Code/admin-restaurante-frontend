@@ -1,11 +1,188 @@
-import { Component } from '@angular/core';
+import { Component, inject, signal } from '@angular/core';
+import {
+  DataTable,
+  TableColumn,
+  TableAction,
+  PaginationMeta,
+} from '../../../../../shared/components/data-table/data-table';
+import { Edit, Trash2, Eye } from 'lucide-angular';
+import type { Category } from '../../../../../core/models/category.model';
+import { SearchBar } from '../../../../../shared/components/search-bar/search-bar';
+import { CategoryService } from '../../services/category.service';
+import { NotificationService } from '../../../../../core/services/notification.service';
+import { firstValueFrom } from 'rxjs';
+import { Button } from '../../../../../shared/components/button/button';
+import { Router } from '@angular/router';
+import { SearchService } from '../../../../../core/services/search.service';
 
 @Component({
   selector: 'app-category-list-page',
-  imports: [],
+  imports: [DataTable, SearchBar, Button],
   templateUrl: './category-list-page.html',
   styleUrl: './category-list-page.css',
 })
 export class CategoryListPage {
+  readonly loading = signal(false);
+  readonly categories = signal<Category[]>([]);
+  readonly meta = signal<PaginationMeta>({
+    limit: 10,
+    current_page: 1,
+    total_pages: 1,
+    total_items: 0,
+    has_next: false,
+    has_prev: false,
+  });
 
+  searchWord = signal<string | undefined>(undefined);
+  currentPage = signal<number>(1);
+  currentLimit = signal<number>(10);
+
+  private categoryService = inject(CategoryService);
+  private searchService = inject(SearchService);
+  private notification = inject(NotificationService);
+  private router = inject(Router);
+
+  readonly columns: TableColumn[] = [
+    { key: 'name', label: 'Nombre', mobileOrder: 1 },
+    { key: 'description', label: 'Descripción', hideOnMobile: true },
+    { key: 'display_order', label: 'Orden', width: '100px', align: 'center', hideOnMobile: true },
+  ];
+
+  readonly tableActions: TableAction[] = [
+    {
+      label: 'Editar',
+      icon: Edit,
+      handler: (row) => this.editCategory(row),
+    },
+    {
+      label: 'Ver detalles',
+      icon: Eye,
+      handler: (row) => this.viewCategory(row),
+    },
+    {
+      label: 'Eliminar',
+      icon: Trash2,
+      variant: 'danger',
+      handler: (row) => this.deleteCategory(row),
+    },
+  ];
+
+  ngOnInit(): void {
+    this.loadCategories();
+  }
+
+  onSearchChange(searchWord: string): void {
+    if (this.searchWord() === searchWord) return;
+    this.searchWord.set(searchWord);
+    this.currentPage.set(1);
+    this.loadCategories();
+  }
+  onToggleChange(event: { row: Category; enabled: boolean }): void {
+    this.categoryService.updateCategoryStatus(event.row.id, event.enabled).subscribe({
+      next: () => {
+        this.notification.success(
+          `Categoría ${event.row.name} ${event.enabled ? 'habilitada' : 'deshabilitada'}`,
+        );
+        this.loadCategories();
+      },
+      error: () => {
+        this.notification.error('No se pudo actualizar el estado');
+      },
+    });
+  }
+
+  onPageChange(page: number): void {
+    const currentMeta = this.meta();
+    if (page < 1) return;
+    if (currentMeta.total_pages > 0 && page > currentMeta.total_pages) return;
+    this.currentPage.set(page);
+    this.loadCategories(this.currentPage(), this.currentLimit());
+  }
+
+  onCategoryClick(category: any): void {
+    console.log('Categoría:', category);
+  }
+
+  private async loadCategories(page?: number, limit?: number, searchWord?: string): Promise<void> {
+    const finalPage = page ?? this.currentPage();
+    const finalLimit = limit ?? this.currentLimit();
+    const finalSearchWord = searchWord ?? this.searchWord();
+
+    const fetchParams = finalSearchWord
+      ? { q: finalSearchWord, type: 'categories', page: finalPage, limit: finalLimit }
+      : { page: finalPage, limit: finalLimit };
+
+    const isCached = finalSearchWord
+      ? this.searchService.checkCache(fetchParams)
+      : this.categoryService.checkCache(fetchParams);
+
+    if (!isCached) {
+      this.loading.set(true);
+    }
+
+    try {
+      let response;
+      
+      if (finalSearchWord) {
+        response = await firstValueFrom(this.searchService.search(fetchParams as any));
+      } else {
+        response = await firstValueFrom(this.categoryService.getCategories(fetchParams));
+      }
+
+      this.categories.set((response.data as any) || []);
+      this.meta.set(
+        response.meta || {
+          limit: finalLimit,
+          current_page: finalPage,
+          total_pages: 1,
+          total_items: response.data?.length || 0,
+          has_next: false,
+          has_prev: false,
+        },
+      );
+
+      if (!isCached) {
+        this.notification.success('Categorías cargadas correctamente');
+      }
+    } catch (error) {
+      console.error('Error cargando categorías', error);
+      this.categories.set([]);
+      this.meta.set({
+        limit: finalLimit,
+        current_page: finalPage,
+        total_pages: 1,
+        total_items: 0,
+        has_next: false,
+        has_prev: false,
+      });
+      this.notification.error('Error al cargar categorías');
+    } finally {
+      this.loading.set(false);
+    }
+  }
+
+  private editCategory(category: any): void {
+    console.log('Editar:', category);
+    this.notification.info(`Editando categoría ${category.name}`);
+    this.router.navigate(['/admin/category-form', category.id]);
+  }
+
+  private viewCategory(category: any): void {
+    console.log('Ver:', category);
+    this.notification.info(`Viendo detalles de ${category.name}`);
+  }
+
+  private deleteCategory(category: any): void {
+    if (confirm(`¿Estás seguro de eliminar la categoría ${category.name}?`)) {
+      this.categoryService.deleteCategory(category.id).subscribe({
+        next: () => {
+          this.notification.warning(`Categoría ${category.name} eliminada`);
+          this.loadCategories();
+        },
+        error: () => {
+          this.notification.error('Error al eliminar categoría');
+        }
+      });
+    }
+  }
 }

@@ -1,1 +1,201 @@
-<p>category-form works!</p>
+<main class="min-h-screen bg-stone-50 flex items-start justify-center px-4 py-12">
+  <article class="w-full max-w-xl">
+
+    <!-- ── Header ──────────────────────────────────────────────────────── -->
+    <header class="mb-8">
+      <p class="flex items-center gap-2 text-xs font-semibold tracking-widest uppercase text-amber-600 mb-3">
+        <span class="block w-6 h-px bg-amber-600" aria-hidden="true"></span>
+        Panel de administración
+      </p>
+      <h1 class="text-3xl font-bold text-stone-900 tracking-tight leading-tight">
+        Nueva categoría
+      </h1>
+      <p class="mt-2 text-sm text-stone-500">
+        Los campos marcados con
+        <abbr title="obligatorio" class="text-red-500 font-semibold no-underline">*</abbr>
+        son obligatorios.
+      </p>
+    </header>
+
+    <!-- ── Card ────────────────────────────────────────────────────────── -->
+    <section
+      aria-label="Formulario de nueva categoría"
+      class="bg-white border border-stone-200 rounded-2xl shadow-sm overflow-hidden"
+    >
+
+      <form [formGroup]="form" (ngSubmit)="onSubmit()" novalidate>
+
+        <section aria-label="Campos del formulario" class="px-8 py-8 flex flex-col gap-6">
+
+          <!-- ── name ────────────────────────────────────────────────── -->
+          <fieldset class="flex flex-col gap-1.5 border-none p-0 m-0">
+            <label for="name"
+              class="text-sm font-semibold text-stone-700 flex items-center gap-1">
+              Nombre
+              <abbr title="obligatorio" class="text-red-500 no-underline" aria-hidden="true">*</abbr>
+            </label>
+
+            <input
+              id="name"
+              type="text"
+              formControlName="name"
+              placeholder="Ej. Entradas, Postres, Bebidas…"
+              autocomplete="off"
+              aria-describedby="name-error"
+              aria-required="true"
+              class="w-full rounded-xl border px-4 py-2.5 text-sm text-stone-800
+                     placeholder:text-stone-300 outline-none transition-all duration-150
+                     focus:ring-2 focus:ring-amber-400 focus:border-amber-400"
+              [ngClass]="{
+                'border-stone-200 bg-stone-50': !(nameCtrl.invalid && nameCtrl.touched),
+                'border-red-300 bg-red-50 focus:ring-red-300 focus:border-red-400':
+                  nameCtrl.invalid && nameCtrl.touched
+              }"
+            />
+
+            @if (nameCtrl.invalid && nameCtrl.touched) {
+              <p
+                id="name-error"
+                role="alert"
+                class="flex items-center gap-1.5 text-xs text-red-500 font-medium mt-0.5"
+              >
+                <lucide-icon name="circle-alert" [size]="14" aria-hidden="true" />
+                @if (nameCtrl.errors?.['required']) { El nombre es obligatorio. }
+                @if (nameCtrl.errors?.['maxlength']) { El nombre no puede superar los 100 caracteres. }
+              </p>
+            }
+          </fieldset>
+
+          <!-- ── description ─────────────────────────────────────────── -->
+          <fieldset class="flex flex-col gap-1.5 border-none p-0 m-0">
+            <label for="description"
+              class="text-sm font-semibold text-stone-700 flex items-center gap-1">
+              Descripción
+              <abbr title="obligatorio" class="text-red-500 no-underline" aria-hidden="true">*</abbr>
+            </label>
+
+            <textarea
+              id="description"
+              formControlName="description"
+              placeholder="Breve descripción de la categoría…"
+              rows="3"
+              aria-describedby="description-error"
+              aria-required="true"
+              class="w-full rounded-xl border px-4 py-2.5 text-sm text-stone-800
+                     placeholder:text-stone-300 outline-none transition-all duration-150
+                     resize-none focus:ring-2 focus:ring-amber-400 focus:border-amber-400"
+              [ngClass]="{
+                'border-stone-200 bg-stone-50': !(descriptionCtrl.invalid && descriptionCtrl.touched),
+                'border-red-300 bg-red-50 focus:ring-red-300 focus:border-red-400':
+                  descriptionCtrl.invalid && descriptionCtrl.touched
+              }"
+            ></textarea>
+
+            @if (descriptionCtrl.invalid && descriptionCtrl.touched) {
+              <p
+                id="description-error"
+                role="alert"
+                class="flex items-center gap-1.5 text-xs text-red-500 font-medium mt-0.5"
+              >
+                <lucide-icon name="circle-alert" [size]="14" aria-hidden="true" />
+                @if (descriptionCtrl.errors?.['required']) { La descripción es obligatoria. }
+                @if (descriptionCtrl.errors?.['maxlength']) { La descripción no puede superar los 500 caracteres. }
+              </p>
+            }
+          </fieldset>
+
+          <!-- ── Opcionales ───────────────────────────────────────────── -->
+          <fieldset class="rounded-xl border border-dashed border-stone-200 bg-stone-50/60 px-5 py-5 flex flex-col gap-5">
+            <legend class="text-xs font-semibold tracking-widest uppercase text-stone-400 px-1">
+              Opciones adicionales
+            </legend>
+
+            <!-- is_active -->
+            <label for="is_active"
+              class="flex items-center gap-3 cursor-pointer select-none group">
+              <span class="relative">
+                <input
+                  id="is_active"
+                  type="checkbox"
+                  formControlName="is_active"
+                  class="sr-only peer"
+                />
+                <span class="block w-10 h-5 rounded-full border-2 border-stone-300 bg-white
+                             transition-all duration-200
+                             peer-checked:bg-amber-500 peer-checked:border-amber-500
+                             group-hover:border-amber-400" aria-hidden="true"></span>
+                <span class="absolute top-0.5 left-0.5 w-4 h-4 rounded-full bg-stone-300
+                             shadow transition-all duration-200
+                             peer-checked:translate-x-5 peer-checked:bg-white" aria-hidden="true"></span>
+              </span>
+              <span>
+                <strong class="block text-sm font-medium text-stone-700">Categoría activa</strong>
+                <small class="text-xs text-stone-400 leading-tight mt-0.5">
+                  Las categorías inactivas no se muestran en el menú.
+                </small>
+              </span>
+            </label>
+
+            <!-- display_order -->
+            <fieldset class="flex flex-col gap-1.5 border-none p-0 m-0">
+              <label for="display_order"
+                class="text-sm font-medium text-stone-700 flex items-center gap-2">
+                Orden de visualización
+                <small class="font-normal text-stone-400 bg-stone-200 px-2 py-0.5 rounded-full not-italic">
+                  opcional · default 0
+                </small>
+              </label>
+              <input
+                id="display_order"
+                type="number"
+                formControlName="display_order"
+                placeholder="0"
+                min="0"
+                class="w-28 rounded-xl border border-stone-200 bg-white px-4 py-2.5
+                       text-sm text-stone-800 placeholder:text-stone-300 outline-none
+                       transition-all duration-150
+                       focus:ring-2 focus:ring-amber-400 focus:border-amber-400"
+              />
+            </fieldset>
+
+          </fieldset>
+
+        </section>
+
+        <!-- ── Acciones ─────────────────────────────────────────────────── -->
+        <footer class="px-8 py-5 bg-stone-50 border-t border-stone-100
+                       flex items-center justify-end gap-3">
+
+          <button
+            type="button"
+            (click)="onCancel()"
+            [disabled]="isSubmitting"
+            class="px-5 py-2.5 rounded-xl text-sm font-semibold text-stone-600
+                   border border-stone-200 bg-white hover:bg-stone-100
+                   transition-all duration-150 disabled:opacity-50 disabled:cursor-not-allowed"
+          >
+            Cancelar
+          </button>
+
+          <button
+            type="submit"
+            [disabled]="isSubmitting"
+            class="px-5 py-2.5 rounded-xl text-sm font-semibold text-white
+                   bg-amber-500 hover:bg-amber-600 active:bg-amber-700
+                   shadow-sm shadow-amber-200 transition-all duration-150
+                   disabled:opacity-50 disabled:cursor-not-allowed
+                   flex items-center gap-2"
+          >
+            @if (isSubmitting) {
+              <lucide-icon name="loader-circle" [size]="16" class="animate-spin" aria-hidden="true" />
+            }
+            <span>{{ isSubmitting ? 'Guardando…' : 'Crear categoría' }}</span>
+          </button>
+
+        </footer>
+
+      </form>
+    </section>
+
+  </article>
+</main>
