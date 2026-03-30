@@ -64,4 +64,22 @@ export class EndpointsService {
   search(): string {
     return `/search`;
   }
+
+  // Business Settings endpoint
+  businessSettings(): string {
+    return `/business-settings`;
+  }
+
+  // Banners endpoints
+  banners(): string {
+    return `/business-settings/banners`;
+  }
+
+  bannerById(bannerId: string): string {
+    return `/business-settings/banners/${bannerId}`;
+  }
+
+  reorderBanners(): string {
+    return `/business-settings/banners/reorder`;
+  }
 }

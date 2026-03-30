@@ -104,43 +104,18 @@
         [config]="businessConfig()"
         (configChange)="onConfigChange('business_config', $event)"
         (isValid)="onTabValidation('business', $event)"
+        (bannerChange)="onBannerChange()"
       ></app-business-config>
     </div>
-
-    <!-- Warning cambios -->
-    @if (hasChanges()) {
-    <div
-      class="flex items-center gap-2 rounded-md border border-yellow-300 bg-yellow-50 p-3 text-sm text-yellow-800"
-    >
-      <lucide-icon [img]="AlertTriangle" class="h-4 w-4"></lucide-icon>
-      Tienes cambios sin guardar
-    </div>
-    }
-    <!-- Botones -->
-    <div class="flex md:justify-end justify-center gap-3 pt-4">
-      <button
-        type="button"
-        (click)="cancelChanges()"
-        [disabled]="!canCancel()"
-        class="flex-1 md:flex-none rounded-md border border-gray-300 px-4 py-2 text-sm hover:bg-gray-100 disabled:opacity-50"
-      >
-        Cancelar
-      </button>
-
-      <button
-        type="button"
-        (click)="saveSettings()"
-        [disabled]="!canSave()"
-        class="flex flex-1 md:flex-none items-center gap-2 rounded-md bg-gray-900 px-4 py-2 text-sm text-white hover:bg-gray-800 disabled:opacity-50"
-      >
-        @if (isSaving()) {
-        <div
-          class="h-4 w-4 animate-spin rounded-full border-2 border-white border-t-transparent"
-        ></div>
-        }
-        {{ isSaving() ? 'Guardando...' : 'Guardar Cambios' }}
-      </button>
-    </div>
   </div>
+
+  <!-- Acciones (Sticky Bar) -->
+  <app-settings-actions
+    [hasChanges]="hasChanges()"
+    [isValid]="isCurrentTabValid()"
+    [isSaving]="isSaving()"
+    (save)="saveSettings()"
+    (cancel)="cancelChanges()"
+  ></app-settings-actions>
   }
 </div>

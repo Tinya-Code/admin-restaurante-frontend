@@ -1,50 +1,64 @@
 import { CommonModule } from '@angular/common';
 import { Component, inject, input, OnInit, output } from '@angular/core';
 import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
+import { LucideAngularModule, MessageSquare } from 'lucide-angular';
+
 import {
-  WHATSAPP_MESSAGE_MAX_LENGTH,
   WhatsAppConfig as WhatsAppConfigModel,
-} from '../../services/settings.models';
+  WHATSAPP_MESSAGE_MAX_LENGTH,
+} from '../../../../../core/models/settings.models';
 
 @Component({
   selector: 'app-whatsapp-config',
-  imports: [CommonModule, ReactiveFormsModule],
+  standalone: true,
+  imports: [CommonModule, ReactiveFormsModule, LucideAngularModule],
   templateUrl: './whatsapp-config.html',
-  styleUrl: './whatsapp-config.css',
 })
 export class WhatsAppConfig implements OnInit {
   config = input<WhatsAppConfigModel>({
+    enabled: false,
     number: '',
     message_template: '',
+    show_prices: true,
+    greeting: '',
+    auto_include_restaurant_name: true,
   });
 
   configChange = output<WhatsAppConfigModel>();
   isValid = output<boolean>();
 
-  private fb = inject(FormBuilder);
+  readonly MessageSquareIcon = MessageSquare;
   readonly maxLength = WHATSAPP_MESSAGE_MAX_LENGTH;
+  private fb = inject(FormBuilder);
 
   whatsappForm: FormGroup = this.fb.group({
+    enabled: [false],
     number: ['', [Validators.required, Validators.pattern(/^[9]\d{8}$/)]],
     message_template: ['', [Validators.required, Validators.maxLength(this.maxLength)]],
+    show_prices: [true],
+    greeting: [''],
+    auto_include_restaurant_name: [true],
   });
 
   ngOnInit(): void {
-    // Emitir cambios y validación
+    if (this.config()) {
+      this.whatsappForm.patchValue(this.config(), { emitEvent: false });
+    }
+
+    this.setupFormListeners();
+    // Emit initial status
+    this.isValid.emit(this.whatsappForm.valid);
+  }
+
+  private setupFormListeners(): void {
     this.whatsappForm.valueChanges.subscribe((values) => {
       const isValid = this.whatsappForm.valid;
       this.isValid.emit(isValid);
 
       if (isValid) {
-        this.configChange.emit(values as WhatsAppConfigModel);
+        this.configChange.emit({ ...this.config(), ...values } as WhatsAppConfigModel);
       }
     });
-
-    if (this.config()) {
-      this.whatsappForm.patchValue(this.config(), { emitEvent: false });
-      const isValid = this.whatsappForm.valid;
-      this.isValid.emit(isValid);
-    }
   }
 
   // Formatear número de WhatsApp
@@ -76,33 +90,23 @@ export class WhatsAppConfig implements OnInit {
     return '';
   }
 
-  // Obtener mensaje de error para mensaje
+  // Obtener mensaje de error para plantilla
   getMessageErrorMessage(): string {
     const control = this.whatsappForm.get('message_template');
 
     if (control?.errors?.['required']) {
-      return 'El mensaje es requerido';
+      return 'La plantilla de mensaje es requerida';
     }
 
     if (control?.errors?.['maxlength']) {
-      return `El mensaje no puede exceder ${this.maxLength} caracteres`;
+      return `La plantilla no debe exceder los ${this.maxLength} caracteres`;
     }
 
     return '';
   }
 
-  // Contador de caracteres
+  // Obtener conteo de caracteres
   getCharacterCount(): number {
     return this.whatsappForm.get('message_template')?.value?.length || 0;
-  }
-
-  // Validar si el formulario es válido
-  get isFormValid(): boolean {
-    return this.whatsappForm.valid;
-  }
-
-  // Obtener valor actual del formulario
-  getFormValue(): WhatsAppConfig {
-    return this.whatsappForm.value as WhatsAppConfig;
   }
 }

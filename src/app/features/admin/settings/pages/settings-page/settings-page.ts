@@ -7,22 +7,33 @@ import {
   MessageCircle,
   TriangleAlert,
 } from 'lucide-angular';
-import { Subject, takeUntil } from 'rxjs';
+import { Subject, takeUntil, forkJoin, of } from 'rxjs';
 
 import { NotificationService } from '../../../../../core/services/notification.service';
+import { BannerService } from '../../services/banner.service';
 import { BusinessConfig } from '../../components/business-config/business-config';
 import { OrderConfig } from '../../components/order-config/order-config';
 import { WhatsAppConfig } from '../../components/whatsapp-config/whatsapp-config';
-import { BusinessSettings } from '../../services/settings.models';
+import { BusinessSettings } from '../../../../../core/models/settings.models';
 import { SettingsService } from '../../services/settings.service';
+import { SettingsActions } from '../../components/settings-actions/settings-actions';
 
 @Component({
   selector: 'app-settings-page',
-  imports: [CommonModule, WhatsAppConfig, OrderConfig, BusinessConfig, LucideAngularModule],
+  standalone: true,
+  imports: [
+    CommonModule,
+    LucideAngularModule,
+    WhatsAppConfig,
+    OrderConfig,
+    BusinessConfig,
+    SettingsActions,
+  ],
   templateUrl: './settings-page.html',
 })
 export class SettingsPage implements OnInit, OnDestroy {
   private settingsService = inject(SettingsService);
+  private bannerService = inject(BannerService);
   private notificationService = inject(NotificationService);
   private destroy$ = new Subject<void>();
 
@@ -43,6 +54,7 @@ export class SettingsPage implements OnInit, OnDestroy {
   loading = signal(false);
   saving = signal(false);
   hasUnsavedChanges = signal(false);
+  hasChanges = computed(() => this.hasUnsavedChanges() || this.bannerService.hasChanges());
   activeTab = signal('whatsapp');
 
   // Tab validation signals
@@ -72,11 +84,8 @@ export class SettingsPage implements OnInit, OnDestroy {
       this.loading.set(true);
     }
 
-    const businessId =
-      sessionStorage.getItem('businessId') || '803a50be-7740-4eaf-b399-2b1ad06f1406';
-
     this.settingsService
-      .getBusinessSettings(businessId)
+      .getBusinessSettings()
       .pipe(takeUntil(this.destroy$))
       .subscribe({
         next: (response) => {
@@ -124,8 +133,12 @@ export class SettingsPage implements OnInit, OnDestroy {
     const settings = this.currentSettings();
     return (
       settings?.whatsapp_config || {
+        enabled: false,
         number: '',
         message_template: '',
+        show_prices: true,
+        greeting: '',
+        auto_include_restaurant_name: true,
       }
     );
   });
@@ -139,8 +152,8 @@ export class SettingsPage implements OnInit, OnDestroy {
         delivery_fee: 0,
         payment_methods: [],
         accepts_reservations: false,
-        delivery_enabled: false,
         pickup_enabled: false,
+        delivery_enabled: false,
       }
     );
   });
@@ -176,68 +189,82 @@ export class SettingsPage implements OnInit, OnDestroy {
     }
 
     this.saving.set(true);
+    
+    // Preparar observables de guardado
+    const settings = this.currentSettings();
+    const configSave$ = settings && this.hasUnsavedChanges() 
+      ? this.settingsService.updateBusinessSettings(settings) 
+      : of(null);
+    
+    const bannersSave$ = this.bannerService.hasChanges() 
+      ? this.bannerService.saveChanges() 
+      : of(null);
 
-    const businessId =
-      sessionStorage.getItem('businessId') || '803a50be-7740-4eaf-b399-2b1ad06f1406';
-    const settings = this.currentSettings()!;
-
-    this.settingsService
-      .updateBusinessSettings(businessId, settings)
+    forkJoin([configSave$, bannersSave$])
       .pipe(takeUntil(this.destroy$))
       .subscribe({
-        next: (response) => {
-          if (response.success && response.data) {
-            this.currentSettings.set(response.data);
-            this.hasUnsavedChanges.set(false);
-            this.showSuccess('Configuración guardada');
+        next: ([configRes]) => {
+          if (configRes && !configRes.success) {
+            this.showError(configRes.message || 'Error al guardar configuración');
           } else {
-            this.showError('Error al guardar');
+            this.notificationService.success('Cambios guardados correctamente');
+            if (configRes && configRes.data) {
+              this.currentSettings.set(configRes.data);
+            }
+            this.hasUnsavedChanges.set(false);
           }
           this.saving.set(false);
         },
         error: () => {
-          this.showError('Error al guardar');
+          this.showError('Ocurrió un error al guardar los cambios');
           this.saving.set(false);
         },
       });
   }
 
   cancelChanges(): void {
-    if (this.hasUnsavedChanges()) {
+    if (this.hasUnsavedChanges() || this.bannerService.hasChanges()) {
       if (!confirm('¿Descartar cambios?')) {
         return;
       }
     }
     this.loadSettings();
     this.hasUnsavedChanges.set(false);
+    if (this.bannerService.hasChanges()) {
+      this.bannerService.cancelChanges();
+    }
   }
+
+  onBannerChange(): void {
+    // El computed hasChanges se actualizará automáticamente 
+    // porque depende de bannerService.hasChanges()
+  }
+
+  // Computed signals for template access
+  isLoading = computed(() => this.loading());
+  isSaving = computed(() => this.saving());
+  isCurrentTabValid = computed(() => {
+    const tab = this.activeTab();
+    return this.tabValidation()[tab];
+  });
+  canSave = computed(() => this.hasChanges() && this.isCurrentTabValid() && !this.saving());
+  canCancel = computed(() => this.hasChanges() && !this.saving());
 
   private isFormValid(): boolean {
     const validation = this.tabValidation();
     return Object.values(validation).every((v) => v);
   }
 
-  private showSuccess(message: string): void {
-    this.notificationService.success(message);
-  }
-
   private showError(message: string): void {
     this.notificationService.error(message);
   }
-
-  // Computed signals for template access
-  isLoading = computed(() => this.loading());
-  isSaving = computed(() => this.saving());
-  hasChanges = computed(() => this.hasUnsavedChanges());
-  canSave = computed(() => this.hasUnsavedChanges() && this.isFormValid() && !this.saving());
-  canCancel = computed(() => this.hasUnsavedChanges() && !this.saving());
 
   isEqual(a: any, b: any): boolean {
     return JSON.stringify(this.sortObject(a)) === JSON.stringify(this.sortObject(b));
   }
 
   sortObject(obj: any): any {
-    if (Array.isArray(obj)) return obj.map(this.sortObject);
+    if (Array.isArray(obj)) return obj.map(this.sortObject.bind(this));
 
     if (obj !== null && typeof obj === 'object') {
       return Object.keys(obj)
