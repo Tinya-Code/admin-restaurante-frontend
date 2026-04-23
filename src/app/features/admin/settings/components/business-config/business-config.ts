@@ -3,13 +3,14 @@ import {
   ChangeDetectionStrategy,
   Component,
   computed,
+  effect,
   inject,
   input,
   OnInit,
   output,
 } from '@angular/core';
 import { FormArray, FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
-import { LucideAngularModule, Clock, MapPin, Share2, Trash2, Plus, AlertCircle } from 'lucide-angular';
+import { LucideAngularModule, Clock, MapPin, Share2, Trash2, Plus, AlertCircle, Info } from 'lucide-angular';
 import {
   BusinessConfig as BusinessConfigModel,
   DAY_NAMES_ES,
@@ -19,16 +20,16 @@ import {
 } from '../../../../../core/models/settings.models';
 
 import { Time12Pipe } from '../../../../../shared/pipes/time-12.pipe';
-import { BannerConfig } from '../banner-config/banner-config';
+import { BannerConfigComponent } from '../banner-config/banner-config';
 
 @Component({
   selector: 'app-business-config',
   standalone: true,
-  imports: [CommonModule, ReactiveFormsModule, LucideAngularModule, Time12Pipe, BannerConfig],
+  imports: [CommonModule, ReactiveFormsModule, LucideAngularModule, Time12Pipe],
   templateUrl: './business-config.html',
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
-export class BusinessConfig implements OnInit {
+export class BusinessConfigComponent implements OnInit {
   config = input<BusinessConfigModel>({
     business_hours: {
       monday: { open: '09:00', close: '22:00', isOpen: true },
@@ -48,6 +49,8 @@ export class BusinessConfig implements OnInit {
     },
   });
 
+  readOnly = input<boolean>(false);
+
   configChange = output<BusinessConfigModel>();
   bannerChange = output<void>();
   isValid = output<boolean>();
@@ -58,6 +61,7 @@ export class BusinessConfig implements OnInit {
   readonly Trash2Icon = Trash2;
   readonly PlusIcon = Plus;
   readonly AlertIcon = AlertCircle;
+  readonly InfoIcon = Info;
 
   private readonly fb = inject(FormBuilder);
   readonly daysOfWeek = DAYS_OF_WEEK;
@@ -79,10 +83,34 @@ export class BusinessConfig implements OnInit {
   canAddMoreZones = computed(() => this.deliveryZonesArray.length < this.maxDeliveryZones);
   isFormValid = computed(() => this.businessForm.valid);
 
+  constructor() {
+    effect(() => {
+      const config = this.config();
+      if (config) {
+        this.initializeDeliveryZones(config.delivery_zones);
+        this.businessForm.patchValue(config, { emitEvent: false });
+        
+        // Handle child controls state manually as they are grouped
+        if (this.readOnly()) {
+          this.businessForm.disable({ emitEvent: false });
+        } else {
+          this.businessForm.enable({ emitEvent: false });
+          // Ensure disabled days remain disabled
+          this.daysOfWeek.forEach(day => {
+            if (!this.isDayOpen(day)) {
+               this.businessForm.get(`business_hours.${day}.open`)?.disable({ emitEvent: false });
+               this.businessForm.get(`business_hours.${day}.close`)?.disable({ emitEvent: false });
+            }
+          });
+        }
+      }
+    });
+  }
+
   ngOnInit(): void {
     this.initializeBusinessHours();
     this.setupFormListeners();
-    this.patchInitialValues();
+    this.isValid.emit(this.businessForm.valid);
   }
 
   private createBusinessForm(): FormGroup {
@@ -100,6 +128,8 @@ export class BusinessConfig implements OnInit {
 
   private setupFormListeners(): void {
     this.businessForm.valueChanges.subscribe((values) => {
+      if (this.readOnly()) return;
+
       const isValid = this.businessForm.valid;
       this.isValid.emit(isValid);
 

@@ -118,10 +118,4 @@ export class ProductService {
       tap(() => this.clearCache())
     );
   }
-
-  reorderProducts(updates: { id: string; display_order: number }[]): Observable<ApiResponse<void>> {
-    return this.api.patch<void>(this.endpoints.productReorderBulk(), { updates }).pipe(
-      tap(() => this.clearCache())
-    );
-  }
 }

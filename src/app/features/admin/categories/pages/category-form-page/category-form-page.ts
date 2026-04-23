@@ -46,7 +46,7 @@ export class CategoryFormPage implements OnInit {
       this.categoryService.updateCategory(dataId, event.data as CategoryUpdate).subscribe({
         next: (res) => {
           this.notification.success('Categoría actualizada correctamente');
-          this.router.navigate(['/admin/categories']);
+          this.router.navigate(['/admin/menu/categories']);
         },
         error: (err) => {
           this.notification.error('Error al actualizar la categoría');
@@ -58,7 +58,7 @@ export class CategoryFormPage implements OnInit {
       this.categoryService.createCategory(event.data as CategoryCreate).subscribe({
         next: (res) => {
           this.notification.success('Categoría creada correctamente');
-          this.router.navigate(['/admin/categories']);
+          this.router.navigate(['/admin/menu/categories']);
         },
         error: (err) => {
           if (err?.status === 409) {

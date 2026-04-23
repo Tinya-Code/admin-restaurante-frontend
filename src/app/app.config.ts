@@ -3,10 +3,11 @@ import {
   provideBrowserGlobalErrorListeners,
   provideZoneChangeDetection,
   isDevMode,
+  provideAppInitializer,
+  inject,
 } from '@angular/core';
 import { provideRouter } from '@angular/router';
 import { provideHttpClient, withFetch } from '@angular/common/http';
-import { HTTP_INTERCEPTORS } from '@angular/common/http';
 import { authInterceptor } from './core/interceptors/auth.interceptor';
 import { withInterceptors } from '@angular/common/http';
 import { routes } from './app.routes';
@@ -17,6 +18,7 @@ import { initializeApp, provideFirebaseApp } from '@angular/fire/app';
 import { provideAuth, getAuth } from '@angular/fire/auth';
 import { provideFirestore, getFirestore } from '@angular/fire/firestore';
 import { environment } from '../environments/environment';
+import { AuthService } from './core/services/auth.service';
 
 export const appConfig: ApplicationConfig = {
   providers: [
@@ -31,5 +33,10 @@ export const appConfig: ApplicationConfig = {
     provideFirebaseApp(() => initializeApp(environment.firebaseConfig)),
     provideFirestore(() => getFirestore()),
     provideAuth(() => getAuth()),
+    provideAppInitializer(() => {
+      const authService = inject(AuthService);
+      return authService.initAuth();
+    }),
   ],
 };
+

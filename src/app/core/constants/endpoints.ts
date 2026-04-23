@@ -12,6 +12,19 @@ export class EndpointsService {
     return `/auth/login`;
   }
 
+  memberships(): string {
+    return `/auth/memberships`;
+  }
+
+  // Menus endpoints
+  menus(): string {
+    return `/menus`;
+  }
+
+  menuById(menuId: string): string {
+    return `/menus/${menuId}`;
+  }
+
   // Categories endpoints
   categories(): string {
     return `/categories`;
@@ -19,6 +32,10 @@ export class EndpointsService {
   
   categoryById(categoryId: string): string {
     return `/categories/${categoryId}`;
+  }
+
+  categoryTypes(): string {
+    return `/category-types`;
   }
 
   // Products endpoints
@@ -34,13 +51,36 @@ export class EndpointsService {
     return `/products/${productId}/disable`;
   }
 
-  productReorderBulk(): string {
-    return `/products/reorder/bulk`;
+  // Combos endpoints
+  combos(): string {
+    return `/combos`;
+  }
+
+  comboById(comboId: string): string {
+    return `/combos/${comboId}`;
+  }
+
+  // Promotions endpoints
+  promotions(): string {
+    return `/promotions`;
+  }
+
+  promotionById(promoId: string): string {
+    return `/promotions/${promoId}`;
+  }
+
+  // Restaurant Tags endpoints
+  restaurantTags(): string {
+    return `/restaurant-tags`;
+  }
+
+  restaurantTagsCatalog(): string {
+    return `/restaurant-tags/catalog`;
   }
 
   // Users endpoints
   userById(userId: string): string {
-    return `${this.baseUrl}/users/${userId}`;
+    return `/users/${userId}`;
   }
 
   // Statistics endpoints
@@ -60,26 +100,38 @@ export class EndpointsService {
     return `${this.statistics()}/products/recent`;
   }
 
+  combosCount(): string {
+    return `${this.statistics()}/combos/count`;
+  }
+
+  visitsOverview(): string {
+    return `${this.statistics()}/visits/overview`;
+  }
+
   // Search endpoint
   search(): string {
     return `/search`;
   }
 
-  // Business Settings endpoint
-  businessSettings(): string {
-    return `/business-settings`;
+  // Settings endpoints
+  restaurantSettings(): string {
+    return `/settings/restaurant`;
   }
 
-  // Banners endpoints
+  branchSettings(): string {
+    return `/settings/branch`;
+  }
+
+  // Banners endpoints (Now a separate module /banners)
   banners(): string {
-    return `/business-settings/banners`;
+    return `/banners`;
   }
 
   bannerById(bannerId: string): string {
-    return `/business-settings/banners/${bannerId}`;
+    return `/banners/${bannerId}`;
   }
 
   reorderBanners(): string {
-    return `/business-settings/banners/reorder`;
+    return `/banners/reorder`;
   }
 }

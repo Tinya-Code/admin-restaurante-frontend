@@ -3,7 +3,9 @@ import { Observable, forkJoin, of, tap, switchMap } from 'rxjs';
 import { Api } from '../../../../core/http/api';
 import { EndpointsService } from '../../../../core/constants/endpoints';
 import { ApiResponse } from '../../../../core/models/api-response.model';
-import { Banner } from '../../../../core/models/settings.models';
+import { Banner } from '../../../../core/models/banner.model';
+import { NotificationService } from '../../../../core/services/notification.service';
+import { catchError, throwError } from 'rxjs';
 
 @Injectable({
   providedIn: 'root',
@@ -11,6 +13,7 @@ import { Banner } from '../../../../core/models/settings.models';
 export class BannerService {
   private readonly api = inject(Api);
   private readonly endpoints = inject(EndpointsService);
+  private readonly notification = inject(NotificationService);
 
   // State Signals
   private _banners = signal<Banner[]>([]);
@@ -32,7 +35,12 @@ export class BannerService {
           const sorted = [...res.data].sort((a, b) => a.display_order - b.display_order);
           this._banners.set(sorted);
           this._initialBanners.set(sorted);
+          this.notification.success('Banners cargados correctamente');
         }
+      }),
+      catchError(err => {
+        this.notification.error('Error al cargar banners');
+        return throwError(() => err);
       })
     );
   }
@@ -115,7 +123,12 @@ export class BannerService {
     if (requests.length === 0) return of(true);
 
     return forkJoin(requests).pipe(
-      switchMap(() => this.loadBanners())
+      switchMap(() => this.loadBanners()),
+      tap(() => this.notification.success('Cambios en banners guardados')),
+      catchError(err => {
+        this.notification.error('Error al guardar cambios en banners');
+        return throwError(() => err);
+      })
     );
   }
 

@@ -9,7 +9,7 @@ import { SeedService } from '../../../core/services/seed.service';
   imports: [CommonModule, LucideAngularModule],
   template: `
     <button
-      class="flex flex-1 items-center md:gap-3 gap-2 md:px-6 px-4 py-3 rounded-full font-medium text-sm border-2 cursor-pointer transition-all duration-200 font-inherit bg-amber-500 text-white border-amber-500 hover:bg-amber-600 hover:border-amber-600 focus:outline-2 focus:outline-amber-500 focus:outline-offset-2 justify-center shadow-lg hover:shadow-xl active:scale-95 disabled:opacity-75 disabled:cursor-not-allowed"
+      class="flex w-full justify-center items-center md:gap-3 gap-2 md:px-6 px-4 py-3 rounded-full font-medium text-sm border-2 cursor-pointer transition-all duration-200 font-inherit bg-amber-500 text-white border-amber-500 hover:bg-amber-600 hover:border-amber-600 focus:outline-2 focus:outline-amber-500 focus:outline-offset-2  shadow-lg hover:shadow-xl active:scale-95 disabled:opacity-75 disabled:cursor-not-allowed"
       (click)="onSeedData()"
       [disabled]="loading()"
       aria-label="Cargar datos iniciales"

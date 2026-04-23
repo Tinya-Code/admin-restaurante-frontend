@@ -17,8 +17,16 @@ export const routes: Routes = [
     ],
   },
   {
-    path: 'admin',
+    path: 'auth/select-restaurant',
     canActivate: [authGuard],
+    loadComponent: () =>
+      import('./features/auth/pages/select-restaurant/select-restaurant').then(
+        (m) => m.SelectRestaurantPage
+      ),
+  },
+  {
+    path: 'admin',
+canActivate: [authGuard],
     loadComponent: () => import('./layouts/admin-layout/admin-layout').then((m) => m.AdminLayout),
     children: [
       {
@@ -29,56 +37,78 @@ export const routes: Routes = [
           ),
       },
       {
-        path: 'products',
-        loadComponent: () =>
-          import('./features/admin/products/pages/product-list-page/product-list-page').then(
-            (m) => m.ProductListPage
-          ),
-      },
-      {
-        path: 'product-form',
-        loadComponent: () =>
-          import('./features/admin/products/pages/product-form-page/product-form-page').then(
-            (m) => m.ProductFormPage
-          ),
-      },
-      {
-        path: 'product-form/:id',
-        loadComponent: () =>
-          import('./features/admin/products/pages/product-form-page/product-form-page').then(
-            (m) => m.ProductFormPage
-          ),
-      },
-      {
-        path: 'categories',
-        loadComponent: () =>
-          import('./features/admin/categories/pages/category-list-page/category-list-page').then(
-            (m) => m.CategoryListPage
-          ),
-      },
-      {
-        path: 'category-form',
-        loadComponent: () =>
-          import('./features/admin/categories/pages/category-form-page/category-form-page').then(
-            (m) => m.CategoryFormPage
-          ),
-      },
-      {
-        path: 'category-form/:id',
-        loadComponent: () =>
-          import('./features/admin/categories/pages/category-form-page/category-form-page').then(
-            (m) => m.CategoryFormPage
-          ),
+        path: 'menu',
+        children: [
+          {
+            path: 'products',
+            loadComponent: () =>
+              import('./features/admin/products/pages/product-list-page/product-list-page').then(
+                (m) => m.ProductListPage
+              ),
+          },
+          {
+            path: 'product-form',
+            loadComponent: () =>
+              import('./features/admin/products/pages/product-form-page/product-form-page').then(
+                (m) => m.ProductFormPage
+              ),
+          },
+          {
+            path: 'product-form/:id',
+            loadComponent: () =>
+              import('./features/admin/products/pages/product-form-page/product-form-page').then(
+                (m) => m.ProductFormPage
+              ),
+          },
+          {
+            path: 'categories',
+            loadComponent: () =>
+              import('./features/admin/categories/pages/category-list-page/category-list-page').then(
+                (m) => m.CategoryListPage
+              ),
+          },
+          {
+            path: 'category-form',
+            loadComponent: () =>
+              import('./features/admin/categories/pages/category-form-page/category-form-page').then(
+                (m) => m.CategoryFormPage
+              ),
+          },
+          {
+            path: 'category-form/:id',
+            loadComponent: () =>
+              import('./features/admin/categories/pages/category-form-page/category-form-page').then(
+                (m) => m.CategoryFormPage
+              ),
+          },
+          { path: '', redirectTo: 'products', pathMatch: 'full' },
+        ],
       },
       {
         path: 'settings',
-        loadComponent: () =>
-          import('./features/admin/settings/pages/settings-page/settings-page').then(
-            (m) => m.SettingsPage
-          ),
+        children: [
+          {
+            path: 'business-profile',
+            loadComponent: () =>
+              import('./features/admin/settings/pages/business-profile/business-profile').then(
+                (m) => m.BusinessProfilePage
+              ),
+          },
+          {
+            path: 'operational',
+            loadComponent: () =>
+              import('./features/admin/settings/pages/operational-settings/operational-settings').then(
+                (m) => m.OperationalSettingsPage
+              ),
+          },
+          { path: '', redirectTo: 'business-profile', pathMatch: 'full' },
+        ],
       },
       { path: '', redirectTo: 'home', pathMatch: 'full' },
     ],
   },
-  { path: '**', redirectTo: 'login' },
+  { 
+    path: '**', 
+    loadComponent: () => import('./core/pages/not-found-page/not-found-page').then((m) => m.NotFoundPage) 
+  },
 ];

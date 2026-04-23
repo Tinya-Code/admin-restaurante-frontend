@@ -110,34 +110,33 @@ export interface BusinessConfig {
   social_media: SocialMedia;
 }
 
+import { Plan } from './plan.model';
+
 export interface BusinessSettings {
-  restaurant_id: string;
+  id: string;
+  name: string;
+  slug: string;
+  phone: string;
+  address: string;
+  logo_url?: string;
+  description?: string;
+  plan: Plan;
+}
+
+/**
+ * Representa la configuración completa de una sucursal.
+ */
+export interface BranchSettings {
+  id: string;
   whatsapp_config: WhatsAppConfig;
   display_config: DisplayConfig;
   order_config: OrderConfig;
   business_config: BusinessConfig;
+  schedule: DayHours;
+  description?: string;
+  logo_url?: string;
+  logo_cloudinary_id?: string;
   created_at?: string;
   updated_at?: string;
 }
 
-export interface Banner {
-  id: string;
-  image_url: string;
-  description?: string;
-  display_order: number;
-  is_active: boolean;
-  created_at?: string;
-  updated_at?: string;
-}
-
-export interface BannerCreate {
-  image_base64: string;
-  description?: string;
-  display_order: number;
-}
-
-export interface BannerUpdate {
-  description?: string;
-  display_order?: number;
-  is_active?: boolean;
-}

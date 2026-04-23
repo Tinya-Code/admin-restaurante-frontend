@@ -1,0 +1,93 @@
+<div class="min-h-screen bg-background p-4 sm:p-6 animate-in fade-in duration-500">
+  <!-- Header -->
+  <header class="mb-8">
+    <h1 class="text-3xl font-bold text-text-primary font-poppins tracking-tight">Perfil del Restaurante</h1>
+    <p class="text-text-secondary font-poppins mt-1">Información global del negocio y plan de suscripción.</p>
+  </header>
+
+  <!-- Loading State -->
+  @if (loading()) {
+    <div class="flex flex-col items-center justify-center py-24">
+      <div class="h-12 w-12 animate-spin rounded-full border-4 border-border border-t-primary"></div>
+      <p class="mt-4 text-text-secondary font-poppins animate-pulse">Cargando información global...</p>
+    </div>
+  }
+
+  @if (!loading()) {
+    <div class="space-y-8 max-w-4xl">
+      <div class="bg-surface rounded-2xl shadow-sm border border-border overflow-hidden">
+        <div class="p-8">
+          <div class="flex flex-col md:flex-row gap-8 items-center md:items-start">
+            <!-- Logo Profile -->
+            <div class="shrink-0">
+                @if (restaurantData()?.logo_url) {
+                    <img [src]="restaurantData()?.logo_url" alt="Logo" class="h-32 w-32 object-contain rounded-2xl border border-border bg-gray-50 p-2 shadow-sm">
+                } @else {
+                    <div class="h-32 w-32 bg-gray-100 rounded-2xl flex items-center justify-center border-2 border-dashed border-border">
+                        <lucide-icon [img]="Building" class="h-12 w-12 text-gray-400"></lucide-icon>
+                    </div>
+                }
+            </div>
+
+            <!-- Basic Info -->
+            <div class="flex-1 space-y-4 text-center md:text-left">
+              <div>
+                <h2 class="text-2xl font-bold text-text-primary font-poppins">{{ restaurantData()?.name || 'Nombre del Restaurante' }}</h2>
+                <p class="text-text-secondary font-poppins">Slug: <code class="bg-gray-100 px-1.5 py-0.5 rounded text-primary text-xs">{{ restaurantData()?.slug || 'n/a' }}</code></p>
+              </div>
+              
+              <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                  <div class="p-4 bg-gray-50 rounded-xl border border-border">
+                      <p class="text-xs text-text-muted font-poppins uppercase tracking-wider mb-1">Teléfono Global</p>
+                      <p class="font-semibold text-text-primary font-poppins">{{ restaurantData()?.phone || 'No configurado' }}</p>
+                  </div>
+                  <div class="p-4 bg-gray-50 rounded-xl border border-border">
+                      <p class="text-xs text-text-muted font-poppins uppercase tracking-wider mb-1">Dirección Legal</p>
+                      <p class="font-semibold text-text-primary font-poppins truncate">{{ restaurantData()?.address || 'No configurada' }}</p>
+                  </div>
+              </div>
+            </div>
+          </div>
+
+          <div class="mt-10 pt-8 border-t border-border">
+              <h3 class="font-bold text-lg font-poppins text-text-primary mb-4">Descripción del Negocio</h3>
+              <p class="text-text-secondary font-poppins leading-relaxed">
+                  {{ restaurantData()?.description || 'No hay una descripción general configurada para el restaurante.' }}
+              </p>
+          </div>
+        </div>
+
+        <!-- Plan Info -->
+        <div class="bg-gray-900 p-8 text-white">
+            <div class="flex justify-between items-center mb-6">
+                <h3 class="font-bold text-xl font-poppins">Plan de Suscripción</h3>
+                <span class="px-3 py-1 bg-primary text-white text-xs font-bold rounded-full uppercase tracking-widest">
+                    {{ restaurantData()?.plan?.name || 'Gratuito' }}
+                </span>
+            </div>
+
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+                <div class="space-y-1">
+                    <p class="text-gray-400 text-xs font-poppins uppercase tracking-wider">Sucursales permitidas</p>
+                    <p class="text-2xl font-bold font-poppins">{{ restaurantData()?.plan?.max_branches || '1' }}</p>
+                </div>
+                <div class="space-y-1">
+                    <p class="text-gray-400 text-xs font-poppins uppercase tracking-wider">Límite de productos</p>
+                    <p class="text-2xl font-bold font-poppins">{{ restaurantData()?.plan?.max_products || '50' }}</p>
+                </div>
+                <div class="space-y-1">
+                    <p class="text-gray-400 text-xs font-poppins uppercase tracking-wider">Próximo pago</p>
+                    <p class="text-2xl font-bold font-poppins">N/A</p>
+                </div>
+            </div>
+        </div>
+      </div>
+
+      <div class="flex justify-center">
+          <p class="text-sm text-text-muted font-poppins text-center max-w-md">
+            ⚠️ Los ajustes operativos como horarios, WhatsApp y métodos de pago ahora se gestionan de forma independiente por cada sucursal.
+          </p>
+      </div>
+    </div>
+  }
+</div>

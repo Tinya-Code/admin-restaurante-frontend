@@ -1,21 +1,14 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { LoginForm } from './login-form';
-import { AuthApiService } from '../../services/auth-api.service';
 import { LucideAngularModule } from 'lucide-angular';
 
 describe('LoginForm', () => {
   let fixture: ComponentFixture<LoginForm>;
   let component: LoginForm;
-  let authService: jasmine.SpyObj<AuthApiService>;
 
   beforeEach(async () => {
-    authService = jasmine.createSpyObj<AuthApiService>('AuthApiService', ['loginWithGoogle']);
-
     await TestBed.configureTestingModule({
       imports: [LoginForm, LucideAngularModule],
-      providers: [
-        { provide: AuthApiService, useValue: authService }
-      ]
     }).compileComponents();
 
     fixture = TestBed.createComponent(LoginForm);
@@ -27,30 +20,20 @@ describe('LoginForm', () => {
     expect(component).toBeTruthy();
   });
 
-  it('should call authService.loginWithGoogle when loginWithGoogle is called', async () => {
-    authService.loginWithGoogle.and.resolveTo();
+  it('should emit onGoogleLogin when loginWithGoogle is called', () => {
+    spyOn(component.onGoogleLogin, 'emit');
     
-    await component.loginWithGoogle();
+    component.loginWithGoogle();
 
-    expect(authService.loginWithGoogle).toHaveBeenCalled();
-    expect(component.isLoading()).toBeFalse();
+    expect(component.onGoogleLogin.emit).toHaveBeenCalled();
   });
 
-  it('should handle error in loginWithGoogle', async () => {
-    authService.loginWithGoogle.and.rejectWith(new Error('Login failed'));
-    
-    await component.loginWithGoogle();
+  it('should prevent emission when isLoading is true', () => {
+    spyOn(component.onGoogleLogin, 'emit');
+    component.isLoading = true;
 
-    expect(authService.loginWithGoogle).toHaveBeenCalled();
-    expect(component.isLoading()).toBeFalse();
-  });
+    component.loginWithGoogle();
 
-  it('should prevent concurrent login attempts', async () => {
-    component.isLoading.set(true);
-    authService.loginWithGoogle.calls.reset();
-
-    await component.loginWithGoogle();
-
-    expect(authService.loginWithGoogle).not.toHaveBeenCalled();
+    expect(component.onGoogleLogin.emit).not.toHaveBeenCalled();
   });
 });

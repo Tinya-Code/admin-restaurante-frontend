@@ -1,8 +1,10 @@
 import { RouterLink, Router } from '@angular/router';
 import { Component, signal, ChangeDetectionStrategy, inject,  } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { LucideAngularModule, LogOut, User, Settings, ChevronDown, Route as RouteIcon } from 'lucide-angular';
+import { LucideAngularModule, LogOut, User, Settings, ChevronDown, Store, RefreshCcw } from 'lucide-angular';
+import { AuthStateService } from '../../../core/services/auth-state.service';
 import { AuthService } from '../../../core/services/auth.service';
+import { TenantService } from '../../../core/services/tenant.service';
 
 import { NotificationService } from '../../../core/services/notification.service';
 interface UserProfile {
@@ -21,17 +23,20 @@ interface UserProfile {
 export class Header {
   private readonly notification = inject(NotificationService);
   private readonly router = inject(Router);
-  private readonly auth = inject(AuthService);
+  private readonly authState = inject(AuthStateService);
+  private readonly authService = inject(AuthService);
+  public readonly tenantService = inject(TenantService);
 
   // Icons
   readonly logOutIcon = LogOut;
   readonly userIcon = User;
   readonly settingsIcon = Settings;
   readonly chevronDownIcon = ChevronDown;
+  readonly refreshIcon = RefreshCcw;
 
   // State
   readonly isMenuOpen = signal(false);
-  readonly user = this.auth.user;
+  readonly user = this.authState.user;
 
   // Config
   readonly appLogo = signal<string>(
@@ -41,9 +46,9 @@ export class Header {
 
   getUserInitials(): string {
     const currentUser = this.user();
-    if (!currentUser || !currentUser.name) return '??';
+    if (!currentUser || !currentUser.displayName) return '??';
     
-    const names = currentUser.name.trim().split(/\s+/);
+    const names = currentUser.displayName.trim().split(/\s+/);
     if (names.length === 0) return '??';
     
     if (names.length === 1) {
@@ -65,8 +70,7 @@ export class Header {
     try {
       this.notification.info('Cerrando sesión...');
       this.closeMenu();
-      await this.auth.logOut();
-      await this.router.navigate(['/login']);
+      await this.authService.closeSession();
     } catch (error) {
       console.error('Logout error:', error);
       this.notification.error('Error al cerrar sesión');
@@ -80,6 +84,12 @@ export class Header {
 
   goToSettings(): void {
     this.router.navigate(['/admin/settings']);
+    this.closeMenu();
+  }
+
+  changeRestaurant(): void {
+    // Solo dirigimos al selector en vez de borrar toda la sesión (lo cual borraba auth y listados)
+    this.router.navigate(['/auth/select-restaurant']);
     this.closeMenu();
   }
 

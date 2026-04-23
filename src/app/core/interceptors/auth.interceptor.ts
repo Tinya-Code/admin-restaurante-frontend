@@ -3,7 +3,8 @@ import { inject } from '@angular/core';
 import { Router } from '@angular/router';
 import { catchError, switchMap, throwError } from 'rxjs';
 import { from } from 'rxjs';
-import { AuthApiService } from '../../features/auth/services/auth-api.service';
+import { AuthService } from '../services/auth.service';
+import { TenantService } from '../services/tenant.service';
 import { environment } from '../../../environments/environment';
 
 /**
@@ -11,8 +12,9 @@ import { environment } from '../../../environments/environment';
  * Agrega el token de Firebase a las peticiones al backend
  */
 export const authInterceptor: HttpInterceptorFn = (req, next) => {
-  const authService = inject(AuthApiService);
+  const authService = inject(AuthService);
   const router = inject(Router);
+  const tenantService = inject(TenantService);
 
   // Solo agregar token a peticiones a nuestro backend
   if (!shouldAttachToken(req.url)) {
@@ -22,17 +24,31 @@ export const authInterceptor: HttpInterceptorFn = (req, next) => {
   // Obtener token y agregarlo a la petición
   return from(authService.getIdToken()).pipe(
     switchMap(token => {
-      let authReq = req;
+      let headers = req.headers;
 
       if (token) {
-        authReq = req.clone({
-          setHeaders: {
-            Authorization: `Bearer ${token}`
-          }
-        });
+        headers = headers.set('Authorization', `Bearer ${token}`);
+      }
+
+      const activeRestaurantId = tenantService.activeRestaurantId();
+      if (activeRestaurantId) {
+        headers = headers.set('x-restaurant-id', activeRestaurantId);
+      }
+
+      const activeBranchId = tenantService.activeBranchId();
+      if (activeBranchId) {
+        headers = headers.set('x-branch-id', activeBranchId);
+      }
+
+      const authReq = req.clone({
+        headers
+      });
+
+      if (token) {
         console.log('🔐 Token agregado a:', req.url);
-      } else {
-        console.warn('⚠️ No hay token disponible para:', req.url);
+      }
+      if (activeRestaurantId) {
+        console.log('📍 Restaurant ID agregado:', activeRestaurantId);
       }
 
       return next(authReq);
@@ -64,7 +80,7 @@ function shouldAttachToken(url: string): boolean {
 function handleError(
   error: HttpErrorResponse,
   router: Router,
-  authService: AuthApiService
+  authService: AuthService
 ) {
   console.error('❌ HTTP Error:', {
     status: error.status,

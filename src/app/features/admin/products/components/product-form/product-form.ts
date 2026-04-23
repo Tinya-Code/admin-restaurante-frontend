@@ -52,7 +52,7 @@ export class ProductForm implements OnInit {
       description: ['', [Validators.maxLength(500)]],
       price: [0, [Validators.required, Validators.min(0.01)]],
       is_available: [true],
-      display_order: [0],
+      is_recommended: [false],
     });
   }
 
@@ -63,6 +63,7 @@ export class ProductForm implements OnInit {
       description: product.description || '',
       price: product.price,
       is_available: product.is_available,
+      is_recommended: product.is_recommended || false,
     });
 
     // if (product.image_url) {
@@ -137,26 +138,29 @@ export class ProductForm implements OnInit {
   }
 
   private buildSubmitData(formValue: any): ProductCreate | ProductUpdate {
-    const baseData = {
+    const baseData: any = {
       category_id: formValue.category_id,
       name: formValue.name,
       description: formValue.description || undefined,
       price: Number(formValue.price),
       is_available: formValue.is_available,
-      display_order: formValue.display_order ?? 0,
+      is_recommended: formValue.is_recommended,
     };
+
+    // Solo enviar imagen si se seleccionó un archivo nuevo (base64)
+    if (this.selectedFile()) {
+      baseData.image_base64 = this.imagePreview();
+    }
 
     if (this.isEditMode()) {
       return {
         id: this.product()!.id,
         ...baseData,
-        // image_url: this.product()!.image_url,
       } as ProductUpdate;
     }
 
     return {
       ...baseData,
-      // image_url: undefined,
     } as ProductCreate;
   }
 
@@ -179,5 +183,8 @@ export class ProductForm implements OnInit {
   }
   get isAvailable() {
     return this.productForm.get('is_available');
+  }
+  get isRecommended() {
+    return this.productForm.get('is_recommended');
   }
 }

@@ -1,24 +1,24 @@
 <!-- data-table.html -->
-<div class="relative w-full min-h-30  bg-white border border-gray-200 overflow-hidden">
+<div class="relative w-full min-h-30 bg-white border border-gray-200 rounded-xl shadow-sm">
   
   @if (loading()) {
-    <div class="absolute inset-0 bg-white/95 flex items-center justify-center z-10">
+    <div class="absolute inset-0 bg-white/95 flex items-center justify-center z-[100] rounded-xl">
       <div class="flex flex-col items-center gap-3">
-        <div class="w-8 h-8 border-2 border-gray-300 border-t-gray-900 rounded-full animate-spin"></div>
+        <div class="w-8 h-8 border-2 border-gray-300 border-t-primary rounded-full animate-spin"></div>
         <p class="text-xs tracking-wider text-gray-500 uppercase">Cargando datos...</p>
       </div>
     </div>
   }
 
-  <div class="w-full overflow-x-auto">
+  <div class="w-full overflow-x-auto md:overflow-visible">
     @if (dataSource().length === 0 && !loading()) {
       <div class="py-16 px-8 text-center">
-        <lucide-angular [img]="icons.inbox" class="w-12 h-12 mx-auto mb-4 text-gray-300 opacity-50" />
+        <lucide-icon [img]="icons.inbox" class="w-12 h-12 mx-auto mb-4 text-gray-300 opacity-50" />
         <p class="text-sm text-gray-500 tracking-wide">{{ emptyMessage() }}</p>
       </div>
     } @else {
       <table class="w-full border-collapse text-sm">
-        <thead class="hidden md:table-header-group">
+        <thead class="hidden  ">
           <tr>
             @if(imageKey()){
               <th class="w-20 px-4 py-4 border-b border-gray-200 bg-gray-50 sticky top-0 z-5">
@@ -140,49 +140,82 @@
                   }
                 </div>
 
-                <!-- Mobile Actions -->
-                <div class="flex md:hidden items-center gap-2">
+                <!-- Mobile Actions Area -->
+                <div class="flex-shrink-0 flex items-center md:hidden ml-auto self-start pt-1 gap-1">
                   @if (showToggle()) {
-                    <label class="relative inline-flex items-center cursor-pointer">
-                      <input 
-                        type="checkbox" 
-                        [checked]="isToggleActive(row)"
-                        (change)="onToggleChange(row, $event)"
-                        class="sr-only peer"
-                      />
-                      <div class="w-9 h-5 bg-gray-200 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:start-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-4 after:w-4 after:transition-all peer-checked:bg-gray-900"></div>
-                    </label>
+                    <div class="flex items-center px-2 mr-1">
+                      <label class="relative inline-flex items-center cursor-pointer">
+                        <input 
+                          type="checkbox" 
+                          [checked]="isToggleActive(row)"
+                          (change)="onToggleChange(row, $event)"
+                          class="sr-only peer"
+                        />
+                        <div class="w-8 h-4 bg-gray-200 rounded-full peer peer-checked:after:translate-x-4 peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:start-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-3 after:w-3 after:transition-all peer-checked:bg-primary"></div>
+                      </label>
+                    </div>
                   }
 
                   <div class="relative">
                     <button 
                       (click)="toggleMenu(rowIndex, $event)"
-                      class="p-1.5 rounded hover:bg-gray-200 transition-colors"
+                      class="p-2.5 rounded-full hover:bg-gray-100 active:bg-gray-200 transition-all text-gray-500"
                       type="button"
+                      aria-label="Acciones"
                     >
-                      <lucide-angular [img]="icons.moreVertical" class="w-5 h-5 text-gray-500" />
+                      <lucide-icon [img]="icons.moreVertical" class="w-5 h-5" />
                     </button>
 
                     @if (openMenuIndex() === rowIndex) {
-                      <div class="absolute right-8 w-40 bg-white border border-gray-200 rounded shadow-lg z-50 transition-all origin-top-right"
-                           [ngClass]="rowIndex >= (dataSource().length - 2) && dataSource().length > 2 ? 'bottom-full mb-1' : 'top-full mt-1'">
-                        <ul class="py-1 text-sm">
-                          @for (action of actions(); track action.label) {
-                            <li>
-                              <button
-                                type="button"
-                                (click)="onActionClick(action, row, $event)"
-                                class="w-full text-left px-4 py-2 hover:bg-gray-100 flex items-center gap-2"
-                                [class.text-red-600]="action.variant === 'danger'"
-                              >
-                                @if (action.icon) {
-                                  <lucide-angular [img]="action.icon" class="w-4 h-4" />
-                                }
-                                <span>{{ action.label }}</span>
-                              </button>
-                            </li>
-                          }
-                        </ul>
+                      <!-- MOBILE ACTION MENU (BOTTOM SHEET PATTERN) -->
+                      <div class="fixed inset-0 z-[100] md:hidden" (click)="closeMenu()">
+                        <!-- Backdrop -->
+                        <div class="absolute inset-0 bg-black/40 backdrop-blur-sm animate-fade-in"></div>
+                        
+                        <!-- Bottom Sheet -->
+                        <div 
+                          class="absolute bottom-0 left-0 right-0 bg-white rounded-t-3xl shadow-2xl p-6 animate-slide-up flex flex-col gap-4"
+                          (click)="$event.stopPropagation()"
+                        >
+                          <div class="w-12 h-1.5 bg-gray-200 rounded-full mx-auto mb-2"></div>
+                          <header class="mb-2">
+                             <h4 class="text-lg font-bold text-gray-900">{{ getCellValue(row, columns()[0]) }}</h4>
+                             <p class="text-sm text-gray-500">Opciones disponibles</p>
+                          </header>
+
+                          <ul class="flex flex-col gap-2">
+                            @for (action of actions(); track action.label) {
+                              <li>
+                                <button
+                                  type="button"
+                                  (click)="onActionClick(action, row, $event)"
+                                  class="w-full flex items-center gap-4 p-4 rounded-2xl hover:bg-gray-50 active:bg-gray-100 transition-colors group"
+                                  [class.text-danger]="action.variant === 'danger'"
+                                  [class.bg-red-50]="action.variant === 'danger'"
+                                >
+                                  <div 
+                                    class="w-10 h-10 rounded-xl flex items-center justify-center bg-gray-100 group-hover:bg-white transition-colors"
+                                    [class.bg-red-100]="action.variant === 'danger'"
+                                    [class.group-hover:bg-red-200]="action.variant === 'danger'"
+                                  >
+                                    @if (action.icon) {
+                                      <lucide-icon [img]="action.icon" class="w-5 h-5 opacity-70" />
+                                    }
+                                  </div>
+                                  <span class="text-base font-semibold">{{ action.label }}</span>
+                                </button>
+                              </li>
+                            }
+                          </ul>
+                          
+                          <button 
+                            type="button" 
+                            (click)="closeMenu()"
+                            class="mt-2 w-full p-4 text-center font-bold text-gray-500 hover:text-gray-900 transition-colors"
+                          >
+                            Cancelar
+                          </button>
+                        </div>
                       </div>
                     }
                   </div>
@@ -232,28 +265,33 @@
                 <div class="relative inline-block">
                 <button 
                   (click)="toggleMenu(rowIndex, $event)"
-                  class="p-2 rounded hover:bg-gray-100 transition-colors"
+                  class="p-2 rounded-full hover:bg-gray-100 transition-colors text-gray-500"
                   type="button"
+                  aria-label="Más opciones"
                 >
-                  <lucide-angular [img]="icons.moreVertical" class="w-5 h-5 text-gray-500" />
+                  <lucide-icon [img]="icons.moreVertical" class="w-5 h-5" />
                 </button>
 
                 @if (openMenuIndex() === rowIndex) {
-                  <div class="absolute right-6 w-48 bg-white border border-gray-200 rounded shadow-lg z-50 transition-all origin-top-right"
-                       [ngClass]="rowIndex >= (dataSource().length - 2) && dataSource().length > 2 ? 'bottom-full mb-1' : 'top-full mt-1'">
-                    <ul class="py-1 text-sm">
+                  <!-- DESKTOP ACTION MENU -->
+                  <div 
+                    class="absolute right-0 w-48 bg-white/95 backdrop-blur-sm border border-gray-200 rounded-xl shadow-2xl z-[150] overflow-hidden animate-zoom-in"
+                    [ngClass]="rowIndex >= (dataSource().length - 2) && dataSource().length > 2 ? 'bottom-full mb-2' : 'top-full mt-2'" 
+                    style="transform-origin: top right;"
+                  >
+                    <ul class="py-1.5">
                       @for (action of actions(); track action.label) {
                         <li>
                           <button
                             type="button"
                             (click)="onActionClick(action, row, $event)"
-                            class="w-full text-left px-4 py-2 hover:bg-gray-100 flex items-center gap-2 transition-colors"
-                            [class.text-red-600]="action.variant === 'danger'"
+                            class="w-full text-left px-4 py-2.5 hover:bg-gray-100 flex items-center gap-3 transition-colors group"
+                            [class.text-danger]="action.variant === 'danger'"
                           >
                             @if (action.icon) {
-                              <lucide-angular [img]="action.icon" class="w-4 h-4" />
+                              <lucide-icon [img]="action.icon" class="w-4 h-4 opacity-60 group-hover:opacity-100" />
                             }
-                            <span>{{ action.label }}</span>
+                            <span class="text-sm font-semibold">{{ action.label }}</span>
                           </button>
                         </li>
                       }
@@ -284,7 +322,7 @@
           class="hidden sm:flex items-center justify-center w-8 h-8 border border-gray-300 text-gray-900 hover:bg-gray-100 hover:border-gray-900 disabled:opacity-30 disabled:cursor-not-allowed transition-all"
           aria-label="Primera página"
         >
-          <lucide-angular [img]="icons.chevronsLeft" class="w-4 h-4" />
+          <lucide-icon [img]="icons.chevronsLeft" class="w-4 h-4" />
         </button>
 
         <button
@@ -294,7 +332,7 @@
           class="flex items-center justify-center w-8 h-8 border border-gray-300 text-gray-900 hover:bg-gray-100 hover:border-gray-900 disabled:opacity-30 disabled:cursor-not-allowed transition-all"
           aria-label="Anterior"
         >
-          <lucide-angular [img]="icons.chevronLeft" class="w-4 h-4" />
+          <lucide-icon [img]="icons.chevronLeft" class="w-4 h-4" />
         </button>
 
         <div class="hidden sm:flex items-center gap-1">
@@ -326,7 +364,7 @@
           class="flex items-center justify-center w-8 h-8 border border-gray-300 text-gray-900 hover:bg-gray-100 hover:border-gray-900 disabled:opacity-30 disabled:cursor-not-allowed transition-all"
           aria-label="Siguiente"
         >
-          <lucide-angular [img]="icons.chevronRight" class="w-4 h-4" />
+          <lucide-icon [img]="icons.chevronRight" class="w-4 h-4" />
         </button>
 
         <button
@@ -336,7 +374,7 @@
           class="hidden sm:flex items-center justify-center w-8 h-8 border border-gray-300 text-gray-900 hover:bg-gray-100 hover:border-gray-900 disabled:opacity-30 disabled:cursor-not-allowed transition-all"
           aria-label="Última página"
         >
-          <lucide-angular [img]="icons.chevronsRight" class="w-4 h-4" />
+          <lucide-icon [img]="icons.chevronsRight" class="w-4 h-4" />
         </button>
       </div>
     </div>
@@ -345,5 +383,6 @@
 </div>
 
 @if (openMenuIndex() !== null) {
-  <div class="fixed inset-0 z-10" (click)="closeMenu()"></div>
+  <!-- General Backdrop for escaping any remaining layout constraints -->
+  <div class="fixed inset-0 z-[140] hidden md:block" (click)="closeMenu()"></div>
 }

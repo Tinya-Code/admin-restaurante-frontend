@@ -1,0 +1,177 @@
+<div class="min-h-screen bg-background p-4 sm:p-6 animate-in fade-in duration-500">
+  <!-- Header -->
+  <header class="mb-8">
+    <h1 class="text-3xl font-bold text-text-primary font-poppins tracking-tight">Ajustes de Sucursal</h1>
+    <p class="text-text-secondary font-poppins mt-1">Configura la identidad y operación de esta sucursal.</p>
+  </header>
+
+  <!-- Loading State -->
+  @if (loading()) {
+    <div class="flex flex-col items-center justify-center py-24">
+      <div class="h-12 w-12 animate-spin rounded-full border-4 border-border border-t-primary"></div>
+      <p class="mt-4 text-text-secondary font-poppins animate-pulse">Cargando datos de la sucursal...</p>
+    </div>
+  }
+
+  @if (!loading()) {
+    <div class="space-y-8 max-w-5xl">
+      <!-- Tabs Navigation -->
+      <nav class="flex gap-1 p-1 bg-gray-100 rounded-xl w-fit overflow-x-auto no-scrollbar">
+        @for (tab of tabs; track tab.id) {
+          <button
+            type="button"
+            (click)="switchTab(tab.id)"
+            class="flex items-center gap-2 px-6 py-2.5 rounded-lg text-sm font-medium transition-all duration-300 whitespace-nowrap"
+            [class.bg-white]="activeTab() === tab.id"
+            [class.text-primary]="activeTab() === tab.id"
+            [class.shadow-sm]="activeTab() === tab.id"
+            [class.text-text-secondary]="activeTab() !== tab.id"
+            [class.hover:bg-gray-200/50]="activeTab() !== tab.id"
+          >
+            <lucide-icon [img]="tab.icon" class="h-4.5 w-4.5"></lucide-icon>
+            <span class="font-poppins">{{ tab.label }}</span>
+          </button>
+        }
+      </nav>
+
+      <!-- Content Area -->
+      <div class="bg-surface rounded-2xl shadow-sm border border-border overflow-hidden transition-all duration-500 min-h-[500px]">
+        
+        <!-- General Section -->
+        <div class="p-8 animate-in fade-in duration-500" [class.hidden]="activeTab() !== 'general'">
+          <div class="mb-10 border-b border-border pb-6 flex justify-between items-center">
+            <div>
+              <h2 class="text-2xl font-bold text-text-primary font-poppins flex items-center gap-2">
+                <lucide-icon [img]="SettingsIcon" class="h-6 w-6 text-primary"></lucide-icon>
+                Ajustes Generales
+              </h2>
+              <p class="text-text-secondary text-sm mt-1 font-poppins">Configura la identidad y canales de contacto de esta sucursal.</p>
+            </div>
+          </div>
+
+          <div class="space-y-16">
+            <!-- Identity Section (Logo & Description) -->
+            <section class="grid md:grid-cols-2 gap-8">
+                <form [formGroup]="branchForm" class="space-y-6">
+                    <div>
+                        <div class="flex items-center gap-3 mb-4">
+                            <div class="h-8 w-1 bg-primary rounded-full"></div>
+                            <h3 class="font-bold text-lg font-poppins text-text-primary">Descripción</h3>
+                        </div>
+                        <textarea 
+                            formControlName="description"
+                            rows="3"
+                            placeholder="Define una descripción única para esta sucursal..."
+                            class="w-full px-5 py-4 bg-gray-50 border border-border rounded-2xl focus:ring-4 focus:ring-primary/10 focus:border-primary outline-none font-poppins resize-none transition-all placeholder:text-text-muted"
+                        ></textarea>
+                    </div>
+
+                    <div>
+                      <div class="flex items-center gap-3 mb-4">
+                          <div class="h-8 w-1 bg-primary rounded-full"></div>
+                          <h3 class="font-bold text-lg font-poppins text-text-primary">URL del Logo</h3>
+                      </div>
+                      <input 
+                          type="text"
+                          formControlName="logo_url"
+                          placeholder="https://ejemplo.com/logo.png"
+                          class="w-full px-5 py-3 bg-gray-50 border border-border rounded-xl focus:ring-4 focus:ring-primary/10 focus:border-primary outline-none font-poppins transition-all"
+                      />
+                    </div>
+                </form>
+                
+                <div class="flex flex-col items-center justify-center p-6 bg-gray-50 rounded-2xl border border-dashed border-border">
+                  @if (branchForm.get('logo_url')?.value) {
+                    <img [src]="branchForm.get('logo_url')?.value" alt="Preview" class="max-h-40 object-contain rounded-lg shadow-md mb-4">
+                  } @else {
+                    <div class="h-32 w-32 bg-gray-200 rounded-full flex items-center justify-center mb-4">
+                      <lucide-icon [img]="ImageIcon" class="h-12 w-12 text-gray-400"></lucide-icon>
+                    </div>
+                  }
+                  <p class="text-xs text-text-muted font-poppins">Vista previa del logo</p>
+                </div>
+            </section>
+
+            <!-- WhatsApp Configuration -->
+            <section>
+              <div class="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 mb-6">
+                <div>
+                    <h3 class="font-bold text-lg font-poppins text-text-primary">Configuración de WhatsApp</h3>
+                    <p class="text-xs text-text-secondary font-poppins mt-1">Define el número y mensaje para pedidos directos.</p>
+                </div>
+              </div>
+
+              <div class="rounded-2xl border border-border overflow-hidden bg-gray-50/30">
+                <app-whatsapp-config
+                  [config]="currentSettings()?.whatsapp_config!"
+                  (configChange)="onConfigChange('whatsapp_config', $event)"
+                ></app-whatsapp-config>
+              </div>
+            </section>
+
+            <!-- Order Configuration -->
+            <section>
+              <div class="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 mb-6">
+                <div>
+                    <h3 class="font-bold text-lg font-poppins text-text-primary">Configuración de Órdenes</h3>
+                    <p class="text-xs text-text-secondary font-poppins mt-1">Control de pedidos, delivery y pagos locales.</p>
+                </div>
+              </div>
+
+              <div class="rounded-2xl border border-border overflow-hidden bg-gray-50/30">
+                  <app-order-config
+                    [config]="currentSettings()?.order_config!"
+                    (configChange)="onConfigChange('order_config', $event)"
+                  ></app-order-config>
+              </div>
+            </section>
+          </div>
+        </div>
+
+        <!-- Schedule Section -->
+        <div class="p-8 animate-in fade-in duration-500" [class.hidden]="activeTab() !== 'schedule'">
+          <div class="mb-10 border-b border-border pb-6">
+            <h2 class="text-2xl font-bold text-text-primary font-poppins flex items-center gap-2">
+              <lucide-icon [img]="ClockIcon" class="h-6 w-6 text-primary"></lucide-icon>
+              Horario de Sucursal
+            </h2>
+            <p class="text-text-secondary text-sm mt-1 font-poppins">Este horario define cuándo los clientes pueden realizar pedidos en esta sede.</p>
+          </div>
+
+          <div class="rounded-2xl border border-border overflow-hidden bg-gray-50/30">
+              <app-business-config
+                [config]="currentSettings()?.business_config!"
+                (configChange)="onConfigChange('business_config', $event)"
+              ></app-business-config>
+          </div>
+        </div>
+
+        <!-- Banners Section -->
+        <div class="p-8 animate-in fade-in duration-500" [class.hidden]="activeTab() !== 'banners'">
+          <div class="mb-10 border-b border-border pb-6">
+            <h2 class="text-2xl font-bold text-text-primary font-poppins flex items-center gap-2">
+              <lucide-icon [img]="ImageIcon" class="h-6 w-6 text-primary"></lucide-icon>
+              Banners Promocionales
+            </h2>
+            <p class="text-text-secondary text-sm mt-1 font-poppins">Imágenes destacadas que se muestran en el inicio de esta sucursal.</p>
+          </div>
+
+          <div class="rounded-2xl border border-border bg-gray-50/30 p-4">
+              <app-banner-config></app-banner-config>
+          </div>
+        </div>
+
+      </div>
+
+      <!-- Actions Bar -->
+      <app-settings-actions
+        [hasChanges]="hasChanges()"
+        [isValid]="true"
+        [isSaving]="saving()"
+        (save)="saveSettings()"
+        (cancel)="cancelChanges()"
+      ></app-settings-actions>
+
+    </div>
+  }
+</div>

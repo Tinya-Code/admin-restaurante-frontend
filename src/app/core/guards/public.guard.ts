@@ -5,7 +5,8 @@ import {
   ActivatedRouteSnapshot, 
   RouterStateSnapshot 
 } from '@angular/router';
-import { AuthApiService } from '../../features/auth/services/auth-api.service';
+import { AuthStateService } from '../services/auth-state.service';
+import { TenantService } from '../services/tenant.service';
 import { filter, map, take } from 'rxjs/operators';
 
 /**
@@ -16,16 +17,21 @@ export const publicGuard: CanActivateFn = (
   route: ActivatedRouteSnapshot,
   state: RouterStateSnapshot
 ) => {
-  const authService = inject(AuthApiService);
+  const authState = inject(AuthStateService);
   const router = inject(Router);
+  const tenantService = inject(TenantService);
 
-  return authService.authState$.pipe(
+  return authState.state$.pipe(
     filter(authState => !authState.isLoading),
     take(1),
     map(authState => {
       if (authState.isAuthenticated) {
-        console.log('✅ Ya autenticado - redirigiendo a home');
-        router.navigate(['/admin/home']);
+        console.log('✅ Ya autenticado - redirigiendo desde public');
+        if (tenantService.activeRestaurantId()) {
+          router.navigate(['/admin/home']);
+        } else {
+          router.navigate(['/auth/select-restaurant']);
+        }
         return false;
       }
 

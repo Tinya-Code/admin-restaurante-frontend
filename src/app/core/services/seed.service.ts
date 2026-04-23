@@ -57,7 +57,7 @@ export class SeedService {
           description: prod.description,
           price: prod.price,
           is_available: prod.is_available,
-          display_order: 0 // Default
+          is_recommended: false
         };
 
         await lastValueFrom(this.productService.createProduct(payload));

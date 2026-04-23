@@ -1,14 +1,17 @@
-<div class="max-w-6xl mx-auto pt-6 p-4 md:p-8" style="font-family: var(--font-poppins)">
-  <!-- Stats Cards -->
-  <section class="mb-12" aria-label="Estadísticas generales">
-    <h2 class="text-xl font-semibold text-gray-900 mb-6">Resumen</h2>
+<div class="max-w-6xl mx-auto p-4 pt-6" style="font-family: var(--font-poppins)">
 
-    <div class="grid grid-cols-1 grid-cols-2 gap-3 md:gap-6 mb-8">
+  <!-- ── Section: KPI Cards ─────────────────────────────────────────── -->
+  <section class="mb-10 @container " aria-label="Estadísticas generales">
+    <h2 class="text-lg font-semibold text-gray-700 mb-4 tracking-tight">Resumen de la sucursal</h2>
+
+    <div class="grid grid-cols-2 md:grid-cols-4   @max-md:grid-cols-2  gap-3 md:gap-4">
+
       <app-stats-card
         [title]="'Productos'"
         [value]="totalProducts()"
         [icon]="HandPlatterIcon"
         [variant]="'primary'"
+        [loading]="loading()"
       />
 
       <app-stats-card
@@ -16,48 +19,98 @@
         [value]="totalCategories()"
         [icon]="BoxIcon"
         [variant]="'secondary'"
+        [loading]="loading()"
       />
+
+      <app-stats-card
+        [title]="'Combos'"
+        [value]="totalCombos()"
+        [icon]="UtensilsIcon"
+        [variant]="'accent'"
+        [loading]="loading()"
+      />
+
+      <app-stats-card
+        [title]="'Visitas totales'"
+        [value]="visitsOverview()?.total_visits ?? 0"
+        [icon]="ChartIcon"
+        [variant]="'success'"
+        [loading]="loading()"
+      />
+
     </div>
   </section>
 
-  <!-- Action Buttons -->
-  <section class="mb-12" aria-label="Acciones rápidas">
-    <h2 class="text-xl font-semibold text-gray-900 mb-6">Acciones Rápidas</h2>
-    <div class="grid grid-cols-1 md:grid-cols-3 gap-4 w-full justify-center">
+
+  <!-- ── Section: Visits breakdown ─────────────────────────────────── -->
+  @if (visitsOverview()!.breakdown!.length > 0) {
+    <section class="mb-10" aria-label="Desglose de visitas">
+      <h2 class="text-lg font-semibold text-gray-700 mb-4 tracking-tight">Desglose de visitas</h2>
+
+      <div class="grid grid-cols-2 md:grid-cols-4 gap-3 md:gap-4">
+        @for (item of visitsOverview()!.breakdown; track item.type) {
+          <app-stats-card
+            [title]="visitLabel(item.type)"
+            [value]="item.count"
+            [variant]="visitVariant(item.type)"
+            [trend]="visitPercent(item.count) + '% del total'"
+          />
+        }
+      </div>
+    </section>
+  }
+
+  <!-- ── Section: Acciones rápidas ─────────────────────────────────── -->
+  <section class="mb-10" aria-label="Acciones rápidas">
+    <h2 class="text-lg font-semibold text-gray-700 mb-4 tracking-tight">Acciones Rápidas</h2>
+
+    <div class="grid grid-cols-2 md:grid-cols-3 justify-items-stretch  gap-3">
+
       <button
-        class="flex items-center md:gap-3 gap-2 md:px-6 px-4 py-3 rounded-full font-medium text-sm border border-gray-300 cursor-pointer transition-all duration-200 text-gray-900 border-gray-300 hover:bg-gray-50 hover:border-gray-400 focus:outline-2 focus:outline-blue-500 focus:outline-offset-2 justify-center"
+        id="btn-copy-qr"
         (click)="copyQRCode()"
-        aria-label="Copiar código QR del menú"
+        aria-label="Generar código QR del menú"
+        class="inline-flex justify-center items-center gap-2 px-5 py-2.5 rounded-full text-sm font-medium
+               border border-gray-200 bg-white text-gray-700
+               hover:border-gray-300 hover:bg-gray-50
+               transition-all  duration-150 focus:outline-none focus:ring-2 focus:ring-cyan-400 focus:ring-offset-2"
       >
-        <lucide-icon [img]="QrCodeIcon" class="w-5 h-5 flex-shrink-0" />
-        <span class="whitespace-nowrap">Generar QR</span>
+        <lucide-icon [img]="QrCodeIcon" class="w-4 h-4" />
+        Generar QR
       </button>
 
       <button
-        class="flex items-center md:gap-3 gap-2 md:px-6 px-4 py-3 rounded-full font-medium text-sm border-2 border-transparent cursor-pointer transition-all duration-200 font-inherit bg-blue-500 text-white border-blue-500 hover:bg-blue-600 hover:border-blue-600 focus:outline-2 focus:outline-blue-500 focus:outline-offset-2 justify-center"
+        id="btn-share-link"
         (click)="shareMenuLink()"
         aria-label="Compartir link del menú"
+        class="inline-flex justify-center items-center gap-2 px-5 py-2.5 rounded-full text-sm font-medium
+               bg-cyan-500 text-white border border-cyan-500
+               hover:bg-cyan-600 hover:border-cyan-600
+               transition-all duration-150 focus:outline-none focus:ring-2 focus:ring-cyan-400 focus:ring-offset-2 shadow-sm hover:shadow-cyan-200 hover:shadow-md"
       >
-        <lucide-icon [img]="Share2Icon" class="w-5 h-5 flex-shrink-0" />
-        <span class="whitespace-nowrap">Compartir link</span>
+        <lucide-icon [img]="Share2Icon" class="w-4 h-4" />
+        Compartir link
       </button>
 
       <app-initial-data-button />
+
     </div>
   </section>
 
-  <!-- Recent Products -->
+  <!-- ── Section: Productos recientes ──────────────────────────────── -->
   <section class="mb-8" aria-label="Productos recientes">
-    <h2 class="text-xl font-semibold text-gray-900 mb-6">Productos Recientes</h2>
+    <h2 class="text-lg font-semibold text-gray-700 mb-4 tracking-tight">Productos Recientes</h2>
 
     <app-data-table
       [dataSource]="recentProducts()"
       [meta]="paginationMeta()"
       [columns]="columns"
       [actions]="tableActions"
+      [loading]="loading()"
       [emptyMessage]="'No hay productos recientes'"
       [mobileMaxFields]="3"
       (pageChange)="onPageChange($event)"
     />
   </section>
+
 </div>

@@ -1,0 +1,6 @@
+<app-restaurant-selector-list 
+  [memberships]="memberships()" 
+  [isLoading]="isLoading()"
+  (onSelect)="select($event)"
+  (onLogout)="logout()">
+</app-restaurant-selector-list>

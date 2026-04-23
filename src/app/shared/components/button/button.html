@@ -1,8 +1,8 @@
 <button 
-  class="p-4 md:py-2.5 md:px-4 text-white fixed bottom-35 md:static active:scale-95 duration-300 right-5 rounded-full md:rounded-sm z-50"
+  class="p-4 md:py-2.5 md:px-4 duration-300 transition text-white fixed bottom-35 md:static active:scale-95  right-5 rounded-full md:rounded-sm z-50"
   [ngClass]="{
-    'bg-azul': name() === '',
-    'flex gap-4 bg-azul': name() !== ''
+    'bg-primary': name() === '',
+    'flex gap-4 bg-primary': name() !== ''
   }"
   [routerLink]="[link()]" 
 >

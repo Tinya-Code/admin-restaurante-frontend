@@ -18,11 +18,8 @@ export interface ApiError {
 }
 
 export interface ApiResponse<T> {
-  success?: boolean;
-  status: 'success' | 'error'; // estado de la respuesta
-  code: string; // código HTTP
-  message: string; // mensaje descriptivo
-  data?: T; // datos (solo si success)
-  meta?: PaginationMeta; // metadatos de paginación
-  error?: ApiError; // información de error (solo si error)
+  success: boolean;
+  message: string;
+  data: T;
+  meta?: PaginationMeta;
 }

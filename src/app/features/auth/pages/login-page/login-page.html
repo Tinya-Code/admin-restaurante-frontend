@@ -1,5 +1,8 @@
 <main class="h-screen w-full grid place-items-center overflow-auto bg-[#fcfaf8]">
   <!-- Componente del formulario de login -->
- <app-login-form></app-login-form>
+  <app-login-form 
+    [isLoading]="isLoading()" 
+    (onGoogleLogin)="loginWithGoogle()">
+  </app-login-form>
  
 </main>

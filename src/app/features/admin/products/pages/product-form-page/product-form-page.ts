@@ -61,7 +61,7 @@ ngOnInit(): void {
           next: (res) => {
             this.notification.success('Producto actualizado correctamente');
             this.isSubmitting.set(false);
-            this.router.navigate(['/admin/products']);
+            this.router.navigate(['/admin/menu/products']);
           },
           error: (err) => {
             this.notification.error('Error al actualizar producto');
@@ -74,7 +74,7 @@ ngOnInit(): void {
         next: (res) => {
           this.notification.success('Producto creado correctamente');
           this.isSubmitting.set(false);
-          this.router.navigate(['/admin/products']);
+          this.router.navigate(['/admin/menu/products']);
         },
         error: (err) => {
           this.notification.error('Error al crear producto');

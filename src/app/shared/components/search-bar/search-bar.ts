@@ -7,8 +7,7 @@ import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 @Component({
   selector: 'app-search-bar',
   imports: [LucideAngularModule, ReactiveFormsModule],
-  templateUrl: './search-bar.html',
-  styleUrl: './search-bar.css',
+  templateUrl: './search-bar.html'
 })
 export class SearchBar {
   // Icons

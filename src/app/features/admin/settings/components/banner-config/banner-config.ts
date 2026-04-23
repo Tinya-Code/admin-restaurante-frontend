@@ -2,7 +2,7 @@ import { CommonModule } from '@angular/common';
 import { Component, inject, OnInit, output, signal } from '@angular/core';
 import { LucideAngularModule, Image, Trash2, Plus, GripVertical, Power, AlertCircle } from 'lucide-angular';
 import { BannerService } from '../../services/banner.service';
-import { Banner } from '../../../../../core/models/settings.models';
+import { Banner } from '../../../../../core/models/banner.model';
 import { NotificationService } from '../../../../../core/services/notification.service';
 
 @Component({
@@ -11,7 +11,7 @@ import { NotificationService } from '../../../../../core/services/notification.s
   imports: [CommonModule, LucideAngularModule],
   templateUrl: './banner-config.html',
 })
-export class BannerConfig implements OnInit {
+export class BannerConfigComponent implements OnInit {
   private bannerService = inject(BannerService);
   private notificationService = inject(NotificationService);
 
@@ -62,8 +62,8 @@ export class BannerConfig implements OnInit {
         return;
       }
 
-      if (file.size > 2 * 1024 * 1024) { 
-        this.notificationService.error('La imagen no debe exceder los 2MB');
+      if (file.size > 5 * 1024 * 1024) { 
+        this.notificationService.error('La imagen no debe exceder los 5MB');
         return;
       }
 

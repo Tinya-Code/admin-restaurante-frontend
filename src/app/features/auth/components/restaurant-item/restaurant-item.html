@@ -1,0 +1,36 @@
+<button 
+  type="button"
+  class="w-full text-left flex items-center p-4 rounded-xl border border-border transition-all duration-300 hover:border-primary hover:bg-primary-light/20 cursor-pointer select-none active:scale-[0.98] group" 
+  (click)="select()"
+  [attr.aria-label]="'Seleccionar ' + item().restaurantName">
+  
+  @if (item().logo) {
+    <img [src]="item().logo" [alt]="'Logo de ' + item().restaurantName" class="w-12 h-12 rounded-lg object-cover mr-4 shrink-0 shadow-sm border border-border">
+  } @else {
+    <div class="w-12 h-12 rounded-lg bg-primary-light flex items-center justify-center text-primary font-bold text-xl mr-4 shrink-0 shadow-sm">
+      {{ item().restaurantName.charAt(0).toUpperCase() }}
+    </div>
+  }
+  
+  <div class="flex-1">
+    <h3 class="font-poppins font-semibold text-text-primary group-hover:text-primary transition-colors flex items-center gap-1.5">
+      {{ item().restaurantName }}
+      <lucide-icon [img]="storeIcon" class="w-3.5 h-3.5 text-text-muted group-hover:text-primary transition-colors" />
+    </h3>
+    <p class="text-sm text-text-secondary font-poppins flex items-center gap-1 mt-0.5">
+      <lucide-icon [img]="mapPinIcon" class="w-3 h-3 opacity-70" />
+      {{ item().branchName || item().restaurantSlug }}
+    </p>
+  </div>
+
+  <span class="px-2 py-1 rounded-md text-xs font-poppins font-medium uppercase tracking-wider shadow-sm ml-2" 
+    [class.bg-accent-light]="item().role === 'admin'" [class.text-accent-hover]="item().role === 'admin'" 
+    [class.bg-primary-light]="item().role === 'owner'" [class.text-primary-hover]="item().role === 'owner'"
+    [class.bg-gray-100]="item().role === 'staff'" [class.text-text-secondary]="item().role === 'staff'">
+    {{ item().role }}
+  </span>
+
+  <div class="ml-4 opacity-0 group-hover:opacity-100 transition-opacity transform -translate-x-2 group-hover:translate-x-0 group-hover:delay-100 duration-300">
+    <lucide-icon [img]="chevronRightIcon" class="w-5 h-5 text-primary" />
+  </div>
+</button>

@@ -1,80 +1,129 @@
-import { CommonModule, Location } from '@angular/common';
+import { CommonModule } from '@angular/common';
 import { Component, computed, inject, input, output, signal } from '@angular/core';
-import { Router } from '@angular/router';
+import { Router, RouterModule, RouterLinkActive } from '@angular/router';
 import {
   ChevronLeft,
   ChevronRight,
   Grid3x3,
   Home,
-  LucideAngularModule,
   Settings,
   UtensilsCrossed,
+  LucideAngularModule,
+  Building,
+  ChevronDown,
 } from 'lucide-angular';
 
 export interface NavItem {
   id: string;
   label: string;
   icon: any;
-  route: string;
+  route?: string;
+  children?: NavItem[];
 }
 
 @Component({
   selector: 'app-sidebar',
-  imports: [CommonModule, LucideAngularModule],
+  standalone: true,
+  imports: [CommonModule, RouterModule, LucideAngularModule, RouterLinkActive],
   templateUrl: './sidebar.html',
-  styleUrl: './sidebar.css',
-  host: {
-    '[class.mobile]': 'isMobile()',
-    '[class.desktop]': '!isMobile()',
-  },
 })
 export class Sidebar {
   private readonly router = inject(Router);
-  private readonly location = inject(Location);
 
-  readonly activeItem = signal<string>('');
-  readonly isCollapsed = signal<boolean>(false);
+  readonly activeIndex = signal<number>(0);
+  readonly isCollapsed = signal(false);
+  readonly isMobile = input<boolean>(false);
+  readonly navigationClick = output<string>();
 
-  // Icon references for template
   readonly ChevronLeftIcon = ChevronLeft;
   readonly ChevronRightIcon = ChevronRight;
+  readonly ChevronDownIcon = ChevronDown;
+  readonly UtensilsCrossed = UtensilsCrossed;
 
   readonly navItems = signal<NavItem[]>([
     { id: 'inicio', label: 'Inicio', icon: Home, route: '/admin/home' },
-    { id: 'carta', label: 'Carta', icon: UtensilsCrossed, route: '/admin/products' },
-    { id: 'categoria', label: 'Categoría', icon: Grid3x3, route: '/admin/categories' },
-    { id: 'configuracion', label: 'Configuración', icon: Settings, route: '/admin/settings' },
+    {
+      id: 'menu',
+      label: 'Menú Digital',
+      icon: UtensilsCrossed,
+      children: [
+        { id: 'productos', label: 'Productos', icon: UtensilsCrossed, route: '/admin/menu/products' },
+        { id: 'categorias', label: 'Categorías', icon: Grid3x3, route: '/admin/menu/categories' },
+      ]
+    },
+    {
+      id: 'configuracion',
+      label: 'Configuración',
+      icon: Settings,
+      children: [
+        { id: 'business-profile', label: 'Perfil del Negocio', icon: Building, route: '/admin/settings/business-profile' },
+        { id: 'operational', label: 'Ajustes de Sucursal', icon: Settings, route: '/admin/settings/operational' },
+      ]
+    },
   ]);
 
-  readonly isMobile = input<boolean>(true);
+  readonly expandedItems = signal<Set<string>>(new Set());
+  readonly mobileSubmenuOpen = signal<string | null>(null);
 
-  readonly navigationClick = output<string>();
+  // ✅ Nuevo método reactivo con signals
+  readonly currentUrl = computed(() => this.router.url);
 
   readonly activeItemData = computed(() => {
-    const currentPath = this.location.path();
-    const activeNav = this.navItems().find(
-      (item) => currentPath.includes(item.route) || item.route.includes(currentPath)
-    );
-    return activeNav || this.navItems()[0]; // Fallback to first item
+    const path = this.currentUrl();
+    return this.navItems().find((item) => item.route && path.startsWith(item.route)) ?? this.navItems()[0];
   });
 
   toggleCollapse(): void {
-    this.isCollapsed.set(!this.isCollapsed());
+    this.isCollapsed.update((v) => !v);
   }
 
-  onItemClick(itemId: string): void {
-    const navItem = this.navItems().find((item) => item.id === itemId);
-    if (navItem) {
-      this.router.navigate([navItem.route]);
+  onItemClick(item: NavItem): void {
+    if (item.children) {
+      if (this.isMobile()) {
+        this.toggleMobileSubmenu(item.id);
+      } else {
+        this.toggleSubmenu(item.id);
+      }
+      return;
     }
-    this.navigationClick.emit(itemId);
+
+    if (item.route) {
+      this.router.navigateByUrl(item.route);
+      this.navigationClick.emit(item.id);
+      this.closeAllSubmenus();
+    }
   }
 
-  isActive(itemId: string): boolean {
-    const currentPath = this.location.path();
-    const navItem = this.navItems().find((item) => item.id === itemId);
-    if (!navItem) return false;
-
-    return currentPath.includes(navItem.route) || navItem.route.includes(currentPath);
+  toggleSubmenu(id: string): void {
+    const expanded = new Set(this.expandedItems());
+    if (expanded.has(id)) {
+      expanded.delete(id);
+    } else {
+      expanded.add(id);
+    }
+    this.expandedItems.set(expanded);
   }
+
+  toggleMobileSubmenu(id: string): void {
+    this.mobileSubmenuOpen.update(current => current === id ? null : id);
+  }
+
+  closeAllSubmenus(): void {
+    this.mobileSubmenuOpen.set(null);
+  }
+
+  isSubmenuExpanded(id: string): boolean {
+    return this.expandedItems().has(id);
+  }
+
+  isParentActive(item: NavItem): boolean {
+    if (!item.children) return false;
+    return item.children.some(child => this.currentUrl().startsWith(child.route!));
+  }
+  setActiveIndex(index: number): void {
+    this.activeIndex.set(index);
+  }
+
+
+
 }

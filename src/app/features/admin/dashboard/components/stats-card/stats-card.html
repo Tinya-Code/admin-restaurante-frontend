@@ -1,14 +1,33 @@
-<div
+<article
   role="article"
-  aria-labelledby="stats-title"
-  class="border border-gray-200 rounded-lg p-4 md:p-6 shadow flex gap-2 md:gap-6 items-center"
->
-  @if (icon()) {
-  <lucide-icon [img]="icon()" class="text-blue-400 h-12 w-12 md:h-14 md:w-14" />
-  }
+  [attr.aria-label]="title()"
+  
+  class="relative flex flex-col gap-3  rounded-sm   p-4 
+          transition-shadow duration-200 overflow-hidden"
+[ngClass]="accentBarClass()"
+         >
+  <!-- Accent bar top -->
+  <div class="absolute top-0 left-0 right-0 h-0.5 rounded-t-2xl" [ngClass]="accentBarClass()"></div>
 
-  <div>
-    <h3 class="text-3xl font-bold md:text-3xl">{{ value() }}</h3>
-    <p id="stats-title">{{ title() }}</p>
+  <!-- Icon + title row -->
+  <div class="flex items-center justify-between ">
+  <!-- Value -->
+  @if (loading()) {
+   <p class="text-4xl font-bold text-gray-100  leading-none ">0</p>
+  } @else {
+    <p class="text-4xl font-bold text-gray-100  leading-none">{{ value() }}</p>
+  }
+    @if (icon()) {
+  <lucide-icon [img]="icon()" class="w-8 h-8  text-white" />
+
+    }
   </div>
-</div>
+    <span class="text-xs font-semibold uppercase tracking-widest text-gray-100">{{ title() }}</span>
+    
+
+
+  <!-- Trend -->
+  @if (trend()) {
+    <p class="text-xs font-medium" [ngClass]="trendClass()">{{ trend() }}</p>
+  }
+</article>

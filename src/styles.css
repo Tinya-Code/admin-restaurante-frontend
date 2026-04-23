@@ -41,42 +41,134 @@
 }
 
 @theme {
+  /* Tipografías */
   --font-tan: 'TAN Nimbus', sans-serif;
   --font-satisfy: 'Satisfy', sans-serif;
   --font-poppins: 'Poppins', sans-serif;
-  --color-rojo-primario: #96100f;
-  --color-gris-oscuro: #151316;
-  --color-azul: #2d82ff;
-  --color-azul-hover: #2569cc;
 
-  --color-primary: #2563eb;
-  --color-primary-hover: #1d4ed8;
-  --color-primary-light: #dbeafe;
+  /* Paleta principal */
+  --color-primary: #00c3d0; /* Turquesa principal */
+  --color-primary-hover: #0099a8; /* Turquesa más oscuro para hover */
+  --color-primary-light: #b3edf1; /* Turquesa claro para fondos suaves */
 
-  --color-accent: #f97316;
-  --color-accent-hover: #ea580c;
-  --color-accent-light: #fed7aa;
+  --color-secondary: #0088ff; /* Azul secundario */
+  --color-secondary-hover: #006fd1; /* Azul más intenso para hover */
+  --color-secondary-light: #cce4ff; /* Azul claro para fondos suaves */
 
-  --color-text-primary: #1f2937;
+  /* Acentos */
+  --color-accent: #f97316; /* Naranja acento */
+  --color-accent-hover: #ea580c; /* Naranja hover */
+  --color-accent-light: #fed7aa; /* Naranja claro */
+
+  /* Estados semánticos */
+  --color-danger: #96100f; /* Rojo para errores */
+  --color-success: #10b981; /* Verde éxito (más coherente que teal puro) */
+  --color-warning: #facc15; /* Amarillo advertencia */
+
+  /* Texto */
+  --color-text-primary: #151316; /* Gris muy oscuro */
+  --color-text-secondary: #4b5563; /* Gris medio */
+  --color-text-muted: #9ca3af; /* Gris claro */
+
+  /* Superficies */
+  --color-background: #f9fafb; /* Fondo general */
+  --color-surface: #ffffff; /* Superficie blanca */
+  --color-border: #e5e7eb; /* Bordes */
+}
+@theme {
+  /* Tipografías */
+  --font-tan: 'TAN Nimbus', sans-serif;
+  --font-satisfy: 'Satisfy', sans-serif;
+  --font-poppins: 'Poppins', sans-serif;
+
+  /* Color central */
+  --color-primary: #00c3d0; /* Turquesa */
+  --color-primary-hover: #0099a8;
+  --color-primary-light: #b3edf1;
+  --color-secondary: #1d1d27;
+
+  /* Neutros */
+  --color-text-primary: #151316;
   --color-text-secondary: #4b5563;
   --color-text-muted: #9ca3af;
+  --color-accent: #f5a623;
 
   --color-background: #f9fafb;
-  --color-border: #e5e7eb;
   --color-surface: #ffffff;
+  --color-border: #e5e7eb;
+
+  /* Animaciones suaves para modales y menús */
+  --animate-fade-in: fade-in 0.3s ease-out;
+  --animate-fade-out: fade-out 0.2s ease-in;
+  --animate-slide-up: slide-up 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+  --animate-zoom-in: zoom-in 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+
+  @keyframes fade-in {
+    from {
+      opacity: 0;
+    }
+    to {
+      opacity: 1;
+    }
+  }
+  @keyframes fade-out {
+    from {
+      opacity: 1;
+    }
+    to {
+      opacity: 0;
+    }
+  }
+  @keyframes slide-up {
+    from {
+      transform: translateY(100%);
+      opacity: 0;
+    }
+    to {
+      transform: translateY(0);
+      opacity: 1;
+    }
+  }
+  @keyframes zoom-in {
+    from {
+      opacity: 0;
+      transform: scale(0.95) translateY(-5px);
+    }
+    to {
+      opacity: 1;
+      transform: scale(1) translateY(0);
+    }
+  }
+  @keyframes pulse-soft {
+    0% { opacity: 0.6; }
+    50% { opacity: 1; }
+    100% { opacity: 0.6; }
+  }
+}
+
+.no-scrollbar::-webkit-scrollbar {
+  display: none;
+}
+.no-scrollbar {
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+}
+
+.animate-pulse-soft {
+  animation: pulse-soft 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
 }
 
 /* Global resets for specific input types */
-input[type="time"]::-webkit-calendar-picker-indicator {
+input[type='time']::-webkit-calendar-picker-indicator {
   display: none;
 }
 
-input[type="number"]::-webkit-outer-spin-button,
-input[type="number"]::-webkit-inner-spin-button {
+input[type='number']::-webkit-outer-spin-button,
+input[type='number']::-webkit-inner-spin-button {
   -webkit-appearance: none;
   margin: 0;
 }
 
-input[type="number"] {
+input[type='number'] {
   -moz-appearance: textfield;
 }

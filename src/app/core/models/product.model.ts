@@ -1,25 +1,32 @@
 export interface Product {
-  id: string;             
+  id: string;
+  category_id: string;
   category_name?: string;
-  category_id?:string;    
   name: string;
-  description?: string;     
+  description?: string;
   price: number;
-  // image_url?: string; // Deshabilitado temporalmente
+  image_url?: string;
+  cloudinary_id?: string;
   is_available: boolean;
-  display_order: number;
-  created_at: string;     
-  updated_at: string;       
+  is_recommended: boolean;
+  created_at: string;
+  updated_at: string;
 }
 
 // (POST) Crear producto
-export type ProductCreate = Omit<Product, 'id' | 'created_at' | 'updated_at'>;
+export type ProductCreate = Omit<Product, 'id' | 'created_at' | 'updated_at'> & {
+  image_base64?: string;
+};
 
 // (PATCH) Actualización parcial
-export type ProductPatch = Partial<Omit<Product, 'created_at' | 'updated_at'>>;
+export type ProductPatch = Partial<Omit<Product, 'created_at' | 'updated_at'>> & {
+  image_base64?: string;
+};
 
 // (PUT) Actualización completa
-export type ProductUpdate = Omit<Product,  'created_at' | 'updated_at'>;
+export type ProductUpdate = Omit<Product,  'created_at' | 'updated_at'> & {
+  image_base64?: string;
+};
 
 // (GET) Listado simple
 export type ProductList = Product[];

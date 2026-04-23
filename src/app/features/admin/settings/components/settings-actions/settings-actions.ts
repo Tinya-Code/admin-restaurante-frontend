@@ -8,7 +8,7 @@ import { LucideAngularModule, AlertTriangle } from 'lucide-angular';
   imports: [CommonModule, LucideAngularModule],
   templateUrl: './settings-actions.html',
 })
-export class SettingsActions {
+export class SettingsActionsComponent {
   hasChanges = input<boolean>(false);
   isValid = input<boolean>(true);
   isSaving = input<boolean>(false);

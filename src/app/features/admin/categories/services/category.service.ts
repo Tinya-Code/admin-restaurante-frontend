@@ -8,6 +8,7 @@ import {
   CategoryCreate,
   CategoryUpdate,
   CategoryList,
+  CategoryType,
 } from '../../../../core/models/category.model';
 import { SearchService } from '../../../../core/services/search.service';
 
@@ -23,13 +24,36 @@ export class CategoryService {
   private readonly _cache = signal<ApiResponse<CategoryList> | null>(null);
   private readonly _lastParams = signal<string>('');
   private readonly _activeCategories = signal<Category[] | null>(null);
+  private readonly _categoryTypes = signal<CategoryType[] | null>(null);
 
   public readonly cache = this._cache.asReadonly();
   public readonly activeCategories = this._activeCategories.asReadonly();
+  public readonly categoryTypes = this._categoryTypes.asReadonly();
 
   checkCache(params?: any): boolean {
     const paramString = JSON.stringify(params || {});
     return !!this._cache() && this._lastParams() === paramString;
+  }
+
+  /**
+   * Obtener tipos de categoría (secciones permitidas)
+   */
+  getCategoryTypes(): Observable<ApiResponse<CategoryType[]>> {
+    if (this._categoryTypes()) {
+      return of({
+        success: true,
+        data: this._categoryTypes()!,
+        message: 'Loaded from cache',
+      });
+    }
+
+    return this.api.get<CategoryType[]>(this.endpoints.categoryTypes()).pipe(
+      tap(response => {
+        if (response.success && response.data) {
+          this._categoryTypes.set(response.data);
+        }
+      })
+    );
   }
 
   /**
@@ -48,8 +72,6 @@ export class CategoryService {
     if (params.is_active === true && params.limit === 100 && this._activeCategories()) {
       return of({
         success: true,
-        status: 'success',
-        code: '200',
         data: this._activeCategories()!,
         message: 'Loaded from active categories cache',
       });

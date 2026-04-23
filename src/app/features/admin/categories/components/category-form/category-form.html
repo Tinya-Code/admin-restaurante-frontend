@@ -1,21 +1,21 @@
-<main class="min-h-screen bg-stone-50 flex items-start justify-center px-4 py-12">
-  <article class="w-full max-w-xl">
+
+
 
     <!-- ── Header ──────────────────────────────────────────────────────── -->
-    <header class="mb-8">
+    <div   class="mb-8">
       <p class="flex items-center gap-2 text-xs font-semibold tracking-widest uppercase text-amber-600 mb-3">
-        <span class="block w-6 h-px bg-amber-600" aria-hidden="true"></span>
+        
         Panel de administración
       </p>
-      <h1 class="text-3xl font-bold text-stone-900 tracking-tight leading-tight">
-        Nueva categoría
+      <h1 class="text-3xl flex  items-center gap-2 font-bold text-accent tracking-tight leading-tight">
+       <span class="block w-10 h-1 bg-accent" aria-hidden="true"></span> Nueva categoría
       </h1>
       <p class="mt-2 text-sm text-stone-500">
         Los campos marcados con
         <abbr title="obligatorio" class="text-red-500 font-semibold no-underline">*</abbr>
         son obligatorios.
       </p>
-    </header>
+    </div>
 
     <!-- ── Card ────────────────────────────────────────────────────────── -->
     <section
@@ -26,6 +26,38 @@
       <form [formGroup]="form" (ngSubmit)="onSubmit()" novalidate>
 
         <section aria-label="Campos del formulario" class="px-8 py-8 flex flex-col gap-6">
+
+          <!-- ── category type ────────────────────────────────────────── -->
+          <fieldset class="flex flex-col gap-1.5 border-none p-0 m-0">
+            <label for="type_id"
+              class="text-sm font-semibold text-stone-700 flex items-center gap-1">
+              Tipo de sección
+              <small class="font-normal text-stone-400 no-italic">(opcional)</small>
+            </label>
+
+            <div class="relative">
+              <select
+                id="type_id"
+                formControlName="type_id"
+                class="w-full appearance-none rounded-xl border border-stone-200 bg-stone-50 px-4 py-2.5 text-sm text-stone-800
+                       outline-none transition-all duration-150
+                       focus:ring-2 focus:ring-amber-400 focus:border-amber-400"
+              >
+                <option value="">Selecciona un tipo de sección...</option>
+                @for (type of categoryTypes(); track type.id) {
+                  <option [value]="type.id">{{ type.name }}</option>
+                }
+              </select>
+              <div class="pointer-events-none absolute inset-y-0 right-0 flex items-center px-4 text-stone-400">
+                <svg class="h-4 w-4 fill-current" viewBox="0 0 20 20">
+                  <path d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z" />
+                </svg>
+              </div>
+            </div>
+            <p class="text-[10px] text-stone-400 leading-tight">
+              Ayuda a organizar tu menú (ej. platos fuertes, bebidas).
+            </p>
+          </fieldset>
 
           <!-- ── name ────────────────────────────────────────────────── -->
           <fieldset class="flex flex-col gap-1.5 border-none p-0 m-0">
@@ -63,6 +95,29 @@
                 @if (nameCtrl.errors?.['required']) { El nombre es obligatorio. }
                 @if (nameCtrl.errors?.['maxlength']) { El nombre no puede superar los 100 caracteres. }
               </p>
+            }
+
+            <!-- ── Suggestions ── -->
+            @if (suggestions().length > 0) {
+              <div class="mt-2 animate-in fade-in slide-in-from-top-1 duration-200">
+                <header class="flex items-center gap-1.5 mb-2 px-1">
+                  <lucide-icon [img]="Sparkles" class="text-amber-500" [size]="12"></lucide-icon>
+                  <span class="text-[10px] uppercase tracking-wider font-bold text-stone-400">Sugerencias populares</span>
+                </header>
+                <div class="flex flex-wrap gap-1.5">
+                  @for (suggestion of suggestions(); track $index) {
+                    <button
+                      type="button"
+                      (click)="onSelectSuggestion(suggestion)"
+                      class="px-2.5 py-1 rounded-full text-xs font-medium border border-stone-200 bg-white
+                             text-stone-600 hover:border-amber-300 hover:bg-amber-50 hover:text-amber-700
+                             transition-all duration-150 active:scale-95 shadow-sm"
+                    >
+                      {{ suggestion }}
+                    </button>
+                  }
+                </div>
+              </div>
             }
           </fieldset>
 
@@ -197,5 +252,3 @@
       </form>
     </section>
 
-  </article>
-</main>

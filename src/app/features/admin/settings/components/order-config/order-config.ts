@@ -1,5 +1,5 @@
+import { Component, effect, inject, input, OnInit, output } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { Component, inject, input, OnInit, output } from '@angular/core';
 import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
 import { LucideAngularModule, CheckCircle2, Clock, Info, AlertCircle } from 'lucide-angular';
 import {
@@ -15,7 +15,7 @@ import {
   imports: [CommonModule, ReactiveFormsModule, LucideAngularModule],
   templateUrl: './order-config.html',
 })
-export class OrderConfig implements OnInit {
+export class OrderConfigComponent implements OnInit {
   config = input<OrderConfigModel>({
     enabled: false,
     max_order_quantity: 1,
@@ -25,6 +25,8 @@ export class OrderConfig implements OnInit {
     delivery_fee: 0,
     payment_methods: [],
   });
+
+  readOnly = input<boolean>(false);
 
   configChange = output<OrderConfigModel>();
   isValid = output<boolean>();
@@ -48,11 +50,22 @@ export class OrderConfig implements OnInit {
     payment_methods: [[]],
   });
 
-  ngOnInit(): void {
-    if (this.config()) {
-      this.orderForm.patchValue(this.config(), { emitEvent: false });
-    }
+  constructor() {
+    effect(() => {
+      const config = this.config();
+      if (config) {
+        this.orderForm.patchValue(config, { emitEvent: false });
+      }
 
+      if (this.readOnly()) {
+        this.orderForm.disable({ emitEvent: false });
+      } else {
+        this.orderForm.enable({ emitEvent: false });
+      }
+    });
+  }
+
+  ngOnInit(): void {
     this.setupFormListeners();
     // Emit initial status
     this.isValid.emit(this.orderForm.valid);
@@ -60,6 +73,8 @@ export class OrderConfig implements OnInit {
 
   private setupFormListeners(): void {
     this.orderForm.valueChanges.subscribe((values) => {
+      if (this.readOnly()) return;
+
       const isValid = this.orderForm.valid;
       this.isValid.emit(isValid);
 

@@ -1,62 +1,191 @@
 @if (!isMobile()) {
-<aside 
-  class="flex flex-col z-40 bg-white border-r border-gray-200 transition-all duration-300 sticky top-16 h-full overflow-y-auto"
-  [class.w-70]="!isCollapsed()"
-  [class.w-20]="isCollapsed()"
->
-  <ul class="flex flex-col gap-1 p-4 flex-1">
-    @for (item of navItems(); track item.id) {
-    <li>
+  <aside
+    class="bg-surface border-r border-border h-full transition-all duration-300 flex flex-col z-50 shadow-sm relative"
+    [class.w-64]="!isCollapsed()"
+    [class.w-20]="isCollapsed()"
+  >
+    <!-- Header / Logo -->
+    <div class="p-6 flex items-center justify-between border-b border-border min-h-[64px]">
+      @if (!isCollapsed()) {
+        <div class="flex items-center gap-2 animate-in fade-in duration-300">
+          <div class="w-8 h-8 bg-primary rounded-lg flex items-center justify-center shadow-md shadow-primary/20">
+            <lucide-icon [img]="UtensilsCrossed" class="text-white w-5 h-5"></lucide-icon>
+          </div>
+          <span class="font-tan text-xl text-primary tracking-tight">SassMenu</span>
+        </div>
+      } @else {
+        <div class="mx-auto w-10 h-10 bg-primary rounded-lg flex items-center justify-center shadow-md shadow-primary/20">
+          <lucide-icon [img]="UtensilsCrossed" class="text-white w-6 h-6"></lucide-icon>
+        </div>
+      }
+    </div>
+
+    <!-- Navigation -->
+    <nav class="flex-1 overflow-y-auto p-4 no-scrollbar">
+      <ul class="space-y-2">
+        @for (item of navItems(); track item.id) {
+          <li>
+            @if (item.children) {
+              <!-- Dropdown Item -->
+              <button
+                (click)="onItemClick(item)"
+                class="w-full flex items-center justify-between px-4 py-3 rounded-xl transition-all duration-200 group cursor-pointer"
+                [class.bg-primary-light/30]="isParentActive(item)"
+                [class.text-primary]="isParentActive(item)"
+                [class.text-text-secondary]="!isParentActive(item)"
+                [class.hover:bg-background]="!isParentActive(item)"
+              >
+                <div class="flex items-center gap-3">
+                  <lucide-icon
+                    [img]="item.icon"
+                    [class.text-primary]="isParentActive(item)"
+                    [class.text-text-muted]="!isParentActive(item)"
+                    class="w-5 h-5 shrink-0 group-hover:scale-110 transition-transform"
+                  ></lucide-icon>
+                  @if (!isCollapsed()) {
+                    <span class="font-medium whitespace-nowrap">{{ item.label }}</span>
+                  }
+                </div>
+                @if (!isCollapsed()) {
+                  <lucide-icon
+                    [img]="ChevronDownIcon"
+                    class="w-4 h-4 transition-transform duration-300"
+                    [class.rotate-180]="isSubmenuExpanded(item.id)"
+                    [class.text-primary]="isParentActive(item)"
+                  ></lucide-icon>
+                }
+              </button>
+
+              <!-- Submenu -->
+              @if (isSubmenuExpanded(item.id) && !isCollapsed()) {
+                <ul class="mt-1 ml-4 pl-4 border-l-2 border-primary-light flex flex-col gap-1 transition-all duration-300 animate-in slide-in-from-top-2">
+                  @for (child of item.children; track child.id) {
+                    <li>
+                      <a
+                        [routerLink]="child.route"
+                        routerLinkActive="bg-primary/10 text-primary font-semibold"
+                        [routerLinkActiveOptions]="{ exact: true }"
+                        class="flex items-center gap-2 px-4 py-2.5 text-sm text-text-secondary rounded-lg hover:bg-background hover:text-primary transition-all group"
+                        (click)="navigationClick.emit(child.id)"
+                      >
+                        <div class="w-1.5 h-1.5 rounded-full bg-current opacity-40 group-hover:opacity-100 transition-opacity"></div>
+                        {{ child.label }}
+                      </a>
+                    </li>
+                  }
+                </ul>
+              }
+            } @else {
+              <!-- Single Link Item -->
+              <a
+                [routerLink]="item.route"
+                routerLinkActive="bg-primary text-white shadow-lg shadow-primary/25"
+                #rla="routerLinkActive"
+                [routerLinkActiveOptions]="{ exact: false }"
+                class="flex items-center gap-3 px-4 py-3 rounded-xl transition-all duration-200 group text-text-secondary hover:bg-background hover:text-primary"
+                [class.justify-center]="isCollapsed()"
+                (click)="onItemClick(item)"
+              >
+                <lucide-icon
+                  [img]="item.icon"
+                  class="w-5 h-5 shrink-0 group-hover:scale-110 transition-transform"
+                  [class.text-white]="rla.isActive"
+                ></lucide-icon>
+                @if (!isCollapsed()) {
+                  <span class="font-medium whitespace-nowrap">{{ item.label }}</span>
+                }
+              </a>
+            }
+          </li>
+        }
+      </ul>
+    </nav>
+
+    <!-- Footer / Collapse Button -->
+    <div class="p-4 border-t border-border">
       <button
-        (click)="onItemClick(item.id)"
-        class="flex items-center gap-3 px-4 py-3 rounded-lg transition-all duration-200 w-full text-left group"
-        [class.bg-teal-50]="isActive(item.id)"
-        [class.text-teal-600]="isActive(item.id)"
-        [class.text-gray-600]="!isActive(item.id)"
-        [class.hover:bg-gray-50]="!isActive(item.id)"
-        [class.hover:text-gray-900]="!isActive(item.id)"
-        [attr.aria-label]="item.label"
+        (click)="toggleCollapse()"
+        class="w-full flex items-center gap-3 px-4 py-2 rounded-lg text-text-muted hover:text-primary hover:bg-background transition-all cursor-pointer"
+        [class.justify-center]="isCollapsed()"
       >
-        <lucide-icon 
-            [img]="item.icon" 
-            class="w-5 h-5 shrink-0"
-            [class.text-teal-600]="isActive(item.id)"
-            [class.text-gray-400]="!isActive(item.id)"
-            [class.group-hover:text-gray-600]="!isActive(item.id)"
-        ></lucide-icon>
+        <lucide-icon [img]="isCollapsed() ? ChevronRightIcon : ChevronLeftIcon" class="w-5 h-5"></lucide-icon>
         @if (!isCollapsed()) {
-        <span class="font-medium whitespace-nowrap">{{ item.label }}</span>
+          <span class="text-sm font-medium">Contraer</span>
         }
       </button>
-    </li>
-    }
-  </ul>
-
-  <div class="p-4 border-t border-gray-100 flex justify-end" [class.justify-center]="isCollapsed()">
-    <button
-      (click)="toggleCollapse()"
-      class="flex items-center justify-center w-8 h-8 rounded-md bg-gray-50 text-gray-500 hover:bg-gray-100 hover:text-gray-700 transition-colors"
-    >
-      <lucide-icon [img]="isCollapsed() ? ChevronRightIcon : ChevronLeftIcon" class="w-4 h-4"></lucide-icon>
-    </button>
-  </div>
-</aside>
+    </div>
+  </aside>
 } @else {
-<nav class="fixed bottom-0 left-0 right-0 z-1000 flex items-center justify-around bg-white border-t border-gray-200 px-2 py-3 shadow-[0_-2px_10px_rgba(0,0,0,0.05)]">
-  <ul class="flex w-full justify-around items-center">
-    @for (item of navItems(); track item.id) {
-    <li class="flex-1">
-      <button
-        (click)="onItemClick(item.id)"
-        class="flex flex-col items-center gap-1 w-full transition-colors"
-        [class.text-teal-600]="isActive(item.id)"
-        [class.text-gray-400]="!isActive(item.id)"
-      >
-        <lucide-icon [img]="item.icon" class="w-6 h-6"></lucide-icon>
-        <span class="text-[10px] font-medium uppercase tracking-wider">{{ item.label }}</span>
-      </button>
-    </li>
-    }
-  </ul>
-</nav>
+  <nav class="fixed bottom-0 left-0 right-0 z-50 flex items-center bg-secondary px-2 py-3 shadow-2xl border-t border-white/5">
+    <ul class="flex w-full justify-around items-center relative">
+      @for (item of navItems(); track item.id; let i = $index) {
+        <li class="flex-1 relative">
+          <!-- Stacked Submenu for Mobile -->
+          @if (item.children && mobileSubmenuOpen() === item.id) {
+            <div 
+              class="absolute bottom-full left-1/2 -translate-x-1/2 mb-4 w-48 bg-secondary rounded-2xl shadow-xl border border-white/10 p-2 animate-in fade-in slide-in-from-bottom-4 transition-all z-[60]"
+            >
+              <ul class="flex flex-col gap-1">
+                @for (child of item.children; track child.id) {
+                  <li>
+                    <a
+                      [routerLink]="child.route"
+                      routerLinkActive="bg-white/10 text-white"
+                      class="flex items-center gap-3 px-4 py-3 rounded-xl text-sm text-text-muted hover:text-white transition-colors"
+                      (click)="onItemClick(child)"
+                    >
+                      <lucide-icon [img]="child.icon" class="w-4 h-4"></lucide-icon>
+                      <span class="font-medium">{{ child.label }}</span>
+                    </a>
+                  </li>
+                }
+              </ul>
+              <!-- Arrow Down Tip -->
+              <div class="absolute top-full left-1/2 -translate-x-1/2 -mt-1 border-8 border-transparent border-t-secondary"></div>
+            </div>
+          }
+
+          <button
+            class="flex flex-col items-center gap-1 w-full transition-colors duration-500 relative"
+            [class.text-white]="isParentActive(item)"
+            [class.text-text-muted]="!isParentActive(item)"
+            (click)="onItemClick(item)"
+          >
+            <!-- Highlight SVG -->
+            <div
+              class="absolute -top-11 w-40 -z-10 transition-transform duration-500 md:hidden pointer-events-none"
+              [ngClass]="{
+                'translate-y-0 opacity-100': isParentActive(item) || (item.route && currentUrl() === item.route),
+                'translate-y-7 opacity-0': !(isParentActive(item) || (item.route && currentUrl() === item.route)),
+              }"
+            >
+              <svg class="w-full h-auto" viewBox="0 0 202.9 45.5">
+                <path
+                  d="M6.7,45.5c5.7,0.1,14.1-0.4,23.3-4c5.7-2.3,9.9-5,18.1-10.5c10.7-7.1,11.8-9.2,20.6-14.3c5-2.9,9.2-5.2,15.2-7
+      c7.1-2.1,13.3-2.3,17.6-2.1c4.2-0.2,10.5,0.1,17.6,2.1c6.1,1.8,10.2,4.1,15.2,7c8.8,5,9.9,7.1,20.6,14.3c8.3,5.5,12.4,8.2,18.1,10.5
+      c9.2,3.6,17.6,4.2,23.3,4H6.7z"
+                  fill="var(--color-secondary)"
+                />
+              </svg>
+            </div>
+            
+            <lucide-icon
+              [img]="item.icon"
+              class="w-8 h-8 text-lg flex justify-center items-center rounded-full transition-all duration-300"
+              [ngClass]="{
+                '-translate-y-4 z-10 scale-125 bg-primary p-2 shadow-lg shadow-primary/40 text-white': isParentActive(item) || (item.route && currentUrl() === item.route),
+                'translate-y-0 scale-100 text-text-muted': !(isParentActive(item) || (item.route && currentUrl() === item.route)),
+              }"
+            ></lucide-icon>
+
+            <span
+              class="text-[10px] font-bold uppercase tracking-widest transition-colors duration-300"
+              [class.text-white]="isParentActive(item) || (item.route && currentUrl() === item.route)"
+              [class.text-text-muted]="!(isParentActive(item) || (item.route && currentUrl() === item.route))"
+            >{{ item.label }}</span>
+          </button>
+        </li>
+      }
+    </ul>
+  </nav>
 }

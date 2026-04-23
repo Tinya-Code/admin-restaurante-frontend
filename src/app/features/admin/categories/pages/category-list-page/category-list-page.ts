@@ -44,6 +44,7 @@ export class CategoryListPage {
 
   readonly columns: TableColumn[] = [
     { key: 'name', label: 'Nombre', mobileOrder: 1 },
+    { key: 'type_name', label: 'Sección', hideOnMobile: true },
     { key: 'description', label: 'Descripción', hideOnMobile: true },
     { key: 'display_order', label: 'Orden', width: '100px', align: 'center', hideOnMobile: true },
   ];
@@ -164,7 +165,7 @@ export class CategoryListPage {
   private editCategory(category: any): void {
     console.log('Editar:', category);
     this.notification.info(`Editando categoría ${category.name}`);
-    this.router.navigate(['/admin/category-form', category.id]);
+    this.router.navigate(['/admin/menu/category-form', category.id]);
   }
 
   private viewCategory(category: any): void {

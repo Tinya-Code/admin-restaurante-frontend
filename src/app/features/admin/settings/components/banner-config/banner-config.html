@@ -10,10 +10,10 @@
       type="button"
       (click)="fileInput.click()"
       [disabled]="uploading() || banners().length >= 2"
-      class="flex items-center justify-center gap-2 px-4 py-2 bg-amber-500 text-white rounded-xl hover:bg-amber-600 transition-all shadow-sm hover:shadow-md disabled:opacity-50 active:scale-95"
+      class="flex items-center justify-center gap-2 px-4 py-2 bg-primary text-white rounded-xl hover:bg-primary-hover transition-all shadow-sm hover:shadow-md disabled:opacity-50 active:scale-95 text-sm"
     >
       <lucide-icon [img]="uploading() ? AlertIcon : PlusIcon" class="w-4 h-4"></lucide-icon>
-      <span class="font-medium">{{ uploading() ? 'Subiendo...' : 'Nuevo Banner' }}</span>
+      <span class="font-bold">{{ uploading() ? 'Subiendo...' : 'Nuevo Banner' }}</span>
     </button>
     <input
       #fileInput
@@ -28,24 +28,24 @@
   @if (loading()) {
     <div class="flex items-center justify-center p-12">
       <div class="relative">
-        <div class="w-12 h-12 rounded-full border-4 border-amber-100 border-t-amber-500 animate-spin"></div>
+        <div class="w-12 h-12 rounded-full border-4 border-primary-light border-t-primary animate-spin"></div>
       </div>
     </div>
   } @else if (banners().length === 0) {
     <!-- Empty State -->
-    <div class="flex flex-col items-center justify-center p-12 border-2 border-dashed border-gray-200 rounded-2xl bg-gray-50/50">
-      <div class="w-16 h-16 bg-white rounded-full shadow-sm flex items-center justify-center mb-4">
-        <lucide-icon [img]="ImageIcon" class="w-8 h-8 text-amber-500"></lucide-icon>
+    <div class="flex flex-col items-center justify-center p-12 border-2 border-dashed border-border rounded-2xl bg-background">
+      <div class="w-16 h-16 bg-surface rounded-full shadow-sm flex items-center justify-center mb-4 border border-border">
+        <lucide-icon [img]="ImageIcon" class="w-8 h-8 text-primary"></lucide-icon>
       </div>
-      <p class="text-gray-900 font-semibold mb-1">Sin banners configurados</p>
-      <p class="text-sm text-gray-400 text-center max-w-xs">Sube banners horizontales (1200x400 recomendado) para captar la atención de tus clientes.</p>
+      <p class="text-text-primary font-bold mb-1">Sin banners configurados</p>
+      <p class="text-sm text-text-muted text-center max-w-xs">Sube banners horizontales (1200x400 recomendado) para captar la atención de tus clientes.</p>
     </div>
   } @else {
     <!-- List -->
     <div class="grid grid-cols-1 gap-4">
       @for (banner of banners(); track banner.id; let i = $index) {
         <div 
-          class="flex flex-col sm:flex-row items-start sm:items-center gap-4 p-4 bg-white border border-gray-100 rounded-2xl transition-all group hover:border-amber-200 hover:shadow-sm"
+          class="flex flex-col sm:flex-row items-start sm:items-center gap-4 p-4 bg-surface border border-border rounded-2xl transition-all group hover:border-primary hover:shadow-md"
           [class.opacity-60]="!banner.is_active"
         >
           <!-- Order Controls -->
@@ -53,7 +53,7 @@
             <button 
               (click)="moveUp(i)" 
               [disabled]="i === 0"
-              class="p-1.5 hover:bg-amber-50 text-gray-400 hover:text-amber-600 rounded-lg transition-colors disabled:opacity-20"
+              class="p-1.5 hover:bg-primary-light text-text-muted hover:text-primary rounded-lg transition-colors disabled:opacity-20"
               title="Mover arriba"
             >
               <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 15l7-7 7 7"></path></svg>
@@ -61,7 +61,7 @@
             <button 
               (click)="moveDown(i)" 
               [disabled]="i === banners().length - 1"
-              class="p-1.5 hover:bg-amber-50 text-gray-400 hover:text-amber-600 rounded-lg transition-colors disabled:opacity-20"
+              class="p-1.5 hover:bg-primary-light text-text-muted hover:text-primary rounded-lg transition-colors disabled:opacity-20"
               title="Mover abajo"
             >
               <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path></svg>
@@ -87,8 +87,9 @@
             <div class="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity flex items-end justify-center pb-2 gap-2">
               <button
                 (click)="toggleStatus(banner)"
-                class="p-2 rounded-full bg-white/90 hover:bg-white text-gray-900 shadow-sm transition-all hover:scale-110"
-                [class.text-amber-500]="banner.is_active"
+                class="p-2 rounded-full bg-surface shadow-sm transition-all hover:scale-110"
+                [class.text-primary]="banner.is_active"
+                [class.text-text-muted]="!banner.is_active"
                 [title]="banner.is_active ? 'Desactivar' : 'Activar'"
               >
                 <lucide-icon [img]="PowerIcon" class="w-3.5 h-3.5"></lucide-icon>
@@ -122,23 +123,23 @@
   }
   
   <!-- Guidelines -->
-  <div class="bg-amber-50/50 rounded-2xl p-5 flex gap-4 items-start border border-amber-100/50">
-    <div class="p-2 bg-amber-100 rounded-xl">
-      <lucide-icon [img]="AlertIcon" class="w-5 h-5 text-amber-600"></lucide-icon>
+  <div class="bg-primary-light rounded-2xl p-5 flex gap-4 items-start border border-primary/20">
+    <div class="p-2 bg-white rounded-xl shadow-sm">
+      <lucide-icon [img]="AlertIcon" class="w-5 h-5 text-primary"></lucide-icon>
     </div>
-    <div class="text-xs text-amber-900/80 leading-relaxed">
-      <p class="font-bold text-amber-900 mb-1">Mejores resultados:</p>
+    <div class="text-xs text-text-primary leading-relaxed">
+      <p class="font-bold mb-1">Mejores resultados:</p>
       <ul class="space-y-1 opacity-90">
-        <li class="flex items-center gap-1.5 font-medium">
-          <span class="w-1 h-1 rounded-full bg-amber-400"></span>
+        <li class="flex items-center gap-1.5 font-bold">
+          <span class="w-1 h-1 rounded-full bg-primary"></span>
           Usa imágenes de 1200x400 píxeles.
         </li>
-        <li class="flex items-center gap-1.5 font-medium">
-          <span class="w-1 h-1 rounded-full bg-amber-400"></span>
+        <li class="flex items-center gap-1.5 font-bold">
+          <span class="w-1 h-1 rounded-full bg-primary"></span>
           Mantén el contenido principal al centro.
         </li>
-        <li class="flex items-center gap-1.5 font-medium">
-          <span class="w-1 h-1 rounded-full bg-amber-400"></span>
+        <li class="flex items-center gap-1.5 font-bold">
+          <span class="w-1 h-1 rounded-full bg-primary"></span>
           Evita bordes con información clave.
         </li>
       </ul>

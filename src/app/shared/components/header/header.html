@@ -22,10 +22,10 @@
         >
           <!-- User Avatar -->
           <div class="relative">
-            @if (user()?.avatar) {
+            @if (user()?.photoUrl) {
               <img
-                [src]="user()?.avatar"
-                [alt]="user()?.name"
+                [src]="user()?.photoUrl"
+                [alt]="user()?.displayName"
                 class="w-8 h-8 sm:w-9 sm:h-9 rounded-full object-cover border-2 border-gray-200"
                 (error)="$event.target.style.display = 'none'"
               />
@@ -48,7 +48,7 @@
           <!-- User Info (hidden on mobile) -->
           <div class="hidden md:flex flex-col items-start min-w-0">
             <span class="text-sm font-medium text-gray-900 truncate max-w-[150px]">
-              {{ user()?.name }}
+              {{ user()?.displayName }}
             </span>
             <span class="text-xs text-gray-500 truncate max-w-[150px]">
               {{  "Admin" }}
@@ -71,7 +71,7 @@
             <!-- User Info Card (mobile only) -->
             <div class="md:hidden px-4 py-3 border-b border-gray-200">
               <p class="text-sm font-medium text-gray-900 truncate">
-                {{ user()?.name }}
+                {{ user()?.displayName }}
               </p>
               <p class="text-xs text-gray-500 truncate mt-0.5">
                 {{ user()?.email }}
@@ -99,6 +99,18 @@
                 <lucide-angular [img]="settingsIcon" class="w-4 h-4 text-gray-500" />
                 <span>Configuración</span>
               </button>
+
+              <!-- Switch Restaurant -->
+              @if (tenantService.memberships().length > 1) {
+                <button
+                  type="button"
+                  (click)="changeRestaurant()"
+                  class="w-full flex items-center gap-3 px-4 py-2.5 text-sm text-gray-700 hover:bg-gray-50 transition-colors"
+                >
+                  <lucide-angular [img]="refreshIcon" class="w-4 h-4 text-gray-500" />
+                  <span>Cambiar restaurante</span>
+                </button>
+              }
 
               <!-- Divider -->
               <div class="border-t border-gray-200 my-1"></div>

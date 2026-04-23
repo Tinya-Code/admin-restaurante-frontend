@@ -239,7 +239,7 @@ export class ProductListPage {
   private editProduct(product: any): void {
     console.log('Editar:', product);
     this.notification.info(`Editando producto ${product.name}`);
-    this.router.navigate(['/admin/product-form', product.id]);
+    this.router.navigate(['/admin/menu/product-form', product.id]);
   }
 
   private viewProduct(product: any): void {

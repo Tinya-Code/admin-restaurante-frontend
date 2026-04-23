@@ -1,7 +1,7 @@
+import { Component, effect, inject, input, OnInit, output, ChangeDetectionStrategy } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { Component, inject, input, OnInit, output } from '@angular/core';
 import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
-import { LucideAngularModule, MessageSquare } from 'lucide-angular';
+import { LucideAngularModule, MessageSquare, Info } from 'lucide-angular';
 
 import {
   WhatsAppConfig as WhatsAppConfigModel,
@@ -14,7 +14,7 @@ import {
   imports: [CommonModule, ReactiveFormsModule, LucideAngularModule],
   templateUrl: './whatsapp-config.html',
 })
-export class WhatsAppConfig implements OnInit {
+export class WhatsAppConfigComponent implements OnInit {
   config = input<WhatsAppConfigModel>({
     enabled: false,
     number: '',
@@ -24,10 +24,13 @@ export class WhatsAppConfig implements OnInit {
     auto_include_restaurant_name: true,
   });
 
+  readOnly = input<boolean>(false);
+
   configChange = output<WhatsAppConfigModel>();
   isValid = output<boolean>();
 
   readonly MessageSquareIcon = MessageSquare;
+  readonly InfoIcon = Info;
   readonly maxLength = WHATSAPP_MESSAGE_MAX_LENGTH;
   private fb = inject(FormBuilder);
 
@@ -40,11 +43,22 @@ export class WhatsAppConfig implements OnInit {
     auto_include_restaurant_name: [true],
   });
 
-  ngOnInit(): void {
-    if (this.config()) {
-      this.whatsappForm.patchValue(this.config(), { emitEvent: false });
-    }
+  constructor() {
+    effect(() => {
+      const config = this.config();
+      if (config) {
+        this.whatsappForm.patchValue(config, { emitEvent: false });
+      }
 
+      if (this.readOnly()) {
+        this.whatsappForm.disable({ emitEvent: false });
+      } else {
+        this.whatsappForm.enable({ emitEvent: false });
+      }
+    });
+  }
+
+  ngOnInit(): void {
     this.setupFormListeners();
     // Emit initial status
     this.isValid.emit(this.whatsappForm.valid);
@@ -52,6 +66,8 @@ export class WhatsAppConfig implements OnInit {
 
   private setupFormListeners(): void {
     this.whatsappForm.valueChanges.subscribe((values) => {
+      if (this.readOnly()) return;
+
       const isValid = this.whatsappForm.valid;
       this.isValid.emit(isValid);
 
